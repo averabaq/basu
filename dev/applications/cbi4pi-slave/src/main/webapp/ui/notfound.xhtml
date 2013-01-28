@@ -1,0 +1,54 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<meta http-equiv="Pragma" content="no-cache" />
+	<meta http-equiv="Cache-Control" content="no-cache" />
+	<meta http-equiv="Cache-Control" content="no-store" />
+	<meta http-equiv="Cache-Control" content="private" />
+	<meta http-equiv="Cache-Control" content="must-revalidate" />
+	<meta http-equiv="Expires" content="-1" />
+	
+	<link rel="Shortcut Icon" href="#{request.contextPath}/resources/images/trem.ico" />
+		
+	<title>#{navigation.page_title}</title>
+	<style>
+body {
+	background-image: url(#{request.contextPath}/resources/images/background.png);
+	height: 100%;
+	width: 100%;
+	padding: 0;
+	font-family: geneva, arial, helvetica, sans-serif;
+	font-size: 75%;
+	vertical-align: top;
+}
+.div-message {
+	position: relative;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 85%;
+	height: 50%;
+	margin: auto;
+}
+	</style>
+</h:head>
+<h:body>
+	<h:form>
+		<div class="div-message">
+			<center>
+				<h:panelGrid columns="1" style="width: 640px; text-align: center;">			
+					<h:graphicImage library="images" with="128px" height="128px" name="notfound.png" />
+					<h3 style="color: #ffffff; text-align: justify;">#{navigation.resource_not_found_message}</h3>
+				</h:panelGrid>
+			</center>
+		</div>
+	</h:form>
+</h:body>
+</html>

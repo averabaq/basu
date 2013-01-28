@@ -1,0 +1,45 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+<f:view contentType="text/html">
+	<h:head>
+		<title><ui:insert name="title">#{navigation.page_title}</ui:insert>
+		</title>
+		<meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
+		<meta http-equiv="Pragma" content="no-cache" />
+		<meta http-equiv="Cache-Control" content="no-cache" />
+		<meta http-equiv="Cache-Control" content="no-store" />
+		<meta http-equiv="Cache-Control" content="private" />
+		<meta http-equiv="Cache-Control" content="must-revalidate" />
+		<meta http-equiv="Expires" content="-1" />
+		
+		<link type="text/css" rel="stylesheet" href="#{request.contextPath}/resources/css/style.css" />
+		<link rel="Shortcut Icon" href="#{request.contextPath}/resources/images/f4bpa.ico" />
+	</h:head>
+	<h:body>					
+		<h:form id="eventDataTabForm">
+			<p:outputPanel id="eventDataTabTitle" autoUpdate="true">
+				<h2>
+					<h:outputText value="Event ID=#{eventController.selectedEvent.eventID} : #{eventController.selectedEvent.processInstance.name}"
+					   title="#{eventController.selectedEvent}" />				   
+				</h2>
+			</p:outputPanel>
+					
+			<p:tabView id="eventDetailTabView">
+				<p:tab id="eventDataTab" title="#{navigation.dialogs_f4bpa_event_data_title}">					
+					<ui:include src="eventDataTable.xhtml" />					
+				</p:tab>
+				<p:tab id="eventPayloadTab" title="#{navigation.dialogs_f4bpa_event_payload_title}">
+					<ui:include src="eventPayloadTable.xhtml" />
+				</p:tab>
+				<p:tab id="eventCorrelationTab" title="#{navigation.dialogs_f4bpa_event_correlation_title}">
+					<ui:include src="eventCorrelationTable.xhtml" />
+				</p:tab>
+			</p:tabView>							
+		</h:form>	
+	</h:body>
+</f:view>
+</html>

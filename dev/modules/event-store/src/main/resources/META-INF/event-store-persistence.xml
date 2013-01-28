@@ -1,0 +1,23 @@
+<persistence xmlns="http://java.sun.com/xml/ns/persistence"  
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  
+             xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/persistence_1_0.xsd"  
+             version="1.0">  
+    <!-- cbi4pi.slave Event Store Persistence Unit -->
+	<persistence-unit name="${cbi4pi.slave.event.store.persistence.unit.name}">
+		<provider>${cbi4pi.slave.event.store.persistence.jpa.provider}</provider>		
+
+		<!-- Properties are set through the applicationContext descriptor file
+		<properties>
+			<property name="hibernate.hbm2ddl.auto"	value="${cbi4pi.slave.event.store.hibernate.persistence.mode}"/>       
+			<property name="hibernate.dialect" value="${cbi4pi.slave.event.store.hibernate.dialect}"/>
+			<property name="hibernate.show_sql" value="${cbi4pi.slave.event.store.hibernate.show_sql}"/>
+			<property name="hibernate.archive.autodetection" value="${cbi4pi.slave.event.store.hibernate.archive.autodetection}"/>
+			<property name="hibernate.connection.driver_class" value="${cbi4pi.slave.event.store.datasource.driver}"/>
+			<property name="hibernate.connection.username" value="${cbi4pi.slave.event.store.datasource.username}"/>
+			<property name="hibernate.connection.password" value="${cbi4pi.slave.event.store.datasource.password}"/>
+			<property name="hibernate.connection.url" value="${cbi4pi.slave.event.store.datasource.url}"/>
+			<property name="hibernate.dialect" value="${cbi4pi.slave.event.store.hibernate.dialect}"/>
+		</properties>
+		-->
+	</persistence-unit>
+</persistence>

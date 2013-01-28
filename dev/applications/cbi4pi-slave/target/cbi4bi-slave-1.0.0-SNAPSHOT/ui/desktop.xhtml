@@ -1,0 +1,104 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+<f:view contentType="text/html">
+	<h:head>
+		<title><ui:insert name="title">#{navigation.page_title}</ui:insert>
+		</title>
+		<meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
+		<meta http-equiv="Pragma" content="no-cache" />
+		<meta http-equiv="Cache-Control" content="no-cache" />
+		<meta http-equiv="Cache-Control" content="no-store" />
+		<meta http-equiv="Cache-Control" content="private" />
+		<meta http-equiv="Cache-Control" content="must-revalidate" />
+		<meta http-equiv="Expires" content="-1" />
+		
+		<link type="text/css" rel="stylesheet" href="#{request.contextPath}/resources/css/style.css" />		
+		<link rel="Shortcut Icon" href="#{request.contextPath}/resources/images/f4bpa.ico" />
+	</h:head>
+
+	<h:body>
+		<h:form id="desktopForm">
+			<p:growl id="message" showDetail="true" sticky="false" />
+			<!--
+			<p:idleMonitor timeout="600000" update="message" idleListener="#{userSessionController.idleListener}" />
+			-->
+			<p:menubar>
+				<p:submenu icon="appleIcon">
+					<p:menuitem value="#{navigation.barmenu_session_about_label}" url="#" onclick="about.show();"></p:menuitem>
+					<p:menuitem value="#{navigation.barmenu_session_disconnect_label}" actionListener="#{userSessionController.logout}" ajax="false"></p:menuitem>					
+				</p:submenu>
+
+				<p:submenu label="#{navigation.barmenu_edit_label}">
+					<p:menuitem value="#{navigation.barmenu_edit_process_mapping_label}" url="#" styleClass="open" onclick="mappings.show()"></p:menuitem>
+					<p:menuitem value="#{navigation.barmenu_edit_process_models_label}" url="#" styleClass="open" onclick="models.show()"></p:menuitem>
+					<p:menuitem value="#{navigation.barmenu_edit_process_instances_label}" url="#" styleClass="open" onclick="instances.show()"></p:menuitem>
+					<p:menuitem value="#{navigation.barmenu_edit_process_events_label}" url="#" styleClass="open"></p:menuitem>
+				</p:submenu>
+
+				<p:submenu label="#{navigation.barmenu_analysis_label}">
+					<p:menuitem value="#{navigation.barmenu_analysis_olap_label}" url="#" styleClass="open"></p:menuitem>
+					<p:menuitem value="#{navigation.barmenu_analysis_bpql_label}" url="#" styleClass="open"></p:menuitem>
+				</p:submenu>
+				
+				<p:submenu label="#{navigation.barmenu_simulation_label}">
+				</p:submenu>				
+
+				<p:submenu label="#{navigation.barmenu_settings_label}">
+					<p:menuitem value="#{navigation.barmenu_settings_monitoring_label}" url="#" styleClass="open"></p:menuitem>
+					<p:menuitem value="#{navigation.barmenu_settings_configuration_label}" url="#" styleClass="open"></p:menuitem>
+				</p:submenu>
+								
+			</p:menubar>	
+
+			<p:dialog widgetVar="welcome" header="#{navigation.welcome_title}" draggable="false" resizable="false" visible="true" modal="true" width="350"> 
+    			<h:panelGrid columns="1" style="width:100%;text-align:center;">
+					<h:graphicImage library="images" name="nuigalway.png" />
+				</h:panelGrid>
+				<h:panelGrid columns="2" style="width:100%; text-align:left;">
+					<h:outputText value="#{navigation.system_title_label}:" style="font-weight: bold;"/>
+					<h:outputText value="#{navigation.system_title}" />
+
+					<h:outputText value="#{navigation.system_title_desc_label}:" style="font-weight: bold;"/>
+					<h:outputText value="#{navigation.system_title_desc}" />
+
+					<h:outputText value="#{navigation.system_version_label}:" style="font-weight: bold;"/>
+					<h:outputText value="#{userSessionController.bundleVersion}" />
+
+					<h:outputText value="#{navigation.system_sysdate_label}:" style="font-weight: bold;"/>
+					<h:outputText value="#{userSessionController.sysDate}" />
+				</h:panelGrid>
+    			<h:panelGrid columns="1" style="width:100%; text-align:center;">
+					<p:commandButton value="#{navigation.dialogs_about_accept_button_label}" onclick="welcome.hide();" global="false" />
+				</h:panelGrid>
+
+				<h:panelGrid columns="1" style="width:100%; text-align: center;">
+					<center>
+						<h:outputLink value="#{navigation.powered_link}" target="_blank" style="color: #0000ff; font-size: 8pt;">#{navigation.powered_company}</h:outputLink>
+					</center>
+				</h:panelGrid>   		
+			</p:dialog>	
+		</h:form>	 
+		
+		<ui:include src="about.xhtml" />		
+		<ui:include src="mappings/mappings.xhtml" />
+		<ui:include src="models/models.xhtml" />
+		<ui:include src="instances/instances.xhtml" />
+		<ui:include src="analysis/analysis.xhtml" />
+		 	 			
+		<p:dock position="bottom">
+			<p:menuitem value="#{navigation.dock_menu_items_mappings_label}" style="color: white;" label="mappings" icon="/resources/images/process-mappings.png" onclick="mappings.show()" url="#" />
+			<p:menuitem value="#{navigation.dock_menu_items_models_label}" style="color: white;" label="models" icon="/resources/images/process-models.png" onclick="models.show()" url="#" />
+			<p:menuitem value="#{navigation.dock_menu_items_instances_label}" style="color: white;" label="instances" icon="/resources/images/process-instances.png" onclick="instances.show()" url="#" />
+			<p:menuitem value="#{navigation.dock_menu_items_analysis_label}" style="color: white;" label="analysis" icon="/resources/images/analysis.png" onclick="analysis.show()" url="#" />
+			<p:menuitem value="#{navigation.dock_menu_items_simulation_label}" style="color: white;" label="simulation" icon="/resources/images/simulation.png" url="#" />
+			<p:menuitem value="#{navigation.dock_menu_items_settings_label}" style="color: white;" label="settings" icon="/resources/images/settings.png" url="#" />
+			<p:menuitem value="#{navigation.dock_menu_items_monitoring_label}" style="color: white;" label="monitoring" icon="/resources/images/monitoring.png" url="#" />
+		</p:dock>		
+	</h:body>
+</f:view>  
+</html>

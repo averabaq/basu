@@ -1,0 +1,94 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+<f:view contentType="text/html">
+	<h:head>
+		<title><ui:insert name="title">#{navigation.page_title}</ui:insert>
+		</title>
+		<meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
+		<meta http-equiv="Pragma" content="no-cache" />
+		<meta http-equiv="Cache-Control" content="no-cache" />
+		<meta http-equiv="Cache-Control" content="no-store" />
+		<meta http-equiv="Cache-Control" content="private" />
+		<meta http-equiv="Cache-Control" content="must-revalidate" />
+		<meta http-equiv="Expires" content="-1" />
+		
+		<link type="text/css" rel="stylesheet" href="#{request.contextPath}/resources/css/style.css" />
+		<link rel="Shortcut Icon" href="#{request.contextPath}/resources/images/f4bpa.ico" />
+	</h:head>
+	<h:body>					
+		<h:form id="eventsTableForm">
+			<p:outputPanel id="instanceTitle" autoUpdate="true">
+				<h2>#{processInstanceController.selectedInstance}</h2>
+			</p:outputPanel>
+										
+			<p:dataTable var="event" id="eventsTable" styleClass="eventsTable" 
+				value="#{processInstanceController.selectedInstance.eventList}" 
+				paginator="true" rows="20" rowsPerPageTemplate="5,10,15,20,25,30"	
+				selection="#{eventController.selectedEvent}" dblClickSelect="true"
+				selectionMode="single" rowKey="#{event.eventID}"			 	 				
+				dynamic="true" update="display" widgetVar="eventsTable"				
+				sortAscMessage="#{navigation.dialogs_f4bpa_events_table_sort_asc_message_label}"
+				sortDescMessage="#{navigation.dialogs_f4bpa_events_table_sort_desc_message_label}"
+				emptyMessage="#{navigation.dialogs_f4bpa_events_table_no_records_found_label}">
+
+				<p:ajax event="rowSelect" listener="#{eventController.loadLazyData}" update=":eventDataTabForm:eventDetailTabView" oncomplete="eventDetail.show()" />  
+
+				<p:column headerText="#{navigation.dialogs_f4bpa_events_table_column_id_label}">
+					<h:outputText value="#{event.eventID}" style="text-align: left;"
+					   title="#{event}" />					
+				</p:column>
+
+				<p:column headerText="#{navigation.dialogs_f4bpa_events_table_column_timestamp_label}">
+					<h:outputText value="#{event.timestamp}" />
+					<!--
+					<h:outputText value="#{event.timestamp}">
+						<f:convertDateTime dateStyle="long" type="both"/>
+					</h:outputText>
+					-->
+				</p:column>
+
+				<!--
+				<p:column headerText="#{navigation.dialogs_f4bpa_events_table_column_process_instance_label}">
+					<h:outputText value="#{event.processInstance.name}" 
+					   title="#{event.processInstance}"/>
+				</p:column>
+				-->
+
+				<p:column headerText="#{navigation.dialogs_f4bpa_events_table_column_activity_instance_label}">
+					<h:outputText value="#{event.activityInstance.name}" 
+					   title="#{event.activityInstance}"/>
+				</p:column>
+				
+				<p:column headerText="#{navigation.dialogs_f4bpa_events_table_column_event_source_name_label}">
+					<h:outputText value="#{event.processInstance.model.source.name}" 
+					 title="#{event.processInstance.model.source}"/>
+				</p:column>
+
+				<p:column headerText="#{navigation.dialogs_f4bpa_events_table_column_model_previous_state_label}">
+					<h:outputText value="#{event.eventDetails.previousState}" />
+				</p:column>
+
+				<p:column headerText="#{navigation.dialogs_f4bpa_events_table_column_model_current_state_label}">
+					<h:outputText value="#{event.eventDetails.currentState}" />
+				</p:column>
+				
+				<!--
+				<p:column style="width: 80px;">		
+					<p:commandButton icon="ui-icon-search" global="true" 
+						oncomplete="eventDetail.show()" 
+						title="#{navigation.dialogs_f4bpa_events_table_column_view_detail_button_label}: #{event}"
+						action="#{eventController.loadLazyData}"
+						update=":eventDataTabForm:eventDetailTabView">
+						<f:setPropertyActionListener target="#{eventController.selectedEvent}" value="#{event}" />  
+					</p:commandButton>	
+				</p:column>
+				-->		
+			</p:dataTable>
+		</h:form>	
+	</h:body>
+</f:view>
+</html>

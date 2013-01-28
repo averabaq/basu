@@ -1,0 +1,77 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+<f:view contentType="text/html">
+	<h:head>
+		<title><ui:insert name="title">#{navigation.page_title}</ui:insert>
+		</title>
+		<meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
+		<meta http-equiv="Pragma" content="no-cache" />
+		<meta http-equiv="Cache-Control" content="no-cache" />
+		<meta http-equiv="Cache-Control" content="no-store" />
+		<meta http-equiv="Cache-Control" content="private" />
+		<meta http-equiv="Cache-Control" content="must-revalidate" />
+		<meta http-equiv="Expires" content="-1" />
+		
+		<link type="text/css" rel="stylesheet" href="#{request.contextPath}/resources/css/style.css" />
+		<link rel="Shortcut Icon" href="#{request.contextPath}/resources/images/f4bpa.ico" />
+	</h:head>
+	<h:body>					
+		<h:form id="modelInstancesTableForm">
+			<p:outputPanel id="modelTitle" autoUpdate="true">
+				<h2>Process Model: #{processModelController.selectedModel.name}</h2>
+			</p:outputPanel>
+			<p:dataTable var="instance" id="modelInstancesTable" styleClass="modelsTable"
+				value="#{processModelController.lazyModel}" 
+				paginator="true" rows="15" rowsPerPageTemplate="5,10,15,20"
+				selection="#{processInstanceController.selectedInstance}" dblClickSelect="true"
+				selectionMode="single" rowKey="#{instance.id}"												 				
+				dynamic="true" update="display" widgetVar="modelInstancesTable"				
+				sortAscMessage="#{navigation.dialogs_f4bpa_model_instances_table_sort_asc_message_label}"
+				sortDescMessage="#{navigation.dialogs_f4bpa_model_instances_table_sort_desc_message_label}"
+				emptyMessage="#{navigation.dialogs_f4bpa_model_instances_table_no_records_found_label}">
+
+				<p:ajax event="rowSelect" listener="#{processInstanceController.loadEvents}" update=":eventsTableForm:eventsTable" oncomplete="events.show()" />  
+
+				<p:column filterBy="#{instance.id}" headerText="#{navigation.dialogs_f4bpa_model_instances_table_column_instance_id_label}">
+					<h:outputText value="#{instance.id}" />
+				</p:column>
+
+				<!--
+				<p:column headerText="#{navigation.dialogs_f4bpa_model_instances_table_column_model_name_label}">
+					<h:outputText value="#{instance.model.name}" />
+				</p:column>
+				-->
+				
+				<p:column filterBy="#{instance.name}" headerText="#{navigation.dialogs_f4bpa_model_instances_table_column_instance_name_label}">
+					<h:outputText value="#{instance.name}" />
+				</p:column>
+
+				<p:column headerText="#{navigation.dialogs_f4bpa_model_instances_table_column_instance_source_id_label}">
+					<h:outputText value="#{instance.instanceSrcId}" />
+				</p:column>
+
+				<p:column headerText="#{navigation.dialogs_f4bpa_model_instances_table_column_instance_source_name_label}">
+					<h:outputText value="#{instance.model.source.name}" />
+				</p:column>
+
+				<p:column headerText="#{navigation.dialogs_f4bpa_model_instances_table_column_instance_source_desc_label}">
+					<h:outputText value="#{instance.model.source.description}" />
+				</p:column>
+
+				<p:column headerText="#{navigation.dialogs_f4bpa_model_instances_table_column_instance_source_inet_address_label}">
+					<h:outputText value="#{instance.model.source.inetAddress}" />
+				</p:column>
+
+				<p:column filterBy="#{instance.correlatorId}" headerText="#{navigation.dialogs_f4bpa_model_instances_table_column_instance_correlation_id_label}">
+					<h:outputText value="#{instance.correlatorId}" />
+				</p:column>
+										
+			</p:dataTable>
+		</h:form>	
+	</h:body>
+</f:view>
+</html>

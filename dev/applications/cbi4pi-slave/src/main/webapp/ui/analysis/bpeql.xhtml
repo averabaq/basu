@@ -1,0 +1,63 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+	<center>	
+	<h:form id="bpeqlForm">
+		<p:panel header="Input Query" toggleable="true"> 
+		 
+			<p:messages id="messages" showDetail="true" autoUpdate="true"/>
+			<p:inputTextarea id="inputarea" rows="10" cols="80" style="font-size: 10pt;"
+				value="#{bpeqlController.query}"/> 
+			<br /> 
+			<br /> 
+			<p:commandButton value="Run Query" actionListener="#{bpeqlController.runQuery}"  
+				title="Run BPEQL Query" update="messages,queryResultTable" /> 
+		</p:panel>
+		<p:panel header="Query Result" toggleable="true">
+			<p:dataTable var="result" id="queryResultTable" styleClass="queryResultTable" 
+				value="#{bpeqlController.queryResults}" 
+				paginator="true" rows="10" rowsPerPageTemplate="5,10,15,20,25,30"								
+				dynamic="true" update="display" widgetVar="queryResultTable"				
+				sortAscMessage="#{navigation.dialogs_f4bpa_bpeql_query_result_table_sort_asc_message_label}"
+				sortDescMessage="#{navigation.dialogs_f4bpa_bpeql_query_result_table_sort_desc_message_label}"
+				emptyMessage="#{navigation.dialogs_f4bpa_bpeql_query_result_table_no_records_found_label}">
+				
+				<p:columns value="#{bpeqlController.columns}" var="column" columnIndexVar="colIndex" style="text-align: right;">		
+					<f:facet name="header">			
+						#{column.header}	
+					</f:facet>		
+					<h:outputText value="#{result[column.property]}" style="text-align: right" rendered="#{column.property == 'id'}"/>
+					<h:outputText value="#{result[column.property]}" style="text-align: right" rendered="#{column.property == 'name'}"/>
+					<h:outputText value="#{result[column.property]}" style="text-align: right" rendered="#{column.property == 'source'}"/>
+					<h:outputText value="#{result[column.property]}" style="text-align: right" rendered="#{column.property == 'model'}"/>
+					<h:outputText value="#{result[column.property]}" style="text-align: right" rendered="#{column.property == 'startTime'}"/>
+					<h:outputText value="#{result[column.property]}" style="text-align: right" rendered="#{column.property == 'endTime'}"/>
+					<h:outputText value="#{result[column.property]}" style="text-align: right" rendered="#{column.property == 'turnAround'}">
+						<f:convertNumber groupingUsed="true" />
+					</h:outputText>	
+					<h:outputText value=" ms" style="text-align: right" rendered="#{column.property == 'turnAround'}" />
+					<h:outputText value="#{result[column.property]}" style="text-align: right" rendered="#{column.property == 'wait'}">
+						<f:convertNumber groupingUsed="true" />
+					</h:outputText>	
+					<h:outputText value=" ms" style="text-align: right" rendered="#{column.property == 'wait'}" />
+					<h:outputText value="#{result[column.property]}" style="text-align: right" rendered="#{column.property == 'changeOver'}">
+						<f:convertNumber groupingUsed="true" />
+					</h:outputText>		
+					<h:outputText value=" ms" style="text-align: right" rendered="#{column.property == 'changeOver'}" />
+					<h:outputText value="#{result[column.property]}" style="text-align: right" rendered="#{column.property == 'processing'}">
+						<f:convertNumber groupingUsed="true" />
+					</h:outputText>	
+					<h:outputText value=" ms" style="text-align: right" rendered="#{column.property == 'processing'}" />
+					<h:outputText value="#{result[column.property]}" style="text-align: right" rendered="#{column.property == 'suspend'}">
+						<f:convertNumber groupingUsed="true" />
+					</h:outputText>	
+					<h:outputText value=" ms" style="text-align: right" rendered="#{column.property == 'suspend'}" />
+				</p:columns>
+			</p:dataTable>
+		</p:panel>
+	</h:form>
+	</center>	
+</html>

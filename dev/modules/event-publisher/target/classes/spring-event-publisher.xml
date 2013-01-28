@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jms="http://www.springframework.org/schema/jms" 
+	xmlns:task="http://www.springframework.org/schema/task" 
+	xmlns:amq="http://activemq.apache.org/schema/core"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+                        http://www.springframework.org/schema/beans/spring-beans.xsd
+                        http://www.springframework.org/schema/context 
+                        http://www.springframework.org/schema/context/spring-context.xsd
+                        http://www.springframework.org/schema/jms 
+                        http://www.springframework.org/schema/jms/spring-jms.xsd
+                        http://www.springframework.org/schema/task 
+                        http://www.springframework.org/schema/task/spring-task.xsd
+                        http://activemq.apache.org/schema/core 
+                        http://activemq.apache.org/schema/core/activemq-core.xsd">
+
+	<!-- enabling annotation driven configuration -->
+	<context:annotation-config />
+	<context:component-scan base-package="es.uc3m.softlab.cbi4pi.slave.ode.event.publisher" />
+
+ 	<!-- creates an activemq connection factory --> 
+	<amq:connectionFactory id="amqConnectionFactory">
+		<property name="brokerURL" value="#{config.brokerUrl}" />
+	</amq:connectionFactory> 	 
+	
+	<!-- connection factory -->
+	<bean id="connectionFactory" class="org.apache.activemq.pool.PooledConnectionFactory">
+		<constructor-arg ref="amqConnectionFactory" />
+	</bean>
+
+	<!-- jms template -->
+	<bean id="jmsTemplate" class="org.springframework.jms.core.JmsTemplate">
+		<constructor-arg ref="connectionFactory" />
+		<property name="sessionTransacted" value="false" />
+		<property name="receiveTimeout" value="5000" />
+	</bean> 
+ 	
+ 	<!-- jms topic message destination -->
+	<bean id="destination" class="org.apache.activemq.command.ActiveMQTopic">
+		<constructor-arg value="es.uc3m.softlab.cbi4pi.slave.event.bpaf" />
+	</bean>
+
+	<!-- task for the event scheduler executor -->
+	<task:annotation-driven executor="eventPublisherExecutor" scheduler="eventPublisherScheduler"/>
+
+	<task:executor id="eventPublisherExecutor" pool-size="15" />
+
+	<task:scheduler id="eventPublisherScheduler" pool-size="10"/>
+
+	<task:scheduled-tasks scheduler="eventPublisherScheduler">
+		<task:scheduled ref="eventScheduler" method="run" 
+			fixed-rate="#{T(java.lang.Long).valueOf(config.timerFixedRate)}"/>
+	</task:scheduled-tasks>
+
+	<!-- to enable a cron based schedule instead of a fixed-rate, 
+	     remove this comment block	and comment that one refering to a
+	     fixed-rate. 
+	<task:scheduled-tasks scheduler="eventPublisherScheduler">
+		<task:scheduled ref="eventScheduler" method="run" 
+		    cron="#{config.timerCron}" /> 
+	</task:scheduled-tasks>
+	 -->
+	 
+	<bean id="eventScheduler" class="es.uc3m.softlab.cbi4pi.slave.ode.event.publisher.EventPublisherScheduler"/>
+
+	<bean name="config" class="es.uc3m.softlab.cbi4pi.slave.ode.event.publisher.Config" scope="singleton"/>
+	
+	<bean id="transactionManager" class="org.apache.geronimo.transaction.manager.GeronimoTransactionManager"/>
+
+	<!-- keeping just for debugging purposes on eclipse 
+	<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName" value="org.postgresql.xa.PGXADataSource" />
+		<property name="url" value="jdbc:postgresql://localhost:5432/ode" />
+		<property name="username" value="ode" />
+		<property name="password" value="ode2f4bpa" />
+	</bean>
+	--> 
+	 
+	<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName" value="org.postgresql.xa.PGXADataSource"/>
+		<property name="url" value="jdbc:postgresql://localhost:5432/ode"/>
+		<property name="username" value="ode"/>
+		<property name="password" value="ode2f4bpa"/>
+	</bean>		
+</beans>

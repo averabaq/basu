@@ -80,6 +80,7 @@ public class EventStoreTest extends AbstractShowcaseTest {
 		source.setDescription("BPEL engine");
 		source.setInetAddress("192.168.1.10");
 		source.setPort(8080);
+		sourceFacade.deleteSource(source);
 		sourceFacade.saveSource(source);
 		
 		ProcessModel processModel = new ProcessModel();		

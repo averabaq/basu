@@ -73,7 +73,7 @@ public class Model implements Serializable {
 	 * @return the {@link #id} property.
 	 */
 	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	//@GeneratedValue(strategy=GenerationType.IDENTITY)
 	public Long getId() {
 		return id;
 	}
@@ -82,7 +82,7 @@ public class Model implements Serializable {
 	 * @param id the {@link #id} property to set
 	 */
 	@Id
-	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="model_sequence")
+	//@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="model_sequence")
 	public void setId(Long id) {
 		this.id = id;
 	}

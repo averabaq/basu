@@ -54,7 +54,7 @@ public class ModelDAOImpl implements ModelDAO {
     @SuppressWarnings("unchecked")
     public List<Model> findAll() throws IllegalArgumentException {
 		logger.debug("Finding all models...");
-		List<Model> list = entityManager.createQuery("from event-store.Model order by id asc").getResultList();
+		List<Model> list = entityManager.createQuery("select m from event-store.Model m order by id asc").getResultList();
 		logger.debug("All models found successfully.");
 		return list;
 	}
@@ -91,7 +91,7 @@ public class ModelDAOImpl implements ModelDAO {
 	 */
     public Model findBySourceData(String modelId, Source source) throws IllegalArgumentException {
     	logger.debug("Retrieving model with source data as pairs of (" + modelId + ", " + source + ")...");
-		Query query = entityManager.createQuery("from event-store.Model m where m.modelSrcId = :sourceId and m.source = :source");
+		Query query = entityManager.createQuery("select m from event-store.Model m where m.modelSrcId = :sourceId and m.source = :source");
 		query.setParameter("sourceId", modelId);
 		query.setParameter("source", source);
 		Model model = null;

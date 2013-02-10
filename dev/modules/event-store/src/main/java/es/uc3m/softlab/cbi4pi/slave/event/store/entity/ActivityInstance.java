@@ -83,7 +83,7 @@ public class ActivityInstance implements Serializable {
 	 * @return the {@link #id} property.
 	 */
 	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	//@GeneratedValue(strategy=GenerationType.IDENTITY)
 	public Long getId() {
 		return id;
 	}
@@ -92,7 +92,7 @@ public class ActivityInstance implements Serializable {
 	 * @param id the {@link #id} property to set
 	 */
 	@Id
-	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="activity_instance_sequence")
+	//@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="activity_instance_sequence")
 	public void setId(Long id) {
 		this.id = id;
 	}

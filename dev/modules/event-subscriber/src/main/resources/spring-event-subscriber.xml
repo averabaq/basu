@@ -30,7 +30,7 @@
 	<bean id="jmsContainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
 		<property name="connectionFactory" ref="connectionFactory"/>
 		<property name="destination" ref="destination"/>
-		<property name="messageListener" ref="/cbi4pi/event-subscriber/service/etlEvent" />
+		<property name="messageListener" ref="/cbi4pi-slave/event-subscriber/service/etlEvent" />
 	</bean>
  	
 	<bean id="destination" class="org.apache.activemq.command.ActiveMQTopic">

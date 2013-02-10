@@ -514,7 +514,8 @@
 	<properties>
 		<vendor>Universidad Carlos III de Madrid</vendor>
 		<vendor-url>http://www.uc3m.es</vendor-url>		
-		<org.apache.activemq.version>5.7.0</org.apache.activemq.version>			<org.hibernate.version>3.6.7.Final</org.hibernate.version>
+		<org.apache.activemq.version>5.7.0</org.apache.activemq.version>			
+		<org.openjpa.version>3.6.7.Final</org.openjpa.version>
 		<org.springframework.version>3.2.0.RELEASE</org.springframework.version>		
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>

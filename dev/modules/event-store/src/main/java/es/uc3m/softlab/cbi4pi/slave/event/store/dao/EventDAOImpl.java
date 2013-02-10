@@ -55,7 +55,7 @@ public class EventDAOImpl implements EventDAO {
     @SuppressWarnings("unchecked")
     public List<Event> findAll() throws IllegalArgumentException {
 		logger.debug("Finding all events...");
-		List<Event> list = entityManager.createQuery("from event-store.Event order by eventID asc").getResultList();
+		List<Event> list = entityManager.createQuery("select e from event-store.Event e order by eventID asc").getResultList();
 		logger.debug("All events found successfully.");
 		return list;
 	}
@@ -93,7 +93,7 @@ public class EventDAOImpl implements EventDAO {
     @SuppressWarnings("unchecked")
     public List<Event> findAllByProcessInstId(String processInstId) throws IllegalArgumentException {
 		logger.debug("Finding all events of process instance with id " + processInstId + "...");
-		Query query = entityManager.createQuery("from event-store.Event e where e.processInstanceID = :processInstId order by eventID asc");
+		Query query = entityManager.createQuery("select e from event-store.Event e where e.processInstanceID = :processInstId order by eventID asc");
 		query.setParameter("processInstId", processInstId);
 		List<Event> list = query.getResultList();
 		logger.debug("All events of process instance with id " + processInstId + " found successfully.");
@@ -113,7 +113,7 @@ public class EventDAOImpl implements EventDAO {
     @SuppressWarnings("unchecked")
     public List<Event> findAllByProcessName(String processName) throws IllegalArgumentException {
 		logger.debug("Finding all events of process with name " + processName + "...");
-		Query query = entityManager.createQuery("from event-store.Event e where e.processName = :processName order by eventID asc");
+		Query query = entityManager.createQuery("select e from event-store.Event e where e.processName = :processName order by eventID asc");
 		query.setParameter("processName", processName);
 		List<Event> list = query.getResultList();
 		logger.debug("All events of process with name " + processName + " found successfully.");

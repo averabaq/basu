@@ -160,7 +160,7 @@ public class Event implements Comparable<Event>, Serializable {
      */
 	@Id
 	@Column(name="event_id", length=150, nullable=false)
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	//@GeneratedValue(strategy=GenerationType.IDENTITY)
     @XmlAttribute(name = "EventID", required = true)
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
     public long getEventID() {
@@ -173,7 +173,7 @@ public class Event implements Comparable<Event>, Serializable {
      *     allowed object is
      *     {@link String }
      */
-	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="event_sequence")	
+	//@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="event_sequence")	
     public void setEventID(long value) {
         this.eventID = value;
     }

@@ -3,7 +3,7 @@
  *
  * @copyright Universidad Carlos III de Madrid. proprietary/confidential. Use is subject to license terms.
  */
-package es.uc3m.softlab.cbi4pi.slave.ode.event.publisher.dao;
+package es.uc3m.softlab.cbi4api.basu.ode.event.publisher.dao;
 
 import org.apache.log4j.Logger;
 import org.apache.ode.dao.jpa.JpaTxMgrProvider;
@@ -12,7 +12,7 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Repository;
 
-import es.uc3m.softlab.cbi4pi.slave.ode.event.publisher.Config;
+import es.uc3m.softlab.cbi4api.basu.ode.event.publisher.Config;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -68,9 +68,9 @@ public class BpelEventDAOConnectionFactoryImpl implements BpelEventDAOConnection
     	 */
     }
     /**
-     * Gets a new {@link es.uc3m.softlab.cbi4pi.slave.ode.event.publisher.dao.BpelEventDAOConnection} 
+     * Gets a new {@link es.uc3m.softlab.cbi4api.basu.ode.event.publisher.dao.BpelEventDAOConnection} 
      * data access object.
-     * @return new {@link es.uc3m.softlab.cbi4pi.slave.ode.event.publisher.dao.BpelEventDAOConnection} dao object.
+     * @return new {@link es.uc3m.softlab.cbi4api.basu.ode.event.publisher.dao.BpelEventDAOConnection} dao object.
      */
     public BpelEventDAOConnection getConnection() {
         try {
@@ -101,9 +101,9 @@ public class BpelEventDAOConnectionFactoryImpl implements BpelEventDAOConnection
         }
     }
     /**
-     * Creates a new {@link es.uc3m.softlab.cbi4pi.slave.ode.event.publisher.dao.BpelEventDAOConnectionImpl} object.
+     * Creates a new {@link es.uc3m.softlab.cbi4api.basu.ode.event.publisher.dao.BpelEventDAOConnectionImpl} object.
      * @param em entity manager to attach to the dao object.
-     * @return new {@link es.uc3m.softlab.cbi4pi.slave.ode.event.publisher.dao.BpelEventDAOConnectionImpl} object.
+     * @return new {@link es.uc3m.softlab.cbi4api.basu.ode.event.publisher.dao.BpelEventDAOConnectionImpl} object.
      */
     private BpelEventDAOConnectionImpl createBpelEventDAOConnection(EntityManager em) {
     	BpelEventDAOConnectionImpl dao = null;

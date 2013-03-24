@@ -8,5 +8,5 @@
                         http://www.springframework.org/schema/context 
                         http://www.springframework.org/schema/context/spring-context.xsd">
 
-	<bean name="eventReader" class="es.uc3m.softlab.cbi4pi.slave.event.subscriber.EventReaderImpl" /> 
+	<bean name="eventReader" class="es.uc3m.softlab.cbi4api.basu.event.subscriber.EventReaderImpl" /> 
 </beans>

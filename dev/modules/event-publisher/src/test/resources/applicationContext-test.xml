@@ -19,11 +19,11 @@
 
 	<!-- enabling annotation driven configuration -->
 	<context:annotation-config />
-	<context:component-scan base-package="es.uc3m.softlab.cbi4pi.slave.ode.event.publisher" resource-pattern="EventSenderImpl.class" />
+	<context:component-scan base-package="es.uc3m.softlab.cbi4api.basu.ode.event.publisher" resource-pattern="EventSenderImpl.class" />
 
  	<!-- creates an activemq connection factory --> 
 	<amq:connectionFactory id="amqConnectionFactory">
-		<property name="brokerURL" value="${test.cbi4pi.slave.event.publisher.activemq.broker.url}" />
+		<property name="brokerURL" value="${test.cbi4api.basu.event.publisher.activemq.broker.url}" />
 	</amq:connectionFactory> 	 
 	
 	<!-- connection factory -->
@@ -40,9 +40,9 @@
  	
  	<!-- jms topic message destination -->
 	<bean id="destination" class="org.apache.activemq.command.ActiveMQTopic">
-		<constructor-arg value="es.uc3m.softlab.cbi4pi.slave.event.publisher.bpaf" />
+		<constructor-arg value="es.uc3m.softlab.cbi4api.basu.event.publisher.bpaf" />
 	</bean>
 
-	<bean name="config" class="es.uc3m.softlab.cbi4pi.slave.ode.event.publisher.Config" scope="singleton"/>
+	<bean name="config" class="es.uc3m.softlab.cbi4api.basu.ode.event.publisher.Config" scope="singleton"/>
 		
 </beans>

@@ -3,5 +3,5 @@
  * 
  * @author averab
  */
-@javax.xml.bind.annotation.XmlSchema(namespace = "http://www.uc3m.es/softlab/cbi4pi")
-package es.uc3m.softlab.cbi4pi.slave.ode.event.publisher.xsd;
+@javax.xml.bind.annotation.XmlSchema(namespace = "http://www.uc3m.es/softlab/cbi4api")
+package es.uc3m.softlab.cbi4api.basu.ode.event.publisher.xsd;

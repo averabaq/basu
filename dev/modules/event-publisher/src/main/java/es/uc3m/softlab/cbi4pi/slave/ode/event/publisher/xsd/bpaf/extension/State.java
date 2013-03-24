@@ -6,7 +6,7 @@
 //
 
 
-package es.uc3m.softlab.cbi4pi.slave.ode.event.publisher.xsd.bpaf.extension;
+package es.uc3m.softlab.cbi4api.basu.ode.event.publisher.xsd.bpaf.extension;
 
 import javax.xml.bind.annotation.XmlEnum;
 import javax.xml.bind.annotation.XmlEnumValue;

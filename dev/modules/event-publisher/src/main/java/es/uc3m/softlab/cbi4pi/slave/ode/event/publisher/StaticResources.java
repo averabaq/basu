@@ -3,7 +3,7 @@
  *
  * @copyright Universidad Carlos III de Madrid. proprietary/confidential. Use is subject to license terms.
  */
-package es.uc3m.softlab.cbi4pi.slave.ode.event.publisher;
+package es.uc3m.softlab.cbi4api.basu.ode.event.publisher;
 
 /**
  * In this class is defined all global and generic static 
@@ -22,18 +22,18 @@ public class StaticResources {
     public static final String STRING_EMPTY="";
 
 	/** Component name for the event publisher container */
-	public static final String COMPONENT_NAME_EVENT_PUBLISHER_CONTAINER = "/cbi4pi-slave/event-publisher/component/EventPublisherContainer";
+	public static final String COMPONENT_NAME_EVENT_PUBLISHER_CONTAINER = "/cbi4api-basu/event-publisher/component/EventPublisherContainer";
 	/** Component name for the bpel event data access object connection factory */
-	public static final String COMPONENT_NAME_BPEL_EVENT_DAO_CONNECTION_FACTORY = "/cbi4pi-slave/event-publisher/component/BpelEventDAOConnectionFactory";
+	public static final String COMPONENT_NAME_BPEL_EVENT_DAO_CONNECTION_FACTORY = "/cbi4api-basu/event-publisher/component/BpelEventDAOConnectionFactory";
 	/** Component name for the event publisher scheduler */
-	public static final String COMPONENT_NAME_CONFIG = "/cbi4pi-slave/event-publisher/component/Config";
+	public static final String COMPONENT_NAME_CONFIG = "/cbi4api-basu/event-publisher/component/Config";
 	/** Component name for the event publisher scheduler */
-	public static final String COMPONENT_NAME_EVENT_SCHEDULER = "/cbi4pi-slave/event-publisher/component/EventPublisherScheduler";
+	public static final String COMPONENT_NAME_EVENT_SCHEDULER = "/cbi4api-basu/event-publisher/component/EventPublisherScheduler";
 	/** Component name for the event reader service */
-	public static final String COMPONENT_NAME_EVENT_READER = "/cbi4pi-slave/event-publisher/component/EventReader";
+	public static final String COMPONENT_NAME_EVENT_READER = "/cbi4api-basu/event-publisher/component/EventReader";
 	/** Component name for the event reader service */
-	public static final String COMPONENT_NAME_EVENT_SENDER = "/cbi4pi-slave/event-publisher/component/EventSender";
+	public static final String COMPONENT_NAME_EVENT_SENDER = "/cbi4api-basu/event-publisher/component/EventSender";
 	
 	/** Service name for the event publisher ETL (Extract, Transform & Load) module */
-	public static final String SERVICE_NAME_EVENT_ETL = "/cbi4pi-slave/event-publisher/service/EventETL";	
+	public static final String SERVICE_NAME_EVENT_ETL = "/cbi4api-basu/event-publisher/service/EventETL";	
 }

@@ -1,8 +1,8 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>es.uc3m.softlab.cbi4pi.slave</groupId>
-		<artifactId>cbi4pi-slave-prj</artifactId>
+		<groupId>es.uc3m.softlab.cbi4api.basu</groupId>
+		<artifactId>basu-prj</artifactId>
 		<version>1.0.0-SNAPSHOT</version>
 		<relativePath>../../pom.xml</relativePath>
 	</parent>	
@@ -16,12 +16,12 @@
 		<url>http://scarab.verasoft.es</url>
 	</issueManagement>
 	 -->
-	<groupId>es.uc3m.softlab.cbi4bi.slave</groupId>
+	<groupId>es.uc3m.softlab.cbi4bi.basu</groupId>
 	<artifactId>event-store</artifactId>
 	<inceptionYear>2013</inceptionYear>
 	<packaging>ejb</packaging>
 	<version>1.0.0-SNAPSHOT</version>
-	<name>CBI4PI (Slave) - Event Store</name>
+	<name>CBI4API (Slave) - Event Store</name>
 	<description>
 		Cloud-based Infrastructure for Process Intelligence (Slave) - Event Store
 	</description>
@@ -29,7 +29,7 @@
 		<license>
 			<name>UC3M Propietary</name>			
 			<distribution>repo</distribution>
-			<comments>CBI4PI / @Copyright ${project.inceptionYear} Universidad Carlos III de Madrid. All rights reserved.</comments>
+			<comments>CBI4API / @Copyright ${project.inceptionYear} Universidad Carlos III de Madrid. All rights reserved.</comments>
 		</license>		
 		<license>
 			<name>Apache 2</name>
@@ -38,11 +38,11 @@
 			<comments>Apache-ODE</comments>
 		</license>		
 	</licenses>
-	<url>http://www.cbi4pi.org/doc/slave/event-store</url>
+	<url>http://www.cbi4api.org/doc/basu/event-store</url>
 	<scm>		
-		<url>https://github.com/averabaq/cbi4pi.git</url>
-		<connection>scm:git:ssh:git@github.com:averabaq/cbi4pi.git</connection>
-		<developerConnection>scm:git:ssh:git@github.com:averabaq/cbi4pi.git</developerConnection>
+		<url>https://github.com/averabaq/cbi4api.git</url>
+		<connection>scm:git:ssh:git@github.com:averabaq/cbi4api.git</connection>
+		<developerConnection>scm:git:ssh:git@github.com:averabaq/cbi4api.git</developerConnection>
 		<tag>HEAD</tag>		
 	</scm>
 	<!--  
@@ -171,6 +171,18 @@
 			<scope>compile</scope>
 		</dependency>	
 		<dependency>
+			<groupId>org.apache.hadoop</groupId>
+			<artifactId>hadoop-core</artifactId>
+			<version>1.1.1</version>
+			<scope>compile</scope>
+		</dependency>		
+		<dependency>
+			<groupId>org.apache.hbase</groupId>
+			<artifactId>hbase</artifactId>
+			<version>0.94.3</version>
+			<scope>compile</scope>
+		</dependency>					
+		<dependency>
 			<groupId>org.datanucleus</groupId>
 			<artifactId>datanucleus-core</artifactId>
 			<version>3.2.0-m3</version>
@@ -193,13 +205,15 @@
 			<artifactId>datanucleus-hbase</artifactId>
 			<version>3.2.0-m3</version>
 			<scope>compile</scope>
-		</dependency>						
+		</dependency>	
+		<!-- 					
 		<dependency>
 			<groupId>org.datanucleus</groupId>
 			<artifactId>datanucleus-enhancer</artifactId>
-			<version>3.0.1</version>
+			<version>3.1.0-release</version>
 			<scope>compile</scope>
 		</dependency>	
+		 -->
 		<dependency>
 			<groupId>org.apache.hbql</groupId>
 			<artifactId>hbql</artifactId>
@@ -274,12 +288,12 @@
 					<ejbVersion>3.1</ejbVersion>
 					<generateClient>true</generateClient>
 					<clientIncludes>   
-						<clientInclude>es/uc3m/softlab/cbi4pi/slave/event/store/entity/*</clientInclude>
-						<clientInclude>es/uc3m/softlab/cbi4pi/slave/event/store/facade/*</clientInclude>
-						<clientInclude>es/uc3m/softlab/cbi4pi/slave/event/store/StaticResources.class</clientInclude>					
+						<clientInclude>es/uc3m/softlab/cbi4api/basu/event/store/domain/*</clientInclude>
+						<clientInclude>es/uc3m/softlab/cbi4api/basu/event/store/facade/*</clientInclude>
+						<clientInclude>es/uc3m/softlab/cbi4api/basu/event/store/StaticResources.class</clientInclude>					
 					</clientIncludes>
 					<clientExcludes>
-						<clientExclude>es/uc3m/softlab/cbi4pi/slave/event/store/facade/*Impl.class</clientExclude>
+						<clientExclude>es/uc3m/softlab/cbi4api/basu/event/store/facade/*Impl.class</clientExclude>
 					</clientExcludes>		
 					<archive>
 						<manifestEntries>
@@ -345,17 +359,19 @@
 						<groupId>org.datanucleus</groupId>
 						<artifactId>datanucleus-api-jpa</artifactId>
 						<version>3.2.0-m3</version>
-					</dependency>										
+					</dependency>									
 					<dependency>
 						<groupId>org.datanucleus</groupId>
 						<artifactId>datanucleus-hbase</artifactId>
 						<version>3.2.0-m3</version>
-					</dependency>						
+					</dependency>	
+					<!-- 					
 					<dependency>
 						<groupId>org.datanucleus</groupId>
 						<artifactId>datanucleus-enhancer</artifactId>
-						<version>3.0.1</version>
-					</dependency>											
+						<version>3.1.0-release</version>
+					</dependency>	
+					 -->										
 				</dependencies>
 			</plugin>	
 			<plugin>
@@ -436,7 +452,7 @@
 		<developer>
 			<id>averab</id>
 			<name>Alejandro Vera-Baquero</name>
-			<email>averab@uc3m.es</email>
+			<email>alejandro.vera@alumnos.uc3m.es</email>
 			<organization>Universidad Carlos III de Madrid</organization>
 			<roles>
 				<role>Developer</role>

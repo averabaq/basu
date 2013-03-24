@@ -3,7 +3,7 @@
  *
  * @copyright Universidad Carlos III de Madrid. proprietary/confidential. Use is subject to license terms.
  */
-package es.uc3m.softlab.cbi4pi.slave.ode.event.publisher;
+package es.uc3m.softlab.cbi4api.basu.ode.event.publisher;
 
 /**
  * Exception to identify errors produced at the event publisher 

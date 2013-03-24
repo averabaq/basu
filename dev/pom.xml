@@ -10,21 +10,21 @@
 		<url>http://scarab.verasoft.es</url>
 	</issueManagement>
 	 -->	
-	<groupId>es.uc3m.softlab.cbi4pi.slave</groupId>
-	<artifactId>cbi4pi-slave-prj</artifactId>
+	<groupId>es.uc3m.softlab.cbi4api.basu</groupId>
+	<artifactId>basu-prj</artifactId>
 	<packaging>pom</packaging>
 	<version>1.0.0-SNAPSHOT</version>
 	<inceptionYear>2013</inceptionYear>	
-	<name>CBI4PI (Slave) - Main Project</name>
+	<name>CBI4API (Slave) - Main Project</name>
 	<description>
 		Cloud-based Infrastructure for Process Intelligence (Slave)
 	</description>
-	<url>http://www.cbi4pi.org/doc</url>
+	<url>http://www.cbi4api.org/doc</url>
 	<licenses>
 		<license>
 			<name>UC3M Propietary</name>			
 			<distribution>repo</distribution>
-			<comments>CBI4PI / @Copyright ${project.inceptionYear} Universidad Carlos III de Madrid. All rights reserved.</comments>
+			<comments>CBI4API / @Copyright ${project.inceptionYear} Universidad Carlos III de Madrid. All rights reserved.</comments>
 		</license>
 		<license>
 			<name>Apache 2</name>
@@ -37,13 +37,13 @@
 		<module>modules/event-publisher</module>
 		<module>modules/event-subscriber</module>
 		<module>modules/event-store</module>
-		<module>applications/cbi4pi-slave-ode</module>
-		<module>applications/cbi4pi-slave</module>
+		<module>applications/basu-ode</module>
+		<module>applications/basu</module>
 	</modules>	
 	<scm>				
-		<url>https://github.com/averabaq/cbi4pi.git</url>
-		<connection>scm:git:ssh:git@github.com:averabaq/cbi4pi.git</connection>
-		<developerConnection>scm:git:ssh:git@github.com:averabaq/cbi4pi.git</developerConnection>
+		<url>https://github.com/averabaq/cbi4api.git</url>
+		<connection>scm:git:ssh:git@github.com:averabaq/cbi4api.git</connection>
+		<developerConnection>scm:git:ssh:git@github.com:averabaq/cbi4api.git</developerConnection>
 		<tag>HEAD</tag>		
 	</scm>
 	<!-- 
@@ -191,7 +191,7 @@
 		<developer>
 			<id>averab</id>
 			<name>Alejandro Vera Baquero</name>
-			<email>averab@uc3m.es</email>
+			<email>alejandro.vera@alumnos.uc3m.es</email>
 			<organization>Universidad Carlos III de Madrid</organization>
 			<roles>
 				<role>Developer</role>

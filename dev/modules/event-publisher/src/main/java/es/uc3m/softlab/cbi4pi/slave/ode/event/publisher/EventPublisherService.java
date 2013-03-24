@@ -3,7 +3,7 @@
  *
  * @copyright Universidad Carlos III de Madrid. proprietary/confidential. Use is subject to license terms.
  */
-package es.uc3m.softlab.cbi4pi.slave.ode.event.publisher;
+package es.uc3m.softlab.cbi4api.basu.ode.event.publisher;
 
 import org.apache.log4j.Logger;
 
@@ -30,7 +30,7 @@ public class EventPublisherService {
 	public static void main(String[] args) {
         try {
             String version = StaticResources.STRING_EMPTY;
-            Package pkg = Package.getPackage("es.uc3m.softlab.cbi4pi.slave.ode.event.publisher");
+            Package pkg = Package.getPackage("es.uc3m.softlab.cbi4api.basu.ode.event.publisher");
             if (pkg != null) {
                 version = ": " + pkg.getImplementationVersion();
             }

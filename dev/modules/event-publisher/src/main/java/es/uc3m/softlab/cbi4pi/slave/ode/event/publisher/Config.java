@@ -3,7 +3,7 @@
  *
  * @copyright Universidad Carlos III de Madrid. proprietary/confidential. Use is subject to license terms.
  */
-package es.uc3m.softlab.cbi4pi.slave.ode.event.publisher;
+package es.uc3m.softlab.cbi4api.basu.ode.event.publisher;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -88,7 +88,7 @@ public class Config {
      */
     public Locale getLocale() {
 		Locale locale;
-		String strLocale = getString("cbi4pi.slave.event.publisher.application.locale");
+		String strLocale = getString("cbi4api.basu.event.publisher.application.locale");
 		if (strLocale == null) 
 			strLocale = StaticResources.DEFAULT_LOCALE;				
 		String locales[] = strLocale.split("_");
@@ -107,9 +107,9 @@ public class Config {
      * @return source identifier.
      */
     public String getSourceId() {		
-		String sourceId = getString("cbi4pi.slave.event.publisher.event.source.id");
+		String sourceId = getString("cbi4api.basu.event.publisher.event.source.id");
 		if (sourceId == null) 
-			logger.error("The property 'cbi4pi.slave.event.publisher.event.source.id' containing the identification of the current source is not found. Please, provide this information.");
+			logger.error("The property 'cbi4api.basu.event.publisher.event.source.id' containing the identification of the current source is not found. Please, provide this information.");
 		return sourceId;
     }   
     /**
@@ -118,9 +118,9 @@ public class Config {
      * @return broker url.
      */
     public String getBrokerUrl() {		
-		String url = getString("cbi4pi.slave.event.publisher.activemq.broker.url");
+		String url = getString("cbi4api.basu.event.publisher.activemq.broker.url");
 		if (url == null) 
-			logger.error("The property 'cbi4pi.slave.event.publisher.activemq.broker.url' containing the identification of the current source is not found. Please, provide this information.");
+			logger.error("The property 'cbi4api.basu.event.publisher.activemq.broker.url' containing the identification of the current source is not found. Please, provide this information.");
 		return url;
     }     
     /**
@@ -131,9 +131,9 @@ public class Config {
     public Long getTimerFixedRate() {		
     	Long timer = null;
 		try {
-			timer = Long.valueOf(getString("cbi4pi.slave.event.publisher.scheduler.timer.fixed.rate"));
+			timer = Long.valueOf(getString("cbi4api.basu.event.publisher.scheduler.timer.fixed.rate"));
 		} catch(NumberFormatException nfex) {
-			logger.fatal("Could not parse 'cbi4pi.slave.event.publisher.scheduler.timer.fixed.rate' property. Number was expected.");
+			logger.fatal("Could not parse 'cbi4api.basu.event.publisher.scheduler.timer.fixed.rate' property. Number was expected.");
 			logger.fatal(nfex.fillInStackTrace());
 		}		
 		return timer;
@@ -144,9 +144,9 @@ public class Config {
      * @return task scheduler cron setting.
      */
     public String getTimerCron() {		
-		String cron = getString("cbi4pi.slave.event.publisher.scheduler.timer.cron");
+		String cron = getString("cbi4api.basu.event.publisher.scheduler.timer.cron");
 		if (cron == null) 
-			logger.error("The property 'cbi4pi.slave.event.publisher.scheduler.timer.cron' containing the cron timer for the scheduler is not found. Please, provide this information.");
+			logger.error("The property 'cbi4api.basu.event.publisher.scheduler.timer.cron' containing the cron timer for the scheduler is not found. Please, provide this information.");
 		return cron;
     }       
     /**
@@ -155,9 +155,9 @@ public class Config {
      */
     public long readLastEvent() throws IOException {
     	Long eventId = 0L;
-		String fileName = getString("cbi4pi.slave.event.publisher.application.event.file");
+		String fileName = getString("cbi4api.basu.event.publisher.application.event.file");
 		if (fileName == null) {
-			throw new IOException("Cannot write last event information. Property \"cbi4pi.slave.event.publisher.application.event.file\" could not be found. Is it defined?");
+			throw new IOException("Cannot write last event information. Property \"cbi4api.basu.event.publisher.application.event.file\" could not be found. Is it defined?");
 		}
 		String applicationDir = getClass().getProtectionDomain().getCodeSource().getLocation().getPath(); 
 		applicationDir = new File(applicationDir).getParent();
@@ -179,9 +179,9 @@ public class Config {
      * @throws IOException if any input/output error occurred.
      */
     public void writeLastEvent(long eventId) throws IOException {
-		String fileName = getString("cbi4pi.slave.event.publisher.application.event.file");
+		String fileName = getString("cbi4api.basu.event.publisher.application.event.file");
 		if (fileName == null) {
-			throw new IOException("Cannot write last event information. Property \"cbi4pi.slave.event.publisher.application.event.file\" could not be found. Is it defined?");
+			throw new IOException("Cannot write last event information. Property \"cbi4api.basu.event.publisher.application.event.file\" could not be found. Is it defined?");
 		}
 		String applicationDir = getClass().getProtectionDomain().getCodeSource().getLocation().getPath(); 
 		applicationDir = new File(applicationDir).getParent();

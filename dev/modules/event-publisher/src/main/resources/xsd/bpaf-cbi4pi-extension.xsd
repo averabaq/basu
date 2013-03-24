@@ -1,42 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- 
   ***********************************************************
-  * BPAF extension for the CBI4PI system
+  * BPAF extension for the CBI4API system
   * Credits by Michael zur Muehlen (Stevens Institute of Technology)
   * Alejandro Vera-Baquero (23/01/2013)
   ***********************************************************
   -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-	xmlns:cbi4pi="http://www.uc3m.es/softlab/cbi4pi"
-	targetNamespace="http://www.uc3m.es/softlab/cbi4pi">
+	xmlns:cbi4api="http://www.uc3m.es/softlab/cbi4api"
+	targetNamespace="http://www.uc3m.es/softlab/cbi4api">
 	<xs:annotation>
 		<xs:documentation xml:lang="en">
 			BPAF (Business Process Analytics Format) extension for 
-			handling events in the CBI4PI (Cloud-based Infrastructure 
+			handling events in the CBI4API (Cloud-based Infrastructure 
 			for Process Intelligence) system			
 		</xs:documentation>
 	</xs:annotation>
 	
 	<xs:element name="Event">
 		<xs:annotation>
-			<xs:documentation>Business Process Analytics Format Event (Extended for CBI4PI)</xs:documentation>
+			<xs:documentation>Business Process Analytics Format Event (Extended for CBI4API)</xs:documentation>
 		</xs:annotation>	
 		<xs:complexType>
 			<xs:sequence>
 				<xs:element name="EventDetails">
 					<xs:complexType>
-						<xs:attribute name="CurrentState" type="cbi4pi:State" use="required"/>
-						<xs:attribute name="PreviousState" type="cbi4pi:State"/>
+						<xs:attribute name="CurrentState" type="cbi4api:State" use="required"/>
+						<xs:attribute name="PreviousState" type="cbi4api:State"/>
 					</xs:complexType>
 				</xs:element>
 				<xs:choice minOccurs="1" maxOccurs="1">					
 					<xs:element name="ProcessInstanceID" type="xs:NMTOKEN" />
-					<xs:element name="Correlation" type="cbi4pi:Correlation" />
+					<xs:element name="Correlation" type="cbi4api:Correlation" />
 				</xs:choice>
-				<xs:element name="DataElement" minOccurs="0" maxOccurs="unbounded" type="cbi4pi:DataElement"/>
-				<xs:element name="Payload" minOccurs="0" maxOccurs="unbounded" type="cbi4pi:Payload"/>
+				<xs:element name="DataElement" minOccurs="0" maxOccurs="unbounded" type="cbi4api:DataElement"/>
+				<xs:element name="Payload" minOccurs="0" maxOccurs="unbounded" type="cbi4api:Payload"/>
 			</xs:sequence>			
-			<xs:attribute name="EventID" type="cbi4pi:ID" use="required"/>
+			<xs:attribute name="EventID" type="cbi4api:ID" use="required"/>
 			<xs:attribute name="ServerID" type="xs:NMTOKEN" use="required"/>
 			<xs:attribute name="ProcessDefinitionID" type="xs:NMTOKEN" use="required"/>
 			<xs:attribute name="ProcessName" type="xs:string"/>
@@ -86,7 +86,7 @@
  
  	<xs:complexType name="Correlation"> 	
  		<xs:sequence> 			 			
- 			<xs:element name="CorrelationElement" type="cbi4pi:CorrelationElement" minOccurs="1" maxOccurs="unbounded" /> 				
+ 			<xs:element name="CorrelationElement" type="cbi4api:CorrelationElement" minOccurs="1" maxOccurs="unbounded" /> 				
  		</xs:sequence>
 	</xs:complexType>
 

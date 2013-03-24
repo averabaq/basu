@@ -3,9 +3,9 @@
  *
  * @copyright Universidad Carlos III de Madrid. proprietary/confidential. Use is subject to license terms.
  */
-package es.uc3m.softlab.cbi4pi.slave.ode.event.publisher.dao;
+package es.uc3m.softlab.cbi4api.basu.ode.event.publisher.dao;
 
-import es.uc3m.softlab.cbi4pi.slave.ode.event.publisher.StaticResources;
+import es.uc3m.softlab.cbi4api.basu.ode.event.publisher.StaticResources;
 
 /**
  * Data access object factory interface for creating <i>dao</i> instances in order 
@@ -27,9 +27,9 @@ public interface BpelEventDAOConnectionFactory {
     public static final String COMPONENT_NAME = StaticResources.COMPONENT_NAME_BPEL_EVENT_DAO_CONNECTION_FACTORY;        
 
     /**
-     * Gets a new {@link es.uc3m.softlab.cbi4pi.slave.ode.event.publisher.dao.BpelEventDAOConnection} 
+     * Gets a new {@link es.uc3m.softlab.cbi4api.basu.ode.event.publisher.dao.BpelEventDAOConnection} 
      * data access object.
-     * @return new {@link es.uc3m.softlab.cbi4pi.slave.ode.event.publisher.dao.BpelEventDAOConnection} dao object.
+     * @return new {@link es.uc3m.softlab.cbi4api.basu.ode.event.publisher.dao.BpelEventDAOConnection} dao object.
      */
     public BpelEventDAOConnection getConnection();
 }

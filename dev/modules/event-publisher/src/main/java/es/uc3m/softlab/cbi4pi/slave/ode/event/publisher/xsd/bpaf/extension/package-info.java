@@ -4,4 +4,4 @@
  * @author averab
  */
 @javax.xml.bind.annotation.XmlSchema(namespace = "http://www.it.nuigalway.ie/ecrg/f4bpa")
-package es.uc3m.softlab.cbi4pi.slave.ode.event.publisher.xsd.bpaf.extension;
+package es.uc3m.softlab.cbi4api.basu.ode.event.publisher.xsd.bpaf.extension;

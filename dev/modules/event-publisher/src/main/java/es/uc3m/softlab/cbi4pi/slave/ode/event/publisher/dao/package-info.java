@@ -5,4 +5,4 @@
  * @author averab
  * @version 1.0.0
  */
-package es.uc3m.softlab.cbi4pi.slave.ode.event.publisher.dao;
+package es.uc3m.softlab.cbi4api.basu.ode.event.publisher.dao;

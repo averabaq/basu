@@ -6,7 +6,7 @@
 //
 
 
-package es.uc3m.softlab.cbi4pi.slave.ode.event.publisher.xsd.bpaf.extension;
+package es.uc3m.softlab.cbi4api.basu.ode.event.publisher.xsd.bpaf.extension;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -21,7 +21,7 @@ import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import es.uc3m.softlab.cbi4pi.slave.ode.event.publisher.xsd.TimeStampAdapter;
+import es.uc3m.softlab.cbi4api.basu.ode.event.publisher.xsd.TimeStampAdapter;
 
 
 /**

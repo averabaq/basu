@@ -19,7 +19,7 @@
 
 	<!-- enabling annotation driven configuration -->
 	<context:annotation-config />
-	<context:component-scan base-package="es.uc3m.softlab.cbi4pi.slave.ode.event.publisher" />
+	<context:component-scan base-package="es.uc3m.softlab.cbi4api.basu.ode.event.publisher" />
 
  	<!-- creates an activemq connection factory --> 
 	<amq:connectionFactory id="amqConnectionFactory">
@@ -40,7 +40,7 @@
  	
  	<!-- jms topic message destination -->
 	<bean id="destination" class="org.apache.activemq.command.ActiveMQTopic">
-		<constructor-arg value="es.uc3m.softlab.cbi4pi.slave.event.bpaf" />
+		<constructor-arg value="es.uc3m.softlab.cbi4api.basu.event.bpaf" />
 	</bean>
 
 	<!-- task for the event scheduler executor -->
@@ -64,9 +64,9 @@
 	</task:scheduled-tasks>
 	 -->
 	 
-	<bean id="eventScheduler" class="es.uc3m.softlab.cbi4pi.slave.ode.event.publisher.EventPublisherScheduler"/>
+	<bean id="eventScheduler" class="es.uc3m.softlab.cbi4api.basu.ode.event.publisher.EventPublisherScheduler"/>
 
-	<bean name="config" class="es.uc3m.softlab.cbi4pi.slave.ode.event.publisher.Config" scope="singleton"/>
+	<bean name="config" class="es.uc3m.softlab.cbi4api.basu.ode.event.publisher.Config" scope="singleton"/>
 	
 	<bean id="transactionManager" class="org.apache.geronimo.transaction.manager.GeronimoTransactionManager"/>
 
@@ -80,9 +80,9 @@
 	--> 
 	 
 	<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
-		<property name="driverClassName" value="${cbi4pi.slave.event.publisher.datasource.driver}"/>
-		<property name="url" value="${cbi4pi.slave.event.publisher.datasource.url}"/>
-		<property name="username" value="${cbi4pi.slave.event.publisher.datasource.username}"/>
-		<property name="password" value="${cbi4pi.slave.event.publisher.datasource.password}"/>
+		<property name="driverClassName" value="${cbi4api.basu.event.publisher.datasource.driver}"/>
+		<property name="url" value="${cbi4api.basu.event.publisher.datasource.url}"/>
+		<property name="username" value="${cbi4api.basu.event.publisher.datasource.username}"/>
+		<property name="password" value="${cbi4api.basu.event.publisher.datasource.password}"/>
 	</bean>		
 </beans>

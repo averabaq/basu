@@ -3,4 +3,4 @@
  * 
  * @author averab
  */
-package es.uc3m.softlab.cbi4pi.slave.ode.event.publisher;
+package es.uc3m.softlab.cbi4api.basu.ode.event.publisher;

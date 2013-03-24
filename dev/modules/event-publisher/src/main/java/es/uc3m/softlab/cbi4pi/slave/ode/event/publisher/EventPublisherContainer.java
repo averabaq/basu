@@ -3,9 +3,9 @@
  *
  * @copyright Universidad Carlos III de Madrid. proprietary/confidential. Use is subject to license terms.
  */
-package es.uc3m.softlab.cbi4pi.slave.ode.event.publisher;
+package es.uc3m.softlab.cbi4api.basu.ode.event.publisher;
 
-import es.uc3m.softlab.cbi4pi.slave.ode.event.publisher.dao.BpelEventDAOConnectionFactoryImpl;
+import es.uc3m.softlab.cbi4api.basu.ode.event.publisher.dao.BpelEventDAOConnectionFactoryImpl;
 
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicBoolean;

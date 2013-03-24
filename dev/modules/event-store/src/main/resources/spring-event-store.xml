@@ -13,7 +13,7 @@
 
 	<!-- enabling annotation driven configuration -->
 	<context:annotation-config />
-	<context:component-scan base-package="es.uc3m.softlab.cbi4pi.slave.event.store" />
+	<context:component-scan base-package="es.uc3m.softlab.cbi4api.basu.event.store" />
 	
 	<tx:annotation-driven transaction-manager="transactionManager" />
 
@@ -25,10 +25,10 @@
 		<property name="jpaProperties">
 			<props>				
 				<!-- It's set through the data source reference  
-				<prop key="hibernate.connection.driver_class">${cbi4pi.slave.event.store.datasource.driver}</prop>  
-				<prop key="hibernate.connection.username">${cbi4pi.slave.event.store.datasource.username}</prop>  
-				<prop key="hibernate.connection.password">${cbi4pi.slave.event.store.datasource.password}</prop>  
-				<prop key="hibernate.connection.url">${cbi4pi.slave.event.store.datasource.url}</prop>
+				<prop key="hibernate.connection.driver_class">${cbi4api.basu.event.store.datasource.driver}</prop>  
+				<prop key="hibernate.connection.username">${cbi4api.basu.event.store.datasource.username}</prop>  
+				<prop key="hibernate.connection.password">${cbi4api.basu.event.store.datasource.password}</prop>  
+				<prop key="hibernate.connection.url">${cbi4api.basu.event.store.datasource.url}</prop>
 				 -->  
 			</props>
 		</property>	 
@@ -44,8 +44,8 @@
 	</bean>
  
 	<bean id="eventStoreDataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
-		<property name="driverClassName" value="${cbi4pi.slave.event.store.hbase.driver}"/>
-		<property name="url" value="${cbi4pi.slave.event.store.hbase.url}"/>
+		<property name="driverClassName" value="${cbi4api.basu.event.store.hbase.driver}"/>
+		<property name="url" value="${cbi4api.basu.event.store.hbase.url}"/>
 		<property name="username" value=""/>
 		<property name="password" value=""/>
 	</bean>

@@ -3,7 +3,7 @@
  *
  * @copyright Universidad Carlos III de Madrid. proprietary/confidential. Use is subject to license terms.
  */
-package es.uc3m.softlab.cbi4pi.slave.ode.event.publisher.xsd;
+package es.uc3m.softlab.cbi4api.basu.ode.event.publisher.xsd;
 
 import java.util.Calendar;
 import javax.xml.bind.annotation.adapters.XmlAdapter;

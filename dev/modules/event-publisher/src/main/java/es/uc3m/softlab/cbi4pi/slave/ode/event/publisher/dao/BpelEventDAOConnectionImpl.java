@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package es.uc3m.softlab.cbi4pi.slave.ode.event.publisher.dao;
+package es.uc3m.softlab.cbi4api.basu.ode.event.publisher.dao;
 
 import java.util.List;
 

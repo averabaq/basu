@@ -3,7 +3,7 @@
  *
  * @copyright Universidad Carlos III de Madrid. proprietary/confidential. Use is subject to license terms.
  */
-package es.uc3m.softlab.cbi4pi.slave.ode.event.publisher;
+package es.uc3m.softlab.cbi4api.basu.ode.event.publisher;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -35,16 +35,16 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import es.uc3m.softlab.cbi4pi.slave.ode.event.publisher.Config;
-import es.uc3m.softlab.cbi4pi.slave.ode.event.publisher.EventPublisherException;
-import es.uc3m.softlab.cbi4pi.slave.ode.event.publisher.EventReader;
-import es.uc3m.softlab.cbi4pi.slave.ode.event.publisher.EventReaderException;
-import es.uc3m.softlab.cbi4pi.slave.ode.event.publisher.EventSender;
-import es.uc3m.softlab.cbi4pi.slave.ode.event.publisher.ODEEventState;
-import es.uc3m.softlab.cbi4pi.slave.ode.event.publisher.xsd.bpaf.extension.DataElement;
-import es.uc3m.softlab.cbi4pi.slave.ode.event.publisher.xsd.bpaf.extension.Event;
-import es.uc3m.softlab.cbi4pi.slave.ode.event.publisher.xsd.bpaf.extension.Payload;
-import es.uc3m.softlab.cbi4pi.slave.ode.event.publisher.xsd.bpaf.extension.State;
+import es.uc3m.softlab.cbi4api.basu.ode.event.publisher.Config;
+import es.uc3m.softlab.cbi4api.basu.ode.event.publisher.EventPublisherException;
+import es.uc3m.softlab.cbi4api.basu.ode.event.publisher.EventReader;
+import es.uc3m.softlab.cbi4api.basu.ode.event.publisher.EventReaderException;
+import es.uc3m.softlab.cbi4api.basu.ode.event.publisher.EventSender;
+import es.uc3m.softlab.cbi4api.basu.ode.event.publisher.ODEEventState;
+import es.uc3m.softlab.cbi4api.basu.ode.event.publisher.xsd.bpaf.extension.DataElement;
+import es.uc3m.softlab.cbi4api.basu.ode.event.publisher.xsd.bpaf.extension.Event;
+import es.uc3m.softlab.cbi4api.basu.ode.event.publisher.xsd.bpaf.extension.Payload;
+import es.uc3m.softlab.cbi4api.basu.ode.event.publisher.xsd.bpaf.extension.State;
 
 /**
  * Specific ETL (Extract, Transform & Load) service implementation for handling
@@ -110,7 +110,7 @@ public class ETLEventImpl implements ETLEvent {
 	}
 	/**
 	 * Converts a list of {@link org.apache.ode.dao.jpa.EventDAOImpl} event objects
-	 * into a list of {@link es.uc3m.softlab.cbi4pi.slave.ode.event.publisher.xsd.bpaf.Event}
+	 * into a list of {@link es.uc3m.softlab.cbi4api.basu.ode.event.publisher.xsd.bpaf.Event}
 	 * event objects.
 	 * 
 	 * @param events list of <strong>ApacheODE</strong> events to transform.
@@ -305,7 +305,7 @@ public class ETLEventImpl implements ETLEvent {
 	 * <message>  
 	 * </code>
 	 * It will be process by this method returning the following information as
-	 * a list of {@link es.uc3m.softlab.cbi4pi.slave.ode.event.publisher.xsd.bpaf.extension.Payload} data:
+	 * a list of {@link es.uc3m.softlab.cbi4api.basu.ode.event.publisher.xsd.bpaf.extension.Payload} data:
 	 * <code>  
 	 * Payload('message.payload.OrderShip.Item.ItemCode', '0587')
 	 * Payload('message.payload.OrderShip.Item.Quantity', '3')
@@ -314,7 +314,7 @@ public class ETLEventImpl implements ETLEvent {
 	 * </code>
 	 * </p>
 	 * @param node current node of the DOM tree.
-	 * @param key partial {@link es.uc3m.softlab.cbi4pi.slave.ode.event.publisher.xsd.bpaf.extension.Payload#getKey()} 
+	 * @param key partial {@link es.uc3m.softlab.cbi4api.basu.ode.event.publisher.xsd.bpaf.extension.Payload#getKey()} 
 	 * associated to the current level node.
 	 * @param data list of payload business data associated to a given level
 	 * of the DOM tree at the current node.

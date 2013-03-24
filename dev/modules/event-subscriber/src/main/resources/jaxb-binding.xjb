@@ -6,17 +6,17 @@
     version="2.1">        
     <jaxb:globalBindings generateIsSetMethod="true" fixedAttributeAsConstantProperty="true">
         <xjc:serializable uid="1"/>       	        
-        <xjc:javaType name="java.util.Calendar" xmlType="xs:dateTime" adapter="es.uc3m.softlab.cbi4pi.slave.event.subscriber.xsd.TimeStampAdapter" />
+        <xjc:javaType name="java.util.Calendar" xmlType="xs:dateTime" adapter="es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.TimeStampAdapter" />
     </jaxb:globalBindings>
-    <jaxb:bindings schemaLocation="xsd/bpaf-cbi4pi-extension.xsd">    	
+    <jaxb:bindings schemaLocation="xsd/bpaf-cbi4api-extension.xsd">    	
     	<jaxb:schemaBindings>    		
-    		<jaxb:package name="es.uc3m.softlab.cbi4pi.slave.event.subscriber.xsd.bpaf.extension" />
+    		<jaxb:package name="es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.bpaf.extension" />
     	</jaxb:schemaBindings>        
     </jaxb:bindings>
     <!-- 
     <jaxb:bindings schemaLocation="xsd/bpaf.xsd">    	
     	<jaxb:schemaBindings>    		
-    		<jaxb:package name="es.uc3m.softlab.cbi4pi.slave.event.subscriber.xsd.bpaf" />
+    		<jaxb:package name="es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.bpaf" />
     	</jaxb:schemaBindings>        
     </jaxb:bindings>
      -->

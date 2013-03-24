@@ -16,7 +16,7 @@
 
 	<!-- enabling annotation driven configuration -->
 	<context:annotation-config />
-	<context:component-scan base-package="es.uc3m.softlab.cbi4pi.slave.event.subscriber" />
+	<context:component-scan base-package="es.uc3m.softlab.cbi4api.basu.event.subscriber" />
 
 	<!-- creates an activemq connection factory -->
 	<amq:connectionFactory id="amqConnectionFactory" brokerURL="tcp://localhost:61616" />
@@ -30,11 +30,11 @@
 	<bean id="jmsContainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
 		<property name="connectionFactory" ref="connectionFactory"/>
 		<property name="destination" ref="destination"/>
-		<property name="messageListener" ref="/cbi4pi-slave/event-subscriber/service/etlEvent" />
+		<property name="messageListener" ref="/cbi4api-basu/event-subscriber/service/etlEvent" />
 	</bean>
  	
 	<bean id="destination" class="org.apache.activemq.command.ActiveMQTopic">
-		<constructor-arg value="es.uc3m.softlab.cbi4pi.slave.event.bpaf" />
+		<constructor-arg value="es.uc3m.softlab.cbi4api.basu.event.bpaf" />
 	</bean>
 
 </beans>

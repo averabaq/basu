@@ -6,6 +6,7 @@
 package es.uc3m.softlab.cbi4api.basu.event.store.dao;
 
 import es.uc3m.softlab.cbi4api.basu.event.store.StaticResources;
+import es.uc3m.softlab.cbi4api.basu.event.store.Stats;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.ActivityInstance;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.ActivityModel;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.Event;
@@ -52,6 +53,8 @@ public class ActivityInstanceDAOImpl implements ActivityInstanceDAO {
     protected EntityManager entityManager;
     /** Model data access object */
     @Autowired private ModelDAO modelDAO;
+    /** Statistical performance object */
+    @Autowired private Stats stats; 
     
 	/**
 	 * Find all {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ActivityInstance} entity 
@@ -115,7 +118,7 @@ public class ActivityInstanceDAOImpl implements ActivityInstanceDAO {
 	 * @return {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ActivityInstance} entity object associated.
 	 * @throws IllegalArgumentException if an illegal argument error occurred.
 	 */
-	synchronized public ActivityInstance findBySourceData(String activityId, Model model) throws IllegalArgumentException {
+	public ActivityInstance findBySourceData(String activityId, Model model) throws IllegalArgumentException {
 		logger.debug("Retrieving activity instance with source data as pairs of (" + activityId + ", " + model.getSource() + ")...");
 		Model _model = modelDAO.findBySourceData(model.getModelSrcId(), model.getSource());
 		if (_model == null)
@@ -125,7 +128,10 @@ public class ActivityInstanceDAOImpl implements ActivityInstanceDAO {
 		query.setParameter("modelId", _model.getId());
 		ActivityInstance instance = null;
 		try {
+			long ini = System.nanoTime();
 			instance = (ActivityInstance)query.getSingleResult();
+			long end = System.nanoTime();
+			stats.writeStat(Stats.Operation.READ_BY_SOURCE_DATA, instance, ini, end);
 			logger.debug("Activity instance " + instance + " retrieved successfully.");
 		} catch(NoResultException nrex) {
 			logger.debug("Activity instance with source data as pairs of (" + activityId + ", " + model.getSource() + ") does not exist.");
@@ -225,7 +231,7 @@ public class ActivityInstanceDAOImpl implements ActivityInstanceDAO {
 	 * @throws IllegalArgumentException if an illegal argument error occurred.
 	 * @throws TransactionRequiredException if a transaction error occurred.
 	 */	
-	synchronized public void save(ActivityInstance instance) throws IllegalArgumentException, TransactionRequiredException {
+	public void save(ActivityInstance instance) throws IllegalArgumentException, TransactionRequiredException {
 		logger.debug("Saving activity instance " + instance + "...");	
 		
 		if (instance == null) {
@@ -233,8 +239,11 @@ public class ActivityInstanceDAOImpl implements ActivityInstanceDAO {
 			throw new IllegalArgumentException("Cannot save activity instance. Activity instance is null.");
 		}
 		if (instance.getId() != null) {
+			long ini = System.nanoTime();
 			/* checks for the activity instance existence */
-			HActivityInstance _hactivityInstance = entityManager.find(HActivityInstance.class, instance.getId());		
+			HActivityInstance _hactivityInstance = entityManager.find(HActivityInstance.class, instance.getId());			
+			long end = System.nanoTime();
+			stats.writeStat(Stats.Operation.READ_BY_ID, instance, ini, end);			
 			if (_hactivityInstance != null) {
 				logger.debug("Activity instance " + instance.getId() + " cannot be persisted because it already exists.");
 				return;
@@ -255,14 +264,22 @@ public class ActivityInstanceDAOImpl implements ActivityInstanceDAO {
 		HActivityInstance hactivityInstance = BusinessObjectAssembler.getInstance().toEntity(instance);
 		Query query = entityManager.createQuery("select max(i.id) from " + HActivityInstance.class.getName() + " i ");
 		Long maxInstance = null;
+
+		long ini = System.nanoTime();
+		/* checks for the process instance existence */
 		maxInstance = (Long)query.getSingleResult();
+		long end = System.nanoTime();
+		stats.writeStat(Stats.Operation.READ_MAX_ID, instance, ini, end);
 		if (maxInstance == null) {
 			logger.warn("There are not activity instances defined at the datastore.");	
 			maxInstance = 0L;
 		}
 		hactivityInstance.setId(maxInstance + 1);
 		instance.setId(hactivityInstance.getId());
-		entityManager.persist(hactivityInstance);	
+		ini = System.nanoTime();
+		entityManager.persist(hactivityInstance);
+		end = System.nanoTime();
+		stats.writeStat(Stats.Operation.WRITE, instance, ini, end);
 		logger.debug("Activity instance " + instance + " saved successfully.");
 	}	
 	/**

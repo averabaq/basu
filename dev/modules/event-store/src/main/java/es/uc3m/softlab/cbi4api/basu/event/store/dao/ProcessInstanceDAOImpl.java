@@ -5,7 +5,10 @@
  */
 package es.uc3m.softlab.cbi4api.basu.event.store.dao;
 
+import es.uc3m.softlab.cbi4api.basu.event.store.Config;
 import es.uc3m.softlab.cbi4api.basu.event.store.StaticResources;
+import es.uc3m.softlab.cbi4api.basu.event.store.Stats;
+import es.uc3m.softlab.cbi4api.basu.event.store.domain.ActivityInstance;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.Event;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.EventCorrelation;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.Model;
@@ -14,6 +17,10 @@ import es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessModel;
 import es.uc3m.softlab.cbi4api.basu.event.store.entity.HModel;
 import es.uc3m.softlab.cbi4api.basu.event.store.entity.HProcessInstance;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -52,7 +59,9 @@ public class ProcessInstanceDAOImpl implements ProcessInstanceDAO {
     protected EntityManager entityManager;
     /** Model data access object */
     @Autowired private ModelDAO modelDAO;
-    
+    /** Statistical performance object */
+    @Autowired private Stats stats; 
+
 	/**
 	 * Find all {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessInstance} entity 
 	 * objects.
@@ -124,7 +133,10 @@ public class ProcessInstanceDAOImpl implements ProcessInstanceDAO {
 		query.setParameter("modelId", _model.getId());		
 		ProcessInstance instance = null;
 		try {
+			long ini = System.nanoTime();
 			instance = (ProcessInstance)query.getSingleResult();
+			long end = System.nanoTime();
+			stats.writeStat(Stats.Operation.READ_BY_SOURCE_DATA, instance, ini, end);		
 			logger.debug("Process instance " + instance + " retrieved successfully.");
 		} catch(NoResultException nrex) {
 			logger.debug("Process instance with source data as pairs of (" + processId + ", " + model.getSource() + ") does not exist.");
@@ -150,7 +162,7 @@ public class ProcessInstanceDAOImpl implements ProcessInstanceDAO {
 	 * @throws IllegalArgumentException if an illegal argument error occurred.
 	 */
     @SuppressWarnings("unchecked")
-    synchronized public ProcessInstance findBySourceData(Set<EventCorrelation> correlation, ProcessModel model) throws IllegalArgumentException {
+    public ProcessInstance findBySourceData(Set<EventCorrelation> correlation, ProcessModel model) throws IllegalArgumentException {
     	logger.debug("Retrieving process instance associted to a determined correlation data from the model " + model + " associated to the source " + model.getSource() + "...");
 		if (correlation == null || correlation.size() == 0) {
 			throw new IllegalArgumentException("Cannot retrieve process instance because no correlation data has been provided.");
@@ -224,7 +236,7 @@ public class ProcessInstanceDAOImpl implements ProcessInstanceDAO {
 	 * @throws IllegalArgumentException if an illegal argument error occurred.
 	 * @throws TransactionRequiredException if a transaction error occurred.
 	 */	
-	synchronized public void save(ProcessInstance instance) throws IllegalArgumentException, TransactionRequiredException {
+	public void save(ProcessInstance instance) throws IllegalArgumentException, TransactionRequiredException {
 		logger.debug("Saving process instance " + instance + "...");			
 		
 		if (instance == null) {
@@ -232,8 +244,11 @@ public class ProcessInstanceDAOImpl implements ProcessInstanceDAO {
 			throw new IllegalArgumentException("Cannot save process instance. Process instance is null.");
 		}
 		if (instance.getId() != null) {
+			long ini = System.nanoTime();
 			/* checks for the process instance existence */
 			HProcessInstance _hprocessInstance = entityManager.find(HProcessInstance.class, instance.getId());		
+			long end = System.nanoTime();
+			stats.writeStat(Stats.Operation.READ_BY_ID, instance, ini, end);
 			if (_hprocessInstance != null) {
 				logger.debug("Process instance " + instance.getId() + " cannot be persisted because it already exists.");
 				return;
@@ -253,14 +268,24 @@ public class ProcessInstanceDAOImpl implements ProcessInstanceDAO {
 		HProcessInstance hprocessInstance = BusinessObjectAssembler.getInstance().toEntity(instance);
 		Query query = entityManager.createQuery("select max(i.id) from " + HProcessInstance.class.getName() + " i ");
 		Long maxInstance = null;
+		
+		long ini = System.nanoTime();
+		/* checks for the process instance existence */
 		maxInstance = (Long)query.getSingleResult();
+		long end = System.nanoTime();
+		stats.writeStat(Stats.Operation.READ_MAX_ID, instance, ini, end);
+		
 		if (maxInstance == null) {
 			logger.warn("There are not process instances defined at the datastore.");	
 			maxInstance = 0L;
 		}
+		
 		hprocessInstance.setId(maxInstance + 1);
 		instance.setId(hprocessInstance.getId());
-		entityManager.persist(hprocessInstance);	
+		ini = System.nanoTime();
+		entityManager.persist(hprocessInstance);
+		end = System.nanoTime();
+		stats.writeStat(Stats.Operation.WRITE, instance, ini, end);
 		logger.debug("Process instance " + instance + " saved successfully.");
 	}	
 	/**

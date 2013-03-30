@@ -5,7 +5,9 @@
  */
 package es.uc3m.softlab.cbi4api.basu.event.store.dao;
 
+import es.uc3m.softlab.cbi4api.basu.event.store.Config;
 import es.uc3m.softlab.cbi4api.basu.event.store.StaticResources;
+import es.uc3m.softlab.cbi4api.basu.event.store.Stats;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.Event;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.EventCorrelation;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.EventData;
@@ -13,6 +15,10 @@ import es.uc3m.softlab.cbi4api.basu.event.store.domain.EventPayload;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessInstance;
 import es.uc3m.softlab.cbi4api.basu.event.store.entity.HEvent;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -51,6 +57,8 @@ public class EventDAOImpl implements EventDAO {
     @Autowired private ProcessInstanceDAO processInstanceDAO;
     /** Activity instance data access object */
     @Autowired private ActivityInstanceDAO activityInstanceDAO;    
+    /** Statistical performance object */
+    @Autowired private Stats stats; 
     
 	/**
 	 * Find all {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Event} entity 
@@ -116,9 +124,12 @@ public class EventDAOImpl implements EventDAO {
 	 */
 	public Event findById(long eventId) throws IllegalArgumentException {
 		logger.debug("Retrieving event with identifier " + eventId + "...");
+		long ini = System.nanoTime();
 		HEvent hevent = entityManager.find(HEvent.class, eventId);	
+		long end = System.nanoTime();	
 		if (hevent != null) {
 			Event event = BusinessObjectAssembler.getInstance().toBusinessObject(hevent);
+			stats.writeStat(Stats.Operation.READ_BY_ID, event, ini, end);	
 			ProcessInstance processInstance = processInstanceDAO.findById(hevent.getProcessInstance());
 			event.setProcessInstance(processInstance);
 			/* TODO: load payload, data, correlation */
@@ -144,7 +155,10 @@ public class EventDAOImpl implements EventDAO {
 	public void merge(Event event) throws IllegalArgumentException, TransactionRequiredException {
 		logger.debug("Merging event " + event + "...");	
 		HEvent hevent = BusinessObjectAssembler.getInstance().toEntity(event);
-		entityManager.merge(hevent);		
+		long ini = System.nanoTime();
+		entityManager.merge(hevent);
+		long end = System.nanoTime();
+		stats.writeStat(Stats.Operation.UPDATE, event, ini, end);	
 		logger.debug("Event " + event + " merged successfully.");
 	}
 	/**
@@ -162,8 +176,11 @@ public class EventDAOImpl implements EventDAO {
 		if (hevent == null) {
 			logger.warn("Event [" + event.getEventID() + "] could not be deleted. It does not exists.");
 			return;
-		}
-		entityManager.remove(hevent);	
+		}	
+		long ini = System.nanoTime();
+		entityManager.remove(hevent);
+		long end = System.nanoTime();
+		stats.writeStat(Stats.Operation.DELETE, event, ini, end);
 		logger.debug("Event " + event + " removed successfully.");
 	}	
 	/**
@@ -175,7 +192,7 @@ public class EventDAOImpl implements EventDAO {
 	 * @throws IllegalArgumentException if an illegal argument error occurred.
 	 * @throws TransactionRequiredException if a transaction error occurred.
 	 */	
-	synchronized public void save(Event event) throws IllegalArgumentException, TransactionRequiredException {
+	public void save(Event event) throws IllegalArgumentException, TransactionRequiredException {
 		logger.debug("Saving event " + event + "...");	
 		/* save process instance */
 		processInstanceDAO.save(event.getProcessInstance());
@@ -185,13 +202,21 @@ public class EventDAOImpl implements EventDAO {
 		HEvent hevent = BusinessObjectAssembler.getInstance().toEntity(event);
 		Query query = entityManager.createQuery("select max(e.eventID) from " + HEvent.class.getName() + " e ");
 		Long maxEvent = null;
-		maxEvent = (Long)query.getSingleResult();
+		long ini = System.nanoTime();
+		maxEvent = (Long)query.getSingleResult();	
+		long end = System.nanoTime();
+		stats.writeStat(Stats.Operation.READ_MAX_ID, event, ini, end);
+		
 		if (maxEvent == null) {
 			logger.warn("There are not events defined at the datastore.");	
 			maxEvent = 0L;
 		}
+
 		hevent.setEventID(maxEvent + 1);
+		ini = System.nanoTime();
 		entityManager.persist(hevent);	
+		end = System.nanoTime();
+		stats.writeStat(Stats.Operation.WRITE, event, ini, end);
 		logger.debug("Event " + event + " saved successfully.");
 	}	
 	/**

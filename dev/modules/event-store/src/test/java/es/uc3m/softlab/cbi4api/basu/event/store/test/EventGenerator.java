@@ -90,19 +90,11 @@ public class EventGenerator extends Thread {
 			element.setEvent(event);
 			event.getData().add(element);
 		}
-		long ini = 0;
-		long end = 0;
 		try {				
-			ini = System.currentTimeMillis();
 			eventFacade.storeEvent(event);	
-			logger.fatal(event.getEventID() + ", " + event.getProcessName() + ", " + event.getActivityName() + ", " + event.getEventDetails().getPreviousState() + ", " + event.getEventDetails().getCurrentState() + ", " + (end - ini));
-			end = System.currentTimeMillis();
-			synchronized (EventStorePerformanceTest.writer) {				
-				EventStorePerformanceTest.writer.print(event.getEventID() + ", " + event.getProcessName() + ", " + event.getActivityName() + ", " + event.getEventDetails().getPreviousState() + ", " + event.getEventDetails().getCurrentState() + ", " + (end - ini) + "\n");
-				EventStorePerformanceTest.writer.flush();
-			}
-		} catch (Exception ex) {
-			logger.error(ex.fillInStackTrace());			
+		} catch (EventException ex) {
+			logger.error(ex.fillInStackTrace());
+			ex.printStackTrace();
 		} 
 	}
 }

@@ -5,7 +5,10 @@
  */
 package es.uc3m.softlab.cbi4api.basu.event.store.dao;
 
+import es.uc3m.softlab.cbi4api.basu.event.store.Config;
 import es.uc3m.softlab.cbi4api.basu.event.store.StaticResources;
+import es.uc3m.softlab.cbi4api.basu.event.store.Stats;
+import es.uc3m.softlab.cbi4api.basu.event.store.domain.ActivityInstance;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.Model;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessInstance;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.Source;
@@ -13,6 +16,10 @@ import es.uc3m.softlab.cbi4api.basu.event.store.entity.HEvent;
 import es.uc3m.softlab.cbi4api.basu.event.store.entity.HModel;
 import es.uc3m.softlab.cbi4api.basu.event.store.entity.HProcessInstance;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,6 +57,8 @@ public class ModelDAOImpl implements ModelDAO {
     protected EntityManager entityManager;
     /** Source data access object */
     @Autowired private SourceDAO sourceDAO;
+    /** Statistical performance object */
+    @Autowired private Stats stats; 
     
 	/**
 	 * Find all {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Model} entity 
@@ -117,7 +126,8 @@ public class ModelDAOImpl implements ModelDAO {
 		query.setParameter("modelSrcId", modelId);
 		query.setParameter("sourceId", source.getId());
 		HModel hmodel = null;
-		try {
+		long ini = System.nanoTime();
+		try {			
 			hmodel = (HModel)query.getSingleResult();
 			logger.debug("Model " + hmodel + " retrieved successfully.");
 		} catch(NoResultException nrex) {
@@ -127,7 +137,9 @@ public class ModelDAOImpl implements ModelDAO {
 			logger.debug(nurex.fillInStackTrace());
 			throw nurex;
 		}
+		long end = System.nanoTime();	
 		Model model = BusinessObjectAssembler.getInstance().toBusinessObject(hmodel);
+		stats.writeStat(Stats.Operation.READ_BY_SOURCE_DATA, model, ini, end);
 		Source _source = sourceDAO.findById(hmodel.getSource());
 		model.setSource(_source);	
 		return model;
@@ -176,7 +188,7 @@ public class ModelDAOImpl implements ModelDAO {
 	 * @throws IllegalArgumentException if an illegal argument error occurred.
 	 * @throws TransactionRequiredException if a transaction error occurred.
 	 */	
-	synchronized public void save(Model model) throws IllegalArgumentException, TransactionRequiredException {
+	public void save(Model model) throws IllegalArgumentException, TransactionRequiredException {
 		logger.debug("Saving model " + model + "...");	
 		
 		if (model == null) {

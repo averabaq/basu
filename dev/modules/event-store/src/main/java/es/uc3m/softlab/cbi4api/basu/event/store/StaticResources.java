@@ -23,6 +23,13 @@ public class StaticResources {
     /** Empty string representation */
     public static final String STRING_EMPTY="";
 
+    /** Bundle key for current locale */
+    public static final String BUNDLE_CONFIG_LOCALE_KEY="cbi4api.basu.event.store.application.locale";
+    /** Bundle key for stats file */
+    public static final String BUNDLE_CONFIG_STATS_FILE_KEY="cbi4api.basu.event.store.stats.file";
+    /** Bundle key for stats active flag */
+    public static final String BUNDLE_CONFIG_STATS_ACTIVE_KEY="cbi4api.basu.event.store.stats.active";
+    
 	/** Component name for event data access object */
 	public static final String COMPONENT_NAME_EVENT_DAO = "/cbi4api-basu/event-store/dao/EventDAO";
 	/** Component name for source data access object */

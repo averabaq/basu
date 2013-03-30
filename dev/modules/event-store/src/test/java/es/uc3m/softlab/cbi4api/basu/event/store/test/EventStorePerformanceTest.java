@@ -5,29 +5,14 @@
  */
 package es.uc3m.softlab.cbi4api.basu.event.store.test;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
 
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.ActivityInstance;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.ActivityModel;
-import es.uc3m.softlab.cbi4api.basu.event.store.domain.Event;
-import es.uc3m.softlab.cbi4api.basu.event.store.domain.EventCorrelation;
-import es.uc3m.softlab.cbi4api.basu.event.store.domain.EventData;
-import es.uc3m.softlab.cbi4api.basu.event.store.domain.EventPayload;
-import es.uc3m.softlab.cbi4api.basu.event.store.domain.Model;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.ModelType;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessInstance;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessModel;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.Source;
-import es.uc3m.softlab.cbi4api.basu.event.store.domain.State;
-import es.uc3m.softlab.cbi4api.basu.event.store.facade.ActivityInstanceException;
 import es.uc3m.softlab.cbi4api.basu.event.store.facade.ActivityInstanceFacade;
 import es.uc3m.softlab.cbi4api.basu.event.store.facade.EventException;
 import es.uc3m.softlab.cbi4api.basu.event.store.facade.EventFacade;
@@ -39,7 +24,6 @@ import es.uc3m.softlab.cbi4api.basu.event.store.facade.SourceException;
 import es.uc3m.softlab.cbi4api.basu.event.store.facade.SourceFacade;
 
 import org.apache.log4j.Logger;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,17 +42,13 @@ public class EventStorePerformanceTest extends AbstractShowcaseTest {
 	/** Log for tracing */
     private static final Logger logger = Logger.getLogger(EventStoreTest.class);
     /** concurrency degree */
-	private static final int CONCURRENCY_DEGREE = 3;
+	private static final int CONCURRENCY_DEGREE = 4;
     /** subprocess span level */
-	private static final int SUBPROCESS_SPAN_LEVEL = 5;	
+	private static final int SUBPROCESS_SPAN_LEVEL = 7;	
 	/** number of events per instance */
-	private static final int EVENTS_PER_INSTANCE = 8;
-	/** Log for tracing */
-    private static final String STATS_FILE = "/var/cbi4api/basu/tmp/stats-" + CONCURRENCY_DEGREE + "-degree.csv";
-    /** Statistic file */
-    protected static PrintWriter writer;
+	private static final int EVENTS_PER_INSTANCE = 10;
 	/** Number of event records to store in this test */
-	private static final int TEST_CASE_EVENT_NUM = 1;
+	private static final int TEST_CASE_EVENT_NUM = 10000;
 	/** Event session facade */
 	@Autowired private EventFacade eventFacade;
 	/** Source session facade */
@@ -130,12 +110,6 @@ public class EventStorePerformanceTest extends AbstractShowcaseTest {
 				//logger.fatal("Creating activity model " + activityModel.getModelSrcId());
 				modelFacade.saveModel(activityModel);
 			}
-		}
-		
-		try {
-			writer = new PrintWriter(new BufferedWriter(new FileWriter(STATS_FILE)));
-		} catch (IOException ex) {			
-			logger.fatal(ex.fillInStackTrace());
 		}
 
 		long pInstanceId = (long)(Math.random() * 10000);

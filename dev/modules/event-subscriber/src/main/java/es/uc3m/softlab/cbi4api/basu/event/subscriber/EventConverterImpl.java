@@ -14,9 +14,7 @@ import es.uc3m.softlab.cbi4api.basu.event.store.domain.Event;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.EventCorrelation;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.EventData;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.EventPayload;
-import es.uc3m.softlab.cbi4api.basu.event.store.domain.ModelType;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessInstance;
-import es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessModel;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.Source;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.State;
 import es.uc3m.softlab.cbi4api.basu.event.store.facade.ActivityInstanceException;
@@ -26,10 +24,10 @@ import es.uc3m.softlab.cbi4api.basu.event.store.facade.ModelFacade;
 import es.uc3m.softlab.cbi4api.basu.event.store.facade.ProcessInstanceException;
 import es.uc3m.softlab.cbi4api.basu.event.store.facade.SourceException;
 import es.uc3m.softlab.cbi4api.basu.event.store.facade.SourceFacade;
+import es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.basu.event.CorrelationElement;
+import es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.basu.event.DataElement;
+import es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.basu.event.Payload;
 
-import es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.bpaf.extension.CorrelationElement;
-import es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.bpaf.extension.DataElement;
-import es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.bpaf.extension.Payload;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,7 +70,7 @@ public class EventConverterImpl implements EventConverter {
      * @throws EventException if any event exception occurred during processing.
      * @throws SourceException if the source it is not defined at the database.
      */
-    public Event transform(es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.bpaf.extension.Event event) throws SourceException, ModelException, ProcessInstanceException, ActivityInstanceException, EventException {
+    public Event transform(es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.basu.event.Event event) throws SourceException, ModelException, ProcessInstanceException, ActivityInstanceException, EventException {
 		/* creates the new event */
     	Event evt = new Event();
 
@@ -82,24 +80,14 @@ public class EventConverterImpl implements EventConverter {
 			logger.fatal("Cannot get source from database for the server with id " + event.getServerID() + ". Please, check if it is defined.");
 			throw new SourceException(es.uc3m.softlab.cbi4api.basu.event.store.StaticResources.WARN_GET_SOURCE_NOT_EXIST,
 					"Cannot get source from database for the server with id " + event.getServerID() + ". Please, check if it is defined.");
-		}		
-		/* gets the process model */
-		ProcessModel processModel = (ProcessModel)modelFacade.getModel(event.getProcessDefinitionID(), source);
-		/* if the process model has not been defined */
-		if (processModel == null) {
-			processModel = new ProcessModel();
-			processModel.setType(ModelType.PROCESS);
-			processModel.setName(event.getProcessDefinitionID());
-			processModel.setModelSrcId(event.getProcessDefinitionID());
-			processModel.setSource(source);
-		}				
+		}						
 		/* correlates the event by obtaining an existing process instance or creating a new one if necessary */
-		ProcessInstance processInstance = eventCorrelator.correlate(event, processModel, source);		
+		ProcessInstance processInstance = eventCorrelator.correlateProcess(event, source);		
 		/* sets the process instance */
 		evt.setProcessInstance(processInstance);
 
 		/* correlates the event by obtaining an existing activity instance or creating a new one if necessary */
-		ActivityInstance activityInstance = eventCorrelator.correlate(event, source);		
+		ActivityInstance activityInstance = eventCorrelator.correlateActivity(event, source);		
 		/* sets the activity instance */
 		evt.setActivityInstance(activityInstance);
 		

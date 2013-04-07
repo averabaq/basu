@@ -5,7 +5,7 @@
  */
 package es.uc3m.softlab.cbi4api.basu.event.subscriber;
 
-import es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.bpaf.extension.Event;
+import es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.basu.event.Event;
 
 import java.io.ByteArrayInputStream;
 
@@ -56,12 +56,12 @@ public class EventReaderImpl implements EventReader {
 
 			ByteArrayInputStream bios = new ByteArrayInputStream(xml);
 			/* create a JAXBContext capable of handling classes */ 
-			JAXBContext jc = JAXBContext.newInstance("es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.bpaf.extension");			
+			JAXBContext jc = JAXBContext.newInstance("es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.basu.event");			
 			/* create an Unmarshaller */
 			Unmarshaller u = jc.createUnmarshaller();        			
 			/* Performs an xml validation against the F4BPA-BPAF schema */ 
 			SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-			Schema schema = factory.newSchema(getClass().getResource(StaticResources.CBI4API_SLAVE_BPAF_XML_SCHEMA_CLASSPATH_FILE));
+			Schema schema = factory.newSchema(getClass().getResource(StaticResources.BASU_EVENT_BPAF_XML_SCHEMA_CLASSPATH_FILE));
 			u.setSchema(schema);			
 			/* unmarshal an instance document into a tree of Java content objects. */			
 			event = (Event) u.unmarshal(bios);

@@ -5,7 +5,6 @@
  */
 package es.uc3m.softlab.cbi4api.basu.event.store.dao;
 
-import es.uc3m.softlab.cbi4api.basu.event.store.Config;
 import es.uc3m.softlab.cbi4api.basu.event.store.StaticResources;
 import es.uc3m.softlab.cbi4api.basu.event.store.Stats;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.Event;
@@ -14,11 +13,8 @@ import es.uc3m.softlab.cbi4api.basu.event.store.domain.EventData;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.EventPayload;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessInstance;
 import es.uc3m.softlab.cbi4api.basu.event.store.entity.HEvent;
+import es.uc3m.softlab.cbi4api.basu.event.store.entity.HSequenceGenerator;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -127,9 +123,9 @@ public class EventDAOImpl implements EventDAO {
 		long ini = System.nanoTime();
 		HEvent hevent = entityManager.find(HEvent.class, eventId);	
 		long end = System.nanoTime();	
+		stats.writeStat(Stats.Operation.READ_BY_ID, hevent, ini, end);
 		if (hevent != null) {
-			Event event = BusinessObjectAssembler.getInstance().toBusinessObject(hevent);
-			stats.writeStat(Stats.Operation.READ_BY_ID, event, ini, end);	
+			Event event = BusinessObjectAssembler.getInstance().toBusinessObject(hevent);	
 			ProcessInstance processInstance = processInstanceDAO.findById(hevent.getProcessInstance());
 			event.setProcessInstance(processInstance);
 			/* TODO: load payload, data, correlation */
@@ -158,7 +154,7 @@ public class EventDAOImpl implements EventDAO {
 		long ini = System.nanoTime();
 		entityManager.merge(hevent);
 		long end = System.nanoTime();
-		stats.writeStat(Stats.Operation.UPDATE, event, ini, end);	
+		stats.writeStat(Stats.Operation.UPDATE, hevent, ini, end);	
 		logger.debug("Event " + event + " merged successfully.");
 	}
 	/**
@@ -180,7 +176,7 @@ public class EventDAOImpl implements EventDAO {
 		long ini = System.nanoTime();
 		entityManager.remove(hevent);
 		long end = System.nanoTime();
-		stats.writeStat(Stats.Operation.DELETE, event, ini, end);
+		stats.writeStat(Stats.Operation.DELETE, hevent, ini, end);
 		logger.debug("Event " + event + " removed successfully.");
 	}	
 	/**
@@ -200,23 +196,30 @@ public class EventDAOImpl implements EventDAO {
 		if (event.getActivityInstance() != null)
 			activityInstanceDAO.save(event.getActivityInstance());	
 		HEvent hevent = BusinessObjectAssembler.getInstance().toEntity(event);
-		Query query = entityManager.createQuery("select max(e.eventID) from " + HEvent.class.getName() + " e ");
-		Long maxEvent = null;
 		long ini = System.nanoTime();
-		maxEvent = (Long)query.getSingleResult();	
+		HSequenceGenerator hsequenceGenerator = entityManager.find(HSequenceGenerator.class, HSequenceGenerator.Type.EVENT);
 		long end = System.nanoTime();
-		stats.writeStat(Stats.Operation.READ_MAX_ID, event, ini, end);
-		
-		if (maxEvent == null) {
-			logger.warn("There are not events defined at the datastore.");	
-			maxEvent = 0L;
+		stats.writeStat(Stats.Operation.READ_MAX_ID, hsequenceGenerator, ini, end);
+		if (hsequenceGenerator == null) {
+			logger.debug("There are not events defined at the datastore.");	
+			hsequenceGenerator = new HSequenceGenerator(HSequenceGenerator.Type.EVENT, 0L);
+			ini = System.nanoTime();
+			entityManager.persist(hsequenceGenerator);
+			end = System.nanoTime();
+			stats.writeStat(Stats.Operation.WRITE, hsequenceGenerator, ini, end);
 		}
-
-		hevent.setEventID(maxEvent + 1);
+		hevent.setEventID(hsequenceGenerator.getNextSeq());
+		event.setEventID(hevent.getEventID());
 		ini = System.nanoTime();
-		entityManager.persist(hevent);	
+		entityManager.persist(hevent);
 		end = System.nanoTime();
-		stats.writeStat(Stats.Operation.WRITE, event, ini, end);
+		stats.writeStat(Stats.Operation.WRITE, hevent, ini, end);
+		/* increase sequence */
+		hsequenceGenerator.increase();
+		ini = System.nanoTime();
+		entityManager.merge(hsequenceGenerator);
+		end = System.nanoTime();
+		stats.writeStat(Stats.Operation.UPDATE, hsequenceGenerator, ini, end);
 		logger.debug("Event " + event + " saved successfully.");
 	}	
 	/**

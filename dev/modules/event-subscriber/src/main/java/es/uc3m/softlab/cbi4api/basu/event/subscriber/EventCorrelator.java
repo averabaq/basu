@@ -7,14 +7,12 @@ package es.uc3m.softlab.cbi4api.basu.event.subscriber;
 
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.ActivityInstance;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessInstance;
-import es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessModel;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.Source;
 import es.uc3m.softlab.cbi4api.basu.event.store.facade.ActivityInstanceException;
 import es.uc3m.softlab.cbi4api.basu.event.store.facade.EventException;
 import es.uc3m.softlab.cbi4api.basu.event.store.facade.ModelException;
 import es.uc3m.softlab.cbi4api.basu.event.store.facade.ProcessInstanceException;
-
-import es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.bpaf.extension.Event;
+import es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.basu.event.Event;
 
 /**
  * Component interface for correlating events before being stored into 
@@ -36,15 +34,13 @@ public interface EventCorrelator {
      * process instance if it exists, otherwise it creates a new one.
      * @param processModel {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessModel} associated to the incoming 
      * {@link es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.bpaf.extension.Event}.
-     * @param source {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Source} associated to the 
-     * {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessModel} of the incoming 
-     * {@link es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.bpaf.extension.Event}.
-     * @return right {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessInstance} associated to properly 
+     * @return exact {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessInstance} associated to properly 
      * correlated the incoming {@link es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.bpaf.extension.Event}.
      * @throws ProcessInstanceException if any process instance exception occurred during processing.
+     * @throws ModelException if any model exception occurred during processing.
      * @throws EventException if any event exception occurred during processing.
      */
-    public ProcessInstance correlate(Event event, ProcessModel processModel, Source source) throws ProcessInstanceException, EventException;
+    public ProcessInstance correlateProcess(Event event, Source source) throws ModelException, ProcessInstanceException, EventException;
     /**
      * Correlates the incoming {@link es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.bpaf.extension.Event} 
      * by obtaining an existing process instance or creating a new one if necessary. 
@@ -59,5 +55,5 @@ public interface EventCorrelator {
      * @throws ModelException if any model exception occurred during processing.
      * @throws EventException if any event exception occurred during processing.
      */
-    public ActivityInstance correlate(Event event, Source source) throws ModelException, ActivityInstanceException, EventException;
+    public ActivityInstance correlateActivity(Event event, Source source) throws ModelException, ActivityInstanceException, EventException;
 }

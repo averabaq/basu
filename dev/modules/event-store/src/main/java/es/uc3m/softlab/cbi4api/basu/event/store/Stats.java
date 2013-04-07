@@ -19,10 +19,11 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import es.uc3m.softlab.cbi4api.basu.event.store.StaticResources;
-import es.uc3m.softlab.cbi4api.basu.event.store.domain.ActivityInstance;
-import es.uc3m.softlab.cbi4api.basu.event.store.domain.Event;
-import es.uc3m.softlab.cbi4api.basu.event.store.domain.Model;
-import es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessInstance;
+import es.uc3m.softlab.cbi4api.basu.event.store.entity.HActivityInstance;
+import es.uc3m.softlab.cbi4api.basu.event.store.entity.HEvent;
+import es.uc3m.softlab.cbi4api.basu.event.store.entity.HModel;
+import es.uc3m.softlab.cbi4api.basu.event.store.entity.HProcessInstance;
+import es.uc3m.softlab.cbi4api.basu.event.store.entity.HSequenceGenerator;
 
 /**
  * Class that configures the global application. It takes
@@ -73,15 +74,18 @@ public class Stats {
      */
     synchronized public void writeStat(Operation op, Object obj, long start, long end) {
     	if (config.isStatsActive()) {
-    		if (obj instanceof Event)
-    			writer.printf("%s,%s,%s,%s,%s,%s\n", op, "EVENT", ((Event)obj).getEventID(), start, end, (end - start));
-    		else if (obj instanceof ProcessInstance)
-    			writer.printf("%s,%s,%s,%s,%s,%s\n", op, "PROCESS_INSTANCE", ((ProcessInstance)obj).getInstanceSrcId(), start, end, (end - start));
-    		else if (obj instanceof ActivityInstance)	
-    			writer.printf("%s,%s,%s,%s,%s,%s\n", op, "ACTIVITY_INSTANCE", ((ActivityInstance)obj).getInstanceSrcId(), start, end, (end - start));
-    		else if (obj instanceof Model)	
-    			writer.printf("%s,%s,%s,%s,%s,%s\n", op, "MODEL", ((Model)obj).getModelSrcId(), start, end, (end - start));
-    		else logger.warn("Unkown statistical performance object object.");
+    		if (obj instanceof HEvent)
+    			writer.printf("%s,%s,%s,%s,%s,%s\n", op, "EVENT", ((HEvent)obj).getEventID(), start, end, (end - start));
+    		else if (obj instanceof HProcessInstance)
+    			writer.printf("%s,%s,%s,%s,%s,%s\n", op, "PROCESS_INSTANCE", ((HProcessInstance)obj).getInstanceSrcId(), start, end, (end - start));
+    		else if (obj instanceof HActivityInstance)	
+    			writer.printf("%s,%s,%s,%s,%s,%s\n", op, "ACTIVITY_INSTANCE", ((HActivityInstance)obj).getInstanceSrcId(), start, end, (end - start));
+    		else if (obj instanceof HModel)	
+    			writer.printf("%s,%s,%s,%s,%s,%s\n", op, "MODEL", ((HModel)obj).getModelSrcId(), start, end, (end - start));
+    		else if (obj instanceof HSequenceGenerator)	
+    			writer.printf("%s,%s,%s,%s,%s,%s\n", op, "SEQUENCE_GENERATOR", ((HSequenceGenerator)obj), start, end, (end - start));   		
+    		else if (obj != null)
+    			logger.warn("Unkown statistical performance object object '" + obj.getClass() + "'.");
     		writer.flush();
     	}
     }

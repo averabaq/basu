@@ -23,9 +23,9 @@ import es.uc3m.softlab.cbi4api.basu.event.store.facade.ModelException;
 import es.uc3m.softlab.cbi4api.basu.event.store.facade.ModelFacade;
 import es.uc3m.softlab.cbi4api.basu.event.store.facade.ProcessInstanceException;
 import es.uc3m.softlab.cbi4api.basu.event.store.facade.ProcessInstanceFacade;
-import es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.bpaf.extension.Correlation;
-import es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.bpaf.extension.CorrelationElement;
-import es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.bpaf.extension.Event;
+import es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.basu.event.Correlation;
+import es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.basu.event.CorrelationElement;
+import es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.basu.event.Event;
 
 import org.apache.log4j.Logger;
 
@@ -62,26 +62,31 @@ public class EventCorrelatorImpl implements EventCorrelator {
      * process instance if it exists, otherwise it creates a new one.
      * @param processModel {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessModel} associated to the incoming 
      * {@link es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.bpaf.extension.Event}.
-     * @param source {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Source} associated to the 
-     * {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessModel} of the incoming 
-     * {@link es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.bpaf.extension.Event}.
-     * @return right {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessInstance} associated to properly 
+     * @return exact {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessInstance} associated to properly 
      * correlated the incoming {@link es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.bpaf.extension.Event}.
      * @throws ProcessInstanceException if any process instance exception occurred during processing.
+     * @throws ModelException if any model exception occurred during processing.
      * @throws EventException if any event exception occurred during processing.
      */
-    public ProcessInstance correlate(Event event, ProcessModel processModel, Source source) throws ProcessInstanceException, EventException {
+    public ProcessInstance correlateProcess(Event event, Source source) throws ModelException, ProcessInstanceException, EventException {
 		logger.debug("Correlating incoming event with id " + event.getEventID());
     	ProcessInstance processInstance = null;
+		/* gets the process model */
+		ProcessModel processModel = (ProcessModel)modelFacade.getModel(event.getProcessDefinitionID(), source);
+		
 		/* If the process instance identifier is provided at source */
 		if (event.getProcessInstanceID() != null) {
 			logger.debug("Incoming event with id " + event.getEventID() + " comes from a bpel engine or alternative system that provides a source process instance identifier.");
 			String processInstanceId = event.getProcessInstanceID();		
 			/* gets the process instance from the event store */
-			processInstance = processInstanceFacade.getProcessInstance(processInstanceId, source);
+			processInstance = processInstanceFacade.getProcessInstance(processInstanceId, processModel);
 	    	/* if the process instance has not been defined yet */
-	    	if (processInstance == null) {
+	    	if (processInstance == null) {	    		
 	    		processInstance = new ProcessInstance();
+	    		/*
+	    		 * TODO: request process instance identifier to GBAS instance
+	    		 * processInstance.setId(new instance from GBAS); 
+	    		 */
 	    		processInstance.setInstanceSrcId(processInstanceId);
 	    		processInstance.setName(event.getProcessName());
 	    		processInstance.setModel(processModel);
@@ -103,6 +108,10 @@ public class EventCorrelatorImpl implements EventCorrelator {
 	    	/* if the process instance has not been defined yet */
 	    	if (processInstance == null) {
 	    		processInstance = new ProcessInstance();
+	    		/*
+	    		 * TODO: request process instance identifier to GBAS instance
+	    		 * processInstance.setId(new instance from GBAS); 
+	    		 */
 	    		processInstance.setInstanceSrcId(null);	    		
 	    		processInstance.setName(event.getProcessName());
 	    		processInstance.setModel(processModel);
@@ -124,7 +133,7 @@ public class EventCorrelatorImpl implements EventCorrelator {
      * @throws ModelException if any model exception occurred during processing.
      * @throws EventException if any event exception occurred during processing.
      */
-    public ActivityInstance correlate(Event event, Source source) throws ModelException, ActivityInstanceException, EventException {
+    public ActivityInstance correlateActivity(Event event, Source source) throws ModelException, ActivityInstanceException, EventException {
     	logger.debug("Correlating incoming event with id " + event.getEventID());
     	ActivityInstance activityInstance = null;		
 		/* if the event refers to an activity */
@@ -144,7 +153,7 @@ public class EventCorrelatorImpl implements EventCorrelator {
 			/* gets the activity instance from the event store */
 			String activityInstanceId = event.getActivityInstanceID();
 			/* gets the activity instance from the event store */
-			activityInstance = activityInstanceFacade.getActivityInstance(activityInstanceId, source);
+			activityInstance = activityInstanceFacade.getActivityInstance(activityInstanceId, activityModel);
 			
 			/* if the activity instance has not been defined yet */
 			if (activityInstance == null) {				
@@ -153,7 +162,7 @@ public class EventCorrelatorImpl implements EventCorrelator {
 				activityInstance.setName(event.getActivityName());
 				activityInstance.setModel(activityModel);
 				if (event.getActivityParentID() != null) {
-					ActivityInstance parent = activityInstanceFacade.getActivityInstance(event.getActivityParentID(), source);
+					ActivityInstance parent = activityInstanceFacade.getActivityInstance(event.getActivityParentID(), activityModel);
 					activityInstance.setParent(parent);
 				}
 			} 			

@@ -15,6 +15,7 @@ import es.uc3m.softlab.cbi4api.basu.event.store.domain.Source;
 import es.uc3m.softlab.cbi4api.basu.event.store.entity.HEvent;
 import es.uc3m.softlab.cbi4api.basu.event.store.entity.HModel;
 import es.uc3m.softlab.cbi4api.basu.event.store.entity.HProcessInstance;
+import es.uc3m.softlab.cbi4api.basu.event.store.entity.HSequenceGenerator;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -125,10 +126,12 @@ public class ModelDAOImpl implements ModelDAO {
 		Query query = entityManager.createQuery("select m from " + HModel.class.getName() + " m where m.modelSrcId = :modelSrcId and m.source = :sourceId");
 		query.setParameter("modelSrcId", modelId);
 		query.setParameter("sourceId", source.getId());
-		HModel hmodel = null;
-		long ini = System.nanoTime();
+		HModel hmodel = null;		
 		try {			
+			long ini = System.nanoTime();
 			hmodel = (HModel)query.getSingleResult();
+			long end = System.nanoTime();
+			stats.writeStat(Stats.Operation.READ_BY_SOURCE_DATA, hmodel, ini, end);
 			logger.debug("Model " + hmodel + " retrieved successfully.");
 		} catch(NoResultException nrex) {
 			logger.debug("Model with source data as pairs of (" + modelId + ", " + source + ") does not exist.");
@@ -136,10 +139,8 @@ public class ModelDAOImpl implements ModelDAO {
 		} catch(NonUniqueResultException nurex) {
 			logger.debug(nurex.fillInStackTrace());
 			throw nurex;
-		}
-		long end = System.nanoTime();	
-		Model model = BusinessObjectAssembler.getInstance().toBusinessObject(hmodel);
-		stats.writeStat(Stats.Operation.READ_BY_SOURCE_DATA, model, ini, end);
+		}			
+		Model model = BusinessObjectAssembler.getInstance().toBusinessObject(hmodel);		
 		Source _source = sourceDAO.findById(hmodel.getSource());
 		model.setSource(_source);	
 		return model;
@@ -212,17 +213,23 @@ public class ModelDAOImpl implements ModelDAO {
 		}
 		logger.debug("Model " + model.getId() + " does not exists. Saving model...");
 		/* TODO: check source */
-		HModel hmodel = BusinessObjectAssembler.getInstance().toEntity(model);
-		Query query = entityManager.createQuery("select max(m.id) from " + HModel.class.getName() + " m ");
-		Long maxInstance = null;
-		maxInstance = (Long)query.getSingleResult();
-		if (maxInstance == null) {
-			logger.warn("There are not models defined at the datastore.");	
-			maxInstance = 0L;
+		HSequenceGenerator hsequenceGenerator = entityManager.find(HSequenceGenerator.class, HSequenceGenerator.Type.MODEL);
+		if (hsequenceGenerator == null) {
+			logger.debug("There are not models defined at the datastore.");	
+			hsequenceGenerator = new HSequenceGenerator(HSequenceGenerator.Type.MODEL, 0L);
+			entityManager.persist(hsequenceGenerator);
 		}
-		hmodel.setId(maxInstance + 1);
+		
+		HModel hmodel = BusinessObjectAssembler.getInstance().toEntity(model);
+		hmodel.setId(hsequenceGenerator.getNextSeq());
 		model.setId(hmodel.getId());
+		long ini = System.nanoTime();
 		entityManager.persist(hmodel);	
+		long end = System.nanoTime();
+		stats.writeStat(Stats.Operation.WRITE, hmodel, ini, end);
+		/* increase sequence */
+		hsequenceGenerator.increase();
+		entityManager.merge(hsequenceGenerator);
 		logger.debug("Model " + model + " saved successfully.");
 	}	
 }

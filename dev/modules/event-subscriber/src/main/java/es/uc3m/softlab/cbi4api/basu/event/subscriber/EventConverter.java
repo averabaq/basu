@@ -42,5 +42,5 @@ public interface EventConverter {
      * @throws EventException if any event exception occurred during processing.
      * @throws SourceException if the source it is not defined at the database.
      */
-    public Event transform(es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.bpaf.extension.Event event) throws SourceException, ModelException, ProcessInstanceException, ActivityInstanceException, EventException;
+    public Event transform(es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.basu.event.Event event) throws SourceException, ModelException, ProcessInstanceException, ActivityInstanceException, EventException;
 }

@@ -420,7 +420,10 @@
 							<extension>true</extension>
 							<verbose>true</verbose>
 							<includeSchemas>
-								<includeSchema>xsd/bpaf-cbi4api-extension.xsd</includeSchema>
+								<includeSchema>xsd/basu-event.xsd</includeSchema>
+								<includeSchema>xsd/basu-process.xsd</includeSchema>									 							
+								<includeSchema>xsd/gbas-order-request.xsd</includeSchema>
+								<includeSchema>xsd/gbas-order-response.xsd</includeSchema>
 							</includeSchemas>
 							<includeBindings>
 								<includeBinding>jaxb-binding.xjb</includeBinding>

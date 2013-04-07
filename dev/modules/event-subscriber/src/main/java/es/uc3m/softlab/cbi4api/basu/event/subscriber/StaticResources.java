@@ -14,8 +14,10 @@ package es.uc3m.softlab.cbi4api.basu.event.subscriber;
 public class StaticResources {
 	/** Internationalization resource bundle */
 	public static final String CONFIG_RESOURCE_BUNDLE="event-subscriber";		
-	/** cbi4api-basu-BPAF xml schema classpath location */
-    public static final String CBI4API_SLAVE_BPAF_XML_SCHEMA_CLASSPATH_FILE="/xsd/bpaf-cbi4api-extension.xsd";
+	/** basu-event BPAF xml schema classpath location */
+    public static final String BASU_EVENT_BPAF_XML_SCHEMA_CLASSPATH_FILE="/xsd/basu-event.xsd";
+	/** basu-process BPAF xml schema classpath location */
+    public static final String BASU_PROCESS_BPAF_XML_SCHEMA_CLASSPATH_FILE="/xsd/basu-process.xsd";
     /** Charset encoding */
     public static final String CHARSET_ENCODING = "UTF-8";
     /** Default application locale */

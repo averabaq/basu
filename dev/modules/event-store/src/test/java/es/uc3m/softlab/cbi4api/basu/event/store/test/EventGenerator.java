@@ -52,8 +52,7 @@ public class EventGenerator extends Thread {
 	 * 
 	 */
 	public void run() {	
-		Event event = new Event();	
-		event.setEventID((long)(Math.random() * 10000000));
+		Event event = new Event();			
 		event.setProcessInstance(processInstance);
 
 		event.setActivityInstance(activityInstance);

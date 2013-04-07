@@ -48,7 +48,7 @@ public class EventStorePerformanceTest extends AbstractShowcaseTest {
 	/** number of events per instance */
 	private static final int EVENTS_PER_INSTANCE = 10;
 	/** Number of event records to store in this test */
-	private static final int TEST_CASE_EVENT_NUM = 10000;
+	private static final int TEST_CASE_EVENT_NUM = 1;
 	/** Event session facade */
 	@Autowired private EventFacade eventFacade;
 	/** Source session facade */
@@ -79,7 +79,7 @@ public class EventStorePerformanceTest extends AbstractShowcaseTest {
 			source.setInetAddress("192.168.1.1" + i);
 			source.setPort(8080);
 			sources.add(source);
-			sourceFacade.saveSource(source);			
+			//sourceFacade.saveSource(source);			
 		}
 		long modelId = (long)(Math.random() * 1000);
 		//logger.fatal("Model " + modelId);
@@ -94,7 +94,7 @@ public class EventStorePerformanceTest extends AbstractShowcaseTest {
 			processModel.setSource(sources.get(i));
 			processModels.add(processModel);
 			//logger.fatal("Creating process model " + processModel.getModelSrcId());
-			modelFacade.saveModel(processModel);
+			//modelFacade.saveModel(processModel);
 		}
 		//logger.fatal("model for activity " + modelId);
 		/* Simulation of one global process per source */
@@ -108,7 +108,7 @@ public class EventStorePerformanceTest extends AbstractShowcaseTest {
 				activityModel.setSource(sources.get(i));
 				activityModels.add(activityModel);
 				//logger.fatal("Creating activity model " + activityModel.getModelSrcId());
-				modelFacade.saveModel(activityModel);
+				//modelFacade.saveModel(activityModel);
 			}
 		}
 
@@ -129,9 +129,9 @@ public class EventStorePerformanceTest extends AbstractShowcaseTest {
 					activityInstance.setModel(activityModels.get((j * SUBPROCESS_SPAN_LEVEL) + k));	
 					//logger.fatal("Assignin activity instance: " + String.format("%05d", Long.valueOf(activityInstance.getInstanceSrcId())));
 					activityInstance.setName("Activity instance [" + String.format("%05d", Long.valueOf(activityInstance.getInstanceSrcId())) + "]");
-					for (int l = 0; l < EVENTS_PER_INSTANCE; l++) {			
+					/*for (int l = 0; l < EVENTS_PER_INSTANCE; l++) {			
 						(new EventGenerator(eventFacade, processInstance, activityInstance)).run();		
-					}
+					}*/
 				}
 			}
 

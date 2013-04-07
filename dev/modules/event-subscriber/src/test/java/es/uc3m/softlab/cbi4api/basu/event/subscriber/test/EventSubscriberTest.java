@@ -6,9 +6,9 @@
 package es.uc3m.softlab.cbi4api.basu.event.subscriber.test;
 
 import es.uc3m.softlab.cbi4api.basu.event.subscriber.EventReader;
-import es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.bpaf.extension.Event;
-import es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.bpaf.extension.Event.EventDetails;
-import es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.bpaf.extension.State;
+import es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.basu.event.Event;
+import es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.basu.event.Event.EventDetails;
+import es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.basu.event.State;
 
 import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
@@ -64,7 +64,7 @@ public class EventSubscriberTest extends AbstractShowcaseTest  {
     @Test
     public void testExtractor() throws Throwable {    
     	for (int i = 0; i < 10 ; i++) {
-    		Event bpafEvent = new es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.bpaf.extension.Event();
+    		Event bpafEvent = new es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.basu.event.Event();
     		bpafEvent.setActivityDefinitionID(UUID.randomUUID().toString());
     		bpafEvent.setActivityInstanceID(UUID.randomUUID().toString());
     		bpafEvent.setActivityName(UUID.randomUUID().toString());
@@ -87,7 +87,7 @@ public class EventSubscriberTest extends AbstractShowcaseTest  {
     		try {    			
     			ByteArrayOutputStream baos = new ByteArrayOutputStream();
     			BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(baos));  	    	
-    			JAXBContext context = JAXBContext.newInstance(es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.bpaf.extension.Event.class);
+    			JAXBContext context = JAXBContext.newInstance(es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.basu.event.Event.class);
     			Marshaller marshaller = context.createMarshaller();
     			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
     			logger.debug("Marshalling event " + bpafEvent + "...");

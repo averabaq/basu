@@ -14,6 +14,7 @@ import es.uc3m.softlab.cbi4api.basu.event.store.domain.EventCorrelation;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.Model;
 import es.uc3m.softlab.cbi4api.basu.event.store.entity.HActivityInstance;
 import es.uc3m.softlab.cbi4api.basu.event.store.entity.HModel;
+import es.uc3m.softlab.cbi4api.basu.event.store.entity.HSequenceGenerator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -126,13 +127,13 @@ public class ActivityInstanceDAOImpl implements ActivityInstanceDAO {
 		Query query = entityManager.createQuery("select p from " + HActivityInstance.class.getName() + " p where p.instanceSrcId = :sourceId and p.model = :modelId");
 		query.setParameter("sourceId", activityId);
 		query.setParameter("modelId", _model.getId());
-		ActivityInstance instance = null;
+		HActivityInstance hinstance = null;
 		try {
 			long ini = System.nanoTime();
-			instance = (ActivityInstance)query.getSingleResult();
+			hinstance = (HActivityInstance)query.getSingleResult();
 			long end = System.nanoTime();
-			stats.writeStat(Stats.Operation.READ_BY_SOURCE_DATA, instance, ini, end);
-			logger.debug("Activity instance " + instance + " retrieved successfully.");
+			stats.writeStat(Stats.Operation.READ_BY_SOURCE_DATA, hinstance, ini, end);
+			logger.debug("Activity instance " + hinstance + " retrieved successfully.");
 		} catch(NoResultException nrex) {
 			logger.debug("Activity instance with source data as pairs of (" + activityId + ", " + model.getSource() + ") does not exist.");
 			return null;
@@ -141,6 +142,7 @@ public class ActivityInstanceDAOImpl implements ActivityInstanceDAO {
 			logger.fatal("This message should never appear. Inconsistence in the database has been found. There exists two or more different local activity instances for a unique pair of source and source activity instances.");			
 			throw new IllegalArgumentException("Inconsistence in the database has been found. There exists two or more different local activity instances for a unique pair of source and source activity instances.");
 		}
+		ActivityInstance instance = BusinessObjectAssembler.getInstance().toBusinessObject(hinstance);
 		return instance;
 	}    	
 	/**
@@ -243,7 +245,7 @@ public class ActivityInstanceDAOImpl implements ActivityInstanceDAO {
 			/* checks for the activity instance existence */
 			HActivityInstance _hactivityInstance = entityManager.find(HActivityInstance.class, instance.getId());			
 			long end = System.nanoTime();
-			stats.writeStat(Stats.Operation.READ_BY_ID, instance, ini, end);			
+			stats.writeStat(Stats.Operation.READ_BY_ID, _hactivityInstance, ini, end);			
 			if (_hactivityInstance != null) {
 				logger.debug("Activity instance " + instance.getId() + " cannot be persisted because it already exists.");
 				return;
@@ -262,24 +264,29 @@ public class ActivityInstanceDAOImpl implements ActivityInstanceDAO {
 
 		/* saves the instance */
 		HActivityInstance hactivityInstance = BusinessObjectAssembler.getInstance().toEntity(instance);
-		Query query = entityManager.createQuery("select max(i.id) from " + HActivityInstance.class.getName() + " i ");
-		Long maxInstance = null;
 
 		long ini = System.nanoTime();
-		/* checks for the process instance existence */
-		maxInstance = (Long)query.getSingleResult();
+		HSequenceGenerator hsequenceGenerator = entityManager.find(HSequenceGenerator.class, HSequenceGenerator.Type.ACTIVITY_INSTANCE);
 		long end = System.nanoTime();
-		stats.writeStat(Stats.Operation.READ_MAX_ID, instance, ini, end);
-		if (maxInstance == null) {
-			logger.warn("There are not activity instances defined at the datastore.");	
-			maxInstance = 0L;
+		stats.writeStat(Stats.Operation.READ_MAX_ID, hsequenceGenerator, ini, end);
+		if (hsequenceGenerator == null) {
+			logger.debug("There are not activity instances defined at the datastore.");	
+			hsequenceGenerator = new HSequenceGenerator(HSequenceGenerator.Type.ACTIVITY_INSTANCE, 0L);
+			ini = System.nanoTime();
+			entityManager.persist(hsequenceGenerator);
+			end = System.nanoTime();
+			stats.writeStat(Stats.Operation.WRITE, hsequenceGenerator, ini, end);
 		}
-		hactivityInstance.setId(maxInstance + 1);
+
+		hactivityInstance.setId(hsequenceGenerator.getNextSeq());
 		instance.setId(hactivityInstance.getId());
 		ini = System.nanoTime();
 		entityManager.persist(hactivityInstance);
 		end = System.nanoTime();
-		stats.writeStat(Stats.Operation.WRITE, instance, ini, end);
+		stats.writeStat(Stats.Operation.WRITE, hactivityInstance, ini, end);
+		/* increase sequence */
+		hsequenceGenerator.increase();
+		entityManager.merge(hsequenceGenerator);
 		logger.debug("Activity instance " + instance + " saved successfully.");
 	}	
 	/**

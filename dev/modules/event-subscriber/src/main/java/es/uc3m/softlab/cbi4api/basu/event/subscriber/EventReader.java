@@ -5,7 +5,7 @@
  */
 package es.uc3m.softlab.cbi4api.basu.event.subscriber;
 
-import es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.bpaf.extension.Event;
+import es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.basu.event.Event;
 
 import javax.jms.Message;
 

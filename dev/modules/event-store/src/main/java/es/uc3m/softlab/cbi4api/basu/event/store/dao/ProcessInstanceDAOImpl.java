@@ -5,10 +5,8 @@
  */
 package es.uc3m.softlab.cbi4api.basu.event.store.dao;
 
-import es.uc3m.softlab.cbi4api.basu.event.store.Config;
 import es.uc3m.softlab.cbi4api.basu.event.store.StaticResources;
 import es.uc3m.softlab.cbi4api.basu.event.store.Stats;
-import es.uc3m.softlab.cbi4api.basu.event.store.domain.ActivityInstance;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.Event;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.EventCorrelation;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.Model;
@@ -16,11 +14,8 @@ import es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessInstance;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessModel;
 import es.uc3m.softlab.cbi4api.basu.event.store.entity.HModel;
 import es.uc3m.softlab.cbi4api.basu.event.store.entity.HProcessInstance;
+import es.uc3m.softlab.cbi4api.basu.event.store.entity.HSequenceGenerator;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -131,13 +126,13 @@ public class ProcessInstanceDAOImpl implements ProcessInstanceDAO {
 		Query query = entityManager.createQuery("select p from " + HProcessInstance.class.getName() + " p where p.instanceSrcId = :sourceId and p.model = :modelId");
 		query.setParameter("sourceId", processId);
 		query.setParameter("modelId", _model.getId());		
-		ProcessInstance instance = null;
+		HProcessInstance hinstance = null;
 		try {
 			long ini = System.nanoTime();
-			instance = (ProcessInstance)query.getSingleResult();
+			hinstance = (HProcessInstance)query.getSingleResult();
 			long end = System.nanoTime();
-			stats.writeStat(Stats.Operation.READ_BY_SOURCE_DATA, instance, ini, end);		
-			logger.debug("Process instance " + instance + " retrieved successfully.");
+			stats.writeStat(Stats.Operation.READ_BY_SOURCE_DATA, hinstance, ini, end);		
+			logger.debug("Process instance " + hinstance + " retrieved successfully.");
 		} catch(NoResultException nrex) {
 			logger.debug("Process instance with source data as pairs of (" + processId + ", " + model.getSource() + ") does not exist.");
 			return null;
@@ -146,6 +141,7 @@ public class ProcessInstanceDAOImpl implements ProcessInstanceDAO {
 			logger.fatal("This message should never appear. Inconsistence in the database has been found. There exists two or more different local process instances for a unique pair of source and source process instances.");			
 			throw new IllegalArgumentException("Inconsistence in the database has been found. There exists two or more different local process instances for a unique pair of source and source process instances.");
 		}
+		ProcessInstance instance = BusinessObjectAssembler.getInstance().toBusinessObject(hinstance);
 		return instance;
 	}   
 	/**
@@ -248,7 +244,7 @@ public class ProcessInstanceDAOImpl implements ProcessInstanceDAO {
 			/* checks for the process instance existence */
 			HProcessInstance _hprocessInstance = entityManager.find(HProcessInstance.class, instance.getId());		
 			long end = System.nanoTime();
-			stats.writeStat(Stats.Operation.READ_BY_ID, instance, ini, end);
+			stats.writeStat(Stats.Operation.READ_BY_ID, _hprocessInstance, ini, end);
 			if (_hprocessInstance != null) {
 				logger.debug("Process instance " + instance.getId() + " cannot be persisted because it already exists.");
 				return;
@@ -266,26 +262,28 @@ public class ProcessInstanceDAOImpl implements ProcessInstanceDAO {
 		modelDAO.save(instance.getModel());
 		/* saves the instance */
 		HProcessInstance hprocessInstance = BusinessObjectAssembler.getInstance().toEntity(instance);
-		Query query = entityManager.createQuery("select max(i.id) from " + HProcessInstance.class.getName() + " i ");
-		Long maxInstance = null;
-		
 		long ini = System.nanoTime();
-		/* checks for the process instance existence */
-		maxInstance = (Long)query.getSingleResult();
+		HSequenceGenerator hsequenceGenerator = entityManager.find(HSequenceGenerator.class, HSequenceGenerator.Type.PROCESS_INSTANCE);
 		long end = System.nanoTime();
-		stats.writeStat(Stats.Operation.READ_MAX_ID, instance, ini, end);
-		
-		if (maxInstance == null) {
-			logger.warn("There are not process instances defined at the datastore.");	
-			maxInstance = 0L;
+		stats.writeStat(Stats.Operation.READ_MAX_ID, hsequenceGenerator, ini, end);
+		if (hsequenceGenerator == null) {
+			logger.debug("There are not process instances defined at the datastore.");	
+			hsequenceGenerator = new HSequenceGenerator(HSequenceGenerator.Type.PROCESS_INSTANCE, 0L);
+			ini = System.nanoTime();
+			entityManager.persist(hsequenceGenerator);
+			end = System.nanoTime();
+			stats.writeStat(Stats.Operation.WRITE, hsequenceGenerator, ini, end);
 		}
-		
-		hprocessInstance.setId(maxInstance + 1);
+
+		hprocessInstance.setId(hsequenceGenerator.getNextSeq());
 		instance.setId(hprocessInstance.getId());
 		ini = System.nanoTime();
 		entityManager.persist(hprocessInstance);
 		end = System.nanoTime();
-		stats.writeStat(Stats.Operation.WRITE, instance, ini, end);
+		stats.writeStat(Stats.Operation.WRITE, hprocessInstance, ini, end);
+		/* increase sequence */
+		hsequenceGenerator.increase();
+		entityManager.merge(hsequenceGenerator);
 		logger.debug("Process instance " + instance + " saved successfully.");
 	}	
 	/**

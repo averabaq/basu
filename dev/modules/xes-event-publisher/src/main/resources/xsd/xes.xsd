@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" 
+  targetNamespace="http://www.xes-standard.org/" xmlns:xes="http://www.xes-standard.org/">
+  <!-- This file describes the XML serialization of the XES format for event log data. -->
+  <!-- For more information about XES, visit http://www.xes-standard.org/ -->
+  
+  <!-- (c) 2009 by Christian W. Guenther (christian@fluxicon.com) -->
+  
+  <!-- Every XES XML Serialization needs to contain exactly one log element -->
+  <xs:element name="log" type="xes:LogType"/>
+  
+  <!-- String attribute -->
+  <xs:complexType name="AttributeStringType">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="string" minOccurs="0" maxOccurs="unbounded" type="xes:AttributeStringType"/>
+      <xs:element name="date" minOccurs="0" maxOccurs="unbounded" type="xes:AttributeDateType"/>
+      <xs:element name="int" minOccurs="0" maxOccurs="unbounded" type="xes:AttributeIntType"/>
+      <xs:element name="float" minOccurs="0" maxOccurs="unbounded" type="xes:AttributeFloatType"/>
+      <xs:element name="boolean" minOccurs="0" maxOccurs="unbounded" type="xes:AttributeBooleanType"/>
+    </xs:choice>
+    <xs:attribute name="key" use="required" type="xs:Name"/>
+    <xs:attribute name="value" use="required" type="xs:string"/>
+  </xs:complexType>
+  
+  <!-- Date attribute -->
+  <xs:complexType name="AttributeDateType">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="string" minOccurs="0" maxOccurs="unbounded" type="xes:AttributeStringType"/>
+      <xs:element name="date" minOccurs="0" maxOccurs="unbounded" type="xes:AttributeDateType"/>
+      <xs:element name="int" minOccurs="0" maxOccurs="unbounded" type="xes:AttributeIntType"/>
+      <xs:element name="float" minOccurs="0" maxOccurs="unbounded" type="xes:AttributeFloatType"/>
+      <xs:element name="boolean" minOccurs="0" maxOccurs="unbounded" type="xes:AttributeBooleanType"/>
+    </xs:choice>
+    <xs:attribute name="key" use="required" type="xs:Name"/>
+    <xs:attribute name="value" use="required" type="xs:dateTime"/>
+  </xs:complexType>
+  
+  <!-- Integer attribute -->
+  <xs:complexType name="AttributeIntType">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="string" minOccurs="0" maxOccurs="unbounded" type="xes:AttributeStringType"/>
+      <xs:element name="date" minOccurs="0" maxOccurs="unbounded" type="xes:AttributeDateType"/>
+      <xs:element name="int" minOccurs="0" maxOccurs="unbounded" type="xes:AttributeIntType"/>
+      <xs:element name="float" minOccurs="0" maxOccurs="unbounded" type="xes:AttributeFloatType"/>
+      <xs:element name="boolean" minOccurs="0" maxOccurs="unbounded" type="xes:AttributeBooleanType"/>
+    </xs:choice>
+    <xs:attribute name="key" use="required" type="xs:Name"/>
+    <xs:attribute name="value" use="required" type="xs:long"/>
+  </xs:complexType>
+  
+  <!-- Floating-point attribute -->
+  <xs:complexType name="AttributeFloatType">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="string" minOccurs="0" maxOccurs="unbounded" type="xes:AttributeStringType"/>
+      <xs:element name="date" minOccurs="0" maxOccurs="unbounded" type="xes:AttributeDateType"/>
+      <xs:element name="int" minOccurs="0" maxOccurs="unbounded" type="xes:AttributeIntType"/>
+      <xs:element name="float" minOccurs="0" maxOccurs="unbounded" type="xes:AttributeFloatType"/>
+      <xs:element name="boolean" minOccurs="0" maxOccurs="unbounded" type="xes:AttributeBooleanType"/>
+    </xs:choice>
+    <xs:attribute name="key" use="required" type="xs:Name"/>
+    <xs:attribute name="value" use="required" type="xs:double"/>
+  </xs:complexType>
+  
+  <!-- Boolean attribute -->
+  <xs:complexType name="AttributeBooleanType">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="string" minOccurs="0" maxOccurs="unbounded" type="xes:AttributeStringType"/>
+      <xs:element name="date" minOccurs="0" maxOccurs="unbounded" type="xes:AttributeDateType"/>
+      <xs:element name="int" minOccurs="0" maxOccurs="unbounded" type="xes:AttributeIntType"/>
+      <xs:element name="float" minOccurs="0" maxOccurs="unbounded" type="xes:AttributeFloatType"/>
+      <xs:element name="boolean" minOccurs="0" maxOccurs="unbounded" type="xes:AttributeBooleanType"/>
+    </xs:choice>
+    <xs:attribute name="key" use="required" type="xs:Name"/>
+    <xs:attribute name="value" use="required" type="xs:boolean"/>
+  </xs:complexType>
+  
+  <!-- Extension definition -->
+  <xs:complexType name="ExtensionType">
+    <xs:attribute name="name" use="required" type="xs:NCName"/>
+    <xs:attribute name="prefix" use="required" type="xs:NCName"/>
+    <xs:attribute name="uri" use="required" type="xs:anyURI"/>
+  </xs:complexType>
+  
+  <!-- Globals definition -->
+  <xs:complexType name="GlobalsType">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="string" minOccurs="0" maxOccurs="unbounded" type="xes:AttributeStringType"/>
+      <xs:element name="date" minOccurs="0" maxOccurs="unbounded" type="xes:AttributeDateType"/>
+      <xs:element name="int" minOccurs="0" maxOccurs="unbounded" type="xes:AttributeIntType"/>
+      <xs:element name="float" minOccurs="0" maxOccurs="unbounded" type="xes:AttributeFloatType"/>
+      <xs:element name="boolean" minOccurs="0" maxOccurs="unbounded" type="xes:AttributeBooleanType"/>
+    </xs:choice>
+    <xs:attribute name="scope" type="xs:NCName" use="required"/>
+  </xs:complexType>
+  
+  <!-- Classifier definition -->
+  <xs:complexType name="ClassifierType">
+    <xs:attribute name="name" type="xs:NCName" use="required"/>
+    <xs:attribute name="keys" type="xs:token" use="required"/>
+  </xs:complexType>
+
+  <!-- Logs may contain attributes and traces -->
+  <xs:complexType name="LogType">
+    <xs:sequence>
+      <xs:element name="extension" minOccurs="0" maxOccurs="unbounded" type="xes:ExtensionType"/>
+      <xs:element name="global" minOccurs="0" maxOccurs="2" type="xes:GlobalsType"/>
+      <xs:element name="classifier" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="string" minOccurs="0" maxOccurs="unbounded" type="xes:AttributeStringType"/>
+        <xs:element name="date" minOccurs="0" maxOccurs="unbounded" type="xes:AttributeDateType"/>
+        <xs:element name="int" minOccurs="0" maxOccurs="unbounded" type="xes:AttributeIntType"/>
+        <xs:element name="float" minOccurs="0" maxOccurs="unbounded" type="xes:AttributeFloatType"/>
+        <xs:element name="boolean" minOccurs="0" maxOccurs="unbounded" type="xes:AttributeBooleanType"/>
+      </xs:choice>
+      <xs:element name="trace" maxOccurs="unbounded" type="xes:TraceType"/>
+    </xs:sequence>
+    <xs:attribute name="xes.version" type="xs:decimal" use="required"/>
+    <xs:attribute name="xes.features" type="xs:token" use="required"/>
+    <xs:attribute name="openxes.version" type="xs:string" use="required"/>
+  </xs:complexType>
+  
+  <!-- Traces may contain attributes and events -->
+  <xs:complexType name="TraceType">
+    <xs:sequence>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="string" minOccurs="0" maxOccurs="unbounded" type="xes:AttributeStringType"/>
+        <xs:element name="date" minOccurs="0" maxOccurs="unbounded" type="xes:AttributeDateType"/>
+        <xs:element name="int" minOccurs="0" maxOccurs="unbounded" type="xes:AttributeIntType"/>
+        <xs:element name="float" minOccurs="0" maxOccurs="unbounded" type="xes:AttributeFloatType"/>
+        <xs:element name="boolean" minOccurs="0" maxOccurs="unbounded" type="xes:AttributeBooleanType"/>
+      </xs:choice>
+      <xs:element name="event" maxOccurs="unbounded" type="xes:EventType"/>
+    </xs:sequence>
+  </xs:complexType>
+  
+  <!-- Events may contain attributes -->
+  <xs:complexType name="EventType">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="string" minOccurs="0" maxOccurs="unbounded" type="xes:AttributeStringType"/>
+      <xs:element name="date" minOccurs="0" maxOccurs="unbounded" type="xes:AttributeDateType"/>
+      <xs:element name="int" minOccurs="0" maxOccurs="unbounded" type="xes:AttributeIntType"/>
+      <xs:element name="float" minOccurs="0" maxOccurs="unbounded" type="xes:AttributeFloatType"/>
+      <xs:element name="boolean" minOccurs="0" maxOccurs="unbounded" type="xes:AttributeBooleanType"/>
+    </xs:choice>
+  </xs:complexType>
+    
+</xs:schema>

@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+  **********************************************************************
+  * XESMAP - Mapping definition format for enabling semantic to XES data
+  **********************************************************************
+  -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:xesmap="http://www.uc3m.es/softlab/basu/xesmap"
+	xmlns:bpaf="http://www.wfmc.org/2009/BPAF2.0"
+	targetNamespace="http://www.uc3m.es/softlab/basu/xesmap">
+	<xs:annotation>
+		<xs:documentation xml:lang="en">
+			XESMAP (eXtensible Event Stream Map) that defines a specific mapping semantic
+			for	event data in XES format.		
+		</xs:documentation>
+	</xs:annotation>
+	
+	<xs:element name="XesMap" xmlns="http://www.uc3m.es/softlab/basu/xesmap">
+		<xs:annotation>
+			<xs:documentation>XESMAP (eXtensible Event Stream Map)</xs:documentation>
+		</xs:annotation>	
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="Trace" type="xesmap:Trace" minOccurs="1" />			
+				<xs:element name="Event" type="xesmap:Event" minOccurs="1" />
+				<xs:element name="StateTransitions" type="xesmap:StateTransitions" minOccurs="0" />
+			</xs:sequence>								
+		</xs:complexType>
+	</xs:element>	
+	
+	<xs:complexType name="StateTransitions" xmlns="http://www.uc3m.es/softlab/basu/xesmap">
+		<xs:sequence>
+			<xs:element name="State" minOccurs="1" maxOccurs="unbounded">
+				<xs:complexType>
+					<xs:attribute name="xes" type="xs:string" use="required"/>
+					<xs:attribute name="bpaf" type="xesmap:BPAFState" use="required"/>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name="key" type="xs:string" use="required"/>
+	</xs:complexType>
+
+	<xs:simpleType name="BPAFState" xmlns="http://www.wfmc.org/2009/BPAF2.0">
+		<xs:annotation>
+			<xs:documentation>Enumeration of Possible BPAF States</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Open"/>
+			<xs:enumeration value="Open.NotRunning"/>
+			<xs:enumeration value="Open.NotRunning.Ready"/>
+			<xs:enumeration value="Open.NotRunning.Assigned"/>
+			<xs:enumeration value="Open.NotRunning.Reserved"/>
+			<xs:enumeration value="Open.NotRunning.Suspended"/>
+			<xs:enumeration value="Open.NotRunning.Suspended.Assigned"/>
+			<xs:enumeration value="Open.NotRunning.Suspended.Reserved"/>
+			<xs:enumeration value="Open.Running"/>
+			<xs:enumeration value="Open.Running.InProgress"/>
+			<xs:enumeration value="Open.Running.Suspended"/>
+			<xs:enumeration value="Closed"/>
+			<xs:enumeration value="Closed.Completed"/>
+			<xs:enumeration value="Closed.Completed.Success"/>
+			<xs:enumeration value="Closed.Completed.Failed"/>
+			<xs:enumeration value="Closed.Cancelled"/>
+			<xs:enumeration value="Closed.Cancelled.Exited"/>
+			<xs:enumeration value="Closed.Cancelled.Error"/>
+			<xs:enumeration value="Closed.Cancelled.Obsolete"/>
+			<xs:enumeration value="Closed.Cancelled.Aborted"/>
+			<xs:enumeration value="Closed.Cancelled.Terminated"/>
+		</xs:restriction>
+	</xs:simpleType>	
+
+	<xs:complexType name="Trace" xmlns="http://www.uc3m.es/softlab/basu/xesmap">
+		<xs:sequence>
+			<xs:element name="EventID" type="xs:string" minOccurs="0" maxOccurs="1" />
+			<xs:element name="ServerID" type="xs:string" minOccurs="0" maxOccurs="1" />
+			<xs:element name="ProcessDefinitionID" type="xs:string" minOccurs="1" maxOccurs="1" />
+			<xs:element name="ProcessInstanceID" type="xs:string" minOccurs="0" maxOccurs="1" />
+			<xs:element name="ProcessName" type="xs:string" minOccurs="1" maxOccurs="1" />
+			<xs:element name="Timestamp" type="xs:string" minOccurs="1" maxOccurs="1" />	
+			<xs:element name="Correlation" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="Payload" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:complexType name="Event" xmlns="http://www.uc3m.es/softlab/basu/xesmap">
+		<xs:sequence>
+			<xs:element name="EventID" type="xs:string" minOccurs="0" maxOccurs="1" />
+			<xs:element name="ServerID" type="xs:string" minOccurs="0" maxOccurs="1" />
+			<xs:element name="ActivityDefinitionID" type="xs:string" minOccurs="1" maxOccurs="1" />
+			<xs:element name="ActivityInstanceID" type="xs:string" minOccurs="0" maxOccurs="1" />
+			<xs:element name="ActivityName" type="xs:string" minOccurs="1" maxOccurs="1" />
+			<xs:element name="Timestamp" type="xs:string" minOccurs="1" maxOccurs="1" />	
+			<xs:element name="Correlation" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="Payload" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>	
+</xs:schema>

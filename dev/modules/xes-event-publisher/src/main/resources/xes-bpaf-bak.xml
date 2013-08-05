@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xesmap:XesMap xmlns:xesmap="http://www.uc3m.es/softlab/basu/xesmap">
+	<xesmap:Trace>
+		<xesmap:EventID>xes:event</xesmap:EventID>
+		<xesmap:SourceID>xes:source</xesmap:SourceID>
+		<xesmap:ProcessDefinitionID>xes:model</xesmap:ProcessDefinitionID>
+		<xesmap:ProcessInstanceID>xes:instance</xesmap:ProcessInstanceID>
+		<xesmap:ProcessName>concept:name</xesmap:ProcessName>
+		<xesmap:Timestamp>time:timestamp</xesmap:Timestamp>
+		<xesmap:Correlation>xes:correlation</xesmap:Correlation>
+		<xesmap:Payload>xes:payload</xesmap:Payload>
+		<xesmap:StateTransitions>
+			<xesmap:State xes="SCHEDULE" bpaf="OPEN_NOT_RUNNING" />
+			<xesmap:State xes="COMPLETE" bpaf="CLOSED_COMPLETED" />
+			<xesmap:State xes="START" bpaf="OPEN_RUNNING" />
+			<xesmap:State xes="ASSIGN" bpaf="OPEN_NOT_RUNNING_ASSIGNED" />
+			<xesmap:State xes="REASSIGN" bpaf="OPEN_NOT_RUNNING_ASSIGNED" />
+			<xesmap:State xes="AUTOSKIP" bpaf="CLOSED_CANCELLED_EXITED" />
+			<xesmap:State xes="MANUALSKIP" bpaf="CLOSED_CANCELLED_EXITED" />
+			<xesmap:State xes="WITHDRAW" bpaf="CLOSED_CANCELLED_ABORTED" />
+			<xesmap:State xes="SUSPEND" bpaf="OPEN_RUNNING_SUSPENDED" />
+			<xesmap:State xes="RESUME" bpaf="OPEN_RUNNING_IN_PROGRESS" />
+			<xesmap:State xes="ATE_ABORT" bpaf="CLOSED_CANCELLED_ABORTED" />
+			<xesmap:State xes="PI_ABORT" bpaf="CLOSED_CANCELLED_ABORTED" />
+		</xesmap:StateTransitions>
+	</xesmap:Trace>
+	<xesmap:Event>
+		<xesmap:EventID>xes:event</xesmap:EventID>
+		<xesmap:SourceID>xes:source</xesmap:SourceID>
+		<xesmap:ActivityDefinitionID>xes:model</xesmap:ActivityDefinitionID>
+		<xesmap:ActivityInstanceID>xes:instance</xesmap:ActivityInstanceID>
+		<xesmap:ActivityName>concept:name</xesmap:ActivityName>
+		<xesmap:Timestamp>time:timestamp</xesmap:Timestamp>
+		<xesmap:Correlation>xes:correlation</xesmap:Correlation>
+		<xesmap:Payload>xes:payload</xesmap:Payload>
+		<xesmap:StateTransitions>
+			<State xes="SCHEDULE" bpaf="OPEN_NOT_RUNNING" />
+			<State xes="COMPLETE" bpaf="CLOSED_COMPLETED" />
+			<State xes="START" bpaf="OPEN_RUNNING" />
+			<State xes="ASSIGN" bpaf="OPEN_NOT_RUNNING_ASSIGNED" />
+			<State xes="REASSIGN" bpaf="OPEN_NOT_RUNNING_ASSIGNED" />
+			<State xes="AUTOSKIP" bpaf="CLOSED_CANCELLED_EXITED" />
+			<State xes="MANUALSKIP" bpaf="CLOSED_CANCELLED_EXITED" />
+			<State xes="WITHDRAW" bpaf="CLOSED_CANCELLED_ABORTED" />
+			<State xes="SUSPEND" bpaf="OPEN_RUNNING_SUSPENDED" />
+			<State xes="RESUME" bpaf="OPEN_RUNNING_IN_PROGRESS" />
+			<State xes="ATE_ABORT" bpaf="CLOSED_CANCELLED_ABORTED" />
+			<State xes="PI_ABORT" bpaf="CLOSED_CANCELLED_ABORTED" />
+		</xesmap:StateTransitions>	
+	</xesmap:Event>
+</xesmap:XesMap>

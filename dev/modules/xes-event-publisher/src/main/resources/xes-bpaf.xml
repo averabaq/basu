@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xesmap:XesMap xmlns:xesmap="http://www.uc3m.es/softlab/basu/xesmap"
+	           xmlns:bpaf="http://www.wfmc.org/2009/BPAF2.0">
+	<Trace>
+		<EventID>identity:id</EventID>
+		<ServerID>xes:source</ServerID>
+		<ProcessDefinitionID>org:group</ProcessDefinitionID>
+		<ProcessInstanceID>concept:name</ProcessInstanceID>
+		<ProcessName>concept:name</ProcessName>
+		<Timestamp>time:timestamp</Timestamp>
+		<Correlation>xes:correlation</Correlation>
+		<Payload>xes:payload</Payload>
+	</Trace>
+	<Event>
+		<EventID>identity:id</EventID>
+		<ServerID>xes:source</ServerID>
+		<ActivityDefinitionID>org:group</ActivityDefinitionID>
+		<ActivityInstanceID>xes:instance</ActivityInstanceID>
+		<ActivityName>concept:name</ActivityName>
+		<Timestamp>time:timestamp</Timestamp>
+		<Correlation>Specialism code</Correlation>
+		<Correlation>Producer code</Correlation>
+		<Correlation>Activity code</Correlation>
+		<Payload>xes:payload</Payload>
+	</Event> 
+	<StateTransitions key="lifecycle:transition">
+		<State xes="SCHEDULE" bpaf="Open.NotRunning" />
+		<State xes="COMPLETE" bpaf="Closed.Completed" />
+		<State xes="START" bpaf="Open.Running" />
+		<State xes="ASSIGN" bpaf="Open.NotRunning.Assigned" />
+		<State xes="REASSIGN" bpaf="Open.NotRunning.Assigned" />
+		<State xes="AUTOSKIP" bpaf="Closed.Cancelled.Exited" />
+		<State xes="MANUALSKIP" bpaf="Closed.Cancelled.Exited" />
+		<State xes="WITHDRAW" bpaf="Closed.Cancelled.Aborted" />
+		<State xes="SUSPEND" bpaf="Open.Running.Suspended" />
+		<State xes="RESUME" bpaf="Open.Running.InProgress" />
+		<State xes="ATE_ABORT" bpaf="Closed.Cancelled.Aborted" />
+		<State xes="PI_ABORT" bpaf="Closed.Cancelled.Aborted" />
+	</StateTransitions>          
+</xesmap:XesMap>

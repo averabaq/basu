@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jms="http://www.springframework.org/schema/jms" 
+	xmlns:task="http://www.springframework.org/schema/task" 
+	xmlns:amq="http://activemq.apache.org/schema/core"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+                        http://www.springframework.org/schema/beans/spring-beans.xsd
+                        http://www.springframework.org/schema/context 
+                        http://www.springframework.org/schema/context/spring-context.xsd
+                        http://www.springframework.org/schema/jms 
+                        http://www.springframework.org/schema/jms/spring-jms.xsd
+                        http://www.springframework.org/schema/task 
+                        http://www.springframework.org/schema/task/spring-task.xsd
+                        http://activemq.apache.org/schema/core 
+                        http://activemq.apache.org/schema/core/activemq-core.xsd">
+
+	<!-- enabling annotation driven configuration -->
+	<context:annotation-config />
+	<context:component-scan base-package="es.uc3m.softlab.cbi4api.basu.xes.event.publisher" />
+     
+	<!-- activemq connection factory -->
+	<amq:connectionFactory id="amqConnectionFactory">
+		<property name="brokerURL" value="#{xesEventPublisherConfig.brokerUrl}" />
+	</amq:connectionFactory> 	 
+		
+    <!-- connection factory -->
+    <bean id="connectionFactory" class="org.apache.activemq.pool.PooledConnectionFactory" destroy-method="stop">
+       <constructor-arg ref="amqConnectionFactory" />
+    </bean>
+    
+    <!-- JMS Template -->
+    <bean name="jmsTemplate" class="org.springframework.jms.core.JmsTemplate">
+      <property name="connectionFactory">
+        <ref local="connectionFactory" />
+      </property>
+      <property name="defaultDestination" ref="bpafDestination" />
+    </bean>    
+       
+ 	<!-- XES events jms destination -->
+	<amq:topic name="xesDestination" physicalName="es.uc3m.softlab.cbi4api.basu.event.xes" />
+
+ 	<!-- BPAF jms topic message destination -->
+	<amq:topic name="bpafDestination" physicalName="es.uc3m.softlab.cbi4api.basu.event.bpaf" />
+	
+</beans>

@@ -23,8 +23,8 @@ public class StaticResources {
     /** Default application locale */
     public static final String DEFAULT_LOCALE="en_IE";
     
-	/** Component name for the event publisher scheduler */
-	public static final String COMPONENT_NAME_CONFIG = "/cbi4api-basu/event-subscriber/component/Config";
+	/** Component name for the event subscriber configuration */
+	public static final String COMPONENT_NAME_CONFIG = "eventSubscriberConfig";
 	/** Component name for the event writer */
 	public static final String COMPONENT_NAME_EVENT_WRITER = "/cbi4api-basu/event-subscriber/component/EventWriter";
 	/** Component name for the event reader service */

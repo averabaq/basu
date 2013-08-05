@@ -13,7 +13,7 @@ package es.uc3m.softlab.cbi4api.basu.ode.event.publisher;
  */
 public class StaticResources {
 	/** Internationalization resource bundle name */
-	public static final String CONFIG_RESOURCE_BUNDLE_NAME="event-publisher";	
+	public static final String CONFIG_RESOURCE_BUNDLE_NAME="ode-event-publisher";	
 	/** Internationalization resource bundle */
 	public static final String CONFIG_RESOURCE_BUNDLE=CONFIG_RESOURCE_BUNDLE_NAME + ".properties";	
     /** Default application locale */

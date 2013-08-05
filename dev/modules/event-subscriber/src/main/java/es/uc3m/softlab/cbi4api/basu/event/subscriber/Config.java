@@ -10,6 +10,9 @@ import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * Class that configures the global application. It takes
@@ -18,38 +21,12 @@ import org.apache.log4j.Logger;
  *
  * @author averab
  */
+@Scope(value=BeanDefinition.SCOPE_SINGLETON)
+@Component(value=StaticResources.COMPONENT_NAME_CONFIG)
 public class Config {
-    /** Instance of this singleton class */
-    private static Config instance = null;
     /** Log for tracing */
     private static final Logger logger = Logger.getLogger(Config.class);  
-    
-    /**
-     * Constructor of this singleton class.     
-     */
-    private Config() {    
-    }
-    /**
-     * Initializes this singleton class and creates a new instance
-     * if it's already not.
-     * 
-     * @return instance of this singleton class.
-     */
-    public static Config init() {
-       	if (instance == null)
-    		instance = new Config();
-    	return instance;    	
-    }
-    /**
-     * Gets the instance of this singleton class.
-     * 
-     * @return instance of this singleton class.
-     */
-    public static Config getInstance() {
-       	if (instance == null)
-    		instance = init();
-    	return instance;
-    }
+
     /**
      * Gets the string value of the key property given.
      * @param key key property.
@@ -66,7 +43,18 @@ public class Config {
     		logger.error(mre.getMessage());         
     	}    	
     	return value;    	
-    }   
+    }  
+    /**
+     * Gets the broker url endpoint where to receive event data from. 
+     * 
+     * @return broker url.
+     */
+    public String getBrokerUrl() {		
+		String url = getString("cbi4api.basu.event.subscriber.activemq.broker.url");
+		if (url == null) 
+			logger.error("The property 'cbi4api.basu.event.subscriber.activemq.broker.url' containing the identification of the broker url could not be found. Please, provide this information.");
+		return url;
+    }      
     /**
      * Gets the local application configuration from business logic layer. It may differ from
      * the presentation layer. 

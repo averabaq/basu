@@ -52,7 +52,7 @@ public class ETLEvent implements MessageListener {
 	 */
 	@Override
 	public void onMessage(Message msg) {
-		try {
+		try {			
 			es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.basu.event.Event bpafEvent;			
 			/* extract event */
 			bpafEvent = extractor.extractEvent(msg);
@@ -75,6 +75,6 @@ public class ETLEvent implements MessageListener {
 			logger.error(sex.fillInStackTrace());		
 		} catch(ModelException mex) {
 			logger.error(mex.fillInStackTrace());		
-		}
+		} 
 	}
 }

@@ -9,7 +9,8 @@
 
 	<import resource="classpath:spring-event-store.xml"/>
 	<import resource="classpath:spring-event-subscriber.xml"/>
-	
+	<import resource="classpath:spring-xes-event-publisher.xml"/>
+	 
 	<context:component-scan base-package="es.uc3m.softlab.cbi4api.basu.web" />
 	
 	<bean class="org.springframework.beans.factory.config.CustomScopeConfigurer">

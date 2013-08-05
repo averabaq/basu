@@ -18,8 +18,10 @@
 	<context:annotation-config />
 	<context:component-scan base-package="es.uc3m.softlab.cbi4api.basu.event.subscriber" />
 
-	<!-- creates an activemq connection factory -->
-	<amq:connectionFactory id="amqConnectionFactory" brokerURL="tcp://localhost:61616" />
+	<!-- activemq connection factory -->
+	<amq:connectionFactory id="amqConnectionFactory">
+		<property name="brokerURL" value="#{eventSubscriberConfig.brokerUrl}" />
+	</amq:connectionFactory>
 	
 	<bean id="connectionFactory" class="org.springframework.jms.connection.CachingConnectionFactory">
 		<constructor-arg ref="amqConnectionFactory" />

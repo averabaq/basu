@@ -48,10 +48,10 @@
 			<fileMode>754</fileMode>
 		</fileSet> 
 		<fileSet>
-			<directory>${project.basedir}/../../modules/event-publisher/src/main/resources</directory>
+			<directory>${project.basedir}/../../modules/ode-event-publisher/src/main/resources</directory>
 			<outputDirectory>/conf</outputDirectory>
 			<includes>
-				<include>event-publisher.properties</include>
+				<include>ode-event-publisher.properties</include>
 			</includes>
 			<fileMode>644</fileMode>
 		</fileSet>  		   	
@@ -59,7 +59,7 @@
 	
 	<files>
 		<file>
-			<source>${project.basedir}/../../modules/event-publisher/target/event-publisher-${project.version}.jar</source>
+			<source>${project.basedir}/../../modules/ode-event-publisher/target/ode-event-publisher-${project.version}.jar</source>
 			<outputDirectory>/bin</outputDirectory>
 			<destName>cbi4api-basu-ode.jar</destName>
 			<fileMode>644</fileMode>
@@ -74,7 +74,7 @@
 				<include>*:jar</include>
 			</includes>
 			<excludes>
-				<exclude>es.uc3m.softlab.cbi4bi.basu:event-publisher</exclude>
+				<exclude>es.uc3m.softlab.cbi4bi.basu:ode-event-publisher</exclude>
 			</excludes>
 			<outputDirectory>/lib</outputDirectory>
 			<useTransitiveDependencies>true</useTransitiveDependencies>

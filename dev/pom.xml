@@ -4,52 +4,45 @@
 		<name>Universidad Carlos III de Madrid</name>
 		<url>http://www.uc3m.es</url>		
 	</organization>
-	<!-- 
 	<issueManagement>
-		<system>Scarab</system>
-		<url>http://scarab.verasoft.es</url>
-	</issueManagement>
-	 -->	
+		<system>YouTrack</system>
+		<url>http://youtrack.verasoft.es</url>
+	</issueManagement>	
 	<groupId>es.uc3m.softlab.cbi4api.basu</groupId>
 	<artifactId>basu-prj</artifactId>
 	<packaging>pom</packaging>
 	<version>1.0.0-SNAPSHOT</version>
 	<inceptionYear>2013</inceptionYear>	
-	<name>CBI4API (Slave) - Main Project</name>
+	<name>CBI4API (BASU) - Main Project</name>
 	<description>
-		Cloud-based Infrastructure for Process Intelligence (Slave)
+		Cloud-based Infrastructure for Advanced Process Intelligence (BASU)
 	</description>
-	<url>http://www.cbi4api.org/doc</url>
+	<url>http://cbi4api.verasoft.es/doc</url>
 	<licenses>
 		<license>
 			<name>UC3M Propietary</name>			
 			<distribution>repo</distribution>
 			<comments>CBI4API / @Copyright ${project.inceptionYear} Universidad Carlos III de Madrid. All rights reserved.</comments>
 		</license>
-		<license>
-			<name>Apache 2</name>
-			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-			<distribution>repo</distribution>
-			<comments>Apache-ODE</comments>
-		</license>	
 	</licenses>	
 	<modules>
-		<module>modules/event-publisher</module>
+	 	<module>modules/mxml-event-publisher</module>
+		<module>modules/xes-event-publisher</module>		 
+		<module>modules/ode-event-publisher</module>		
 		<module>modules/event-subscriber</module>
 		<module>modules/event-store</module>
 		<module>applications/basu-ode</module>
 		<module>applications/basu</module>
 	</modules>	
-	<scm>				
-		<url>https://github.com/averabaq/cbi4api.git</url>
-		<connection>scm:git:ssh:git@github.com:averabaq/cbi4api.git</connection>
-		<developerConnection>scm:git:ssh:git@github.com:averabaq/cbi4api.git</developerConnection>
+	<scm>		
+		<url>http://git.verasoft.es/cbi4api/basu.git</url>
+		<connection>scm:git:ssh://git.verasoft.es/var/git/cbi4api/basu.git</connection>
+		<developerConnection>scm:git:ssh://git.verasoft.es/var/git/cbi4api/basu.git</developerConnection>
 		<tag>HEAD</tag>		
 	</scm>
-	<!-- 
 	<ciManagement>
-		<system>hudson</system>
-		<url>http://mscsed.verasoft.es/hudson</url>
+		<system>teamcity</system>
+		<url>http://teamcity.verasoft.es/teamcity</url>
 		<notifiers>
 			<notifier>
 				<type>mail</type>
@@ -58,21 +51,18 @@
 				<sendOnSuccess>false</sendOnSuccess>
 				<sendOnWarning>false</sendOnWarning>				
 				<configuration>
-					<address>a.verabaquero1@nuigalway.ie</address>
+					<address>averab@verasoft.es</address>
 				</configuration>
 			</notifier>
 		</notifiers>
 	</ciManagement>
-	 -->
-	<!--
 	<repositories>
 		<repository>
-			<id>mscsed</id>
-			<url>http://mscsed.verasoft.es/nexus/content/repositories/public</url>
+			<id>nexus</id>
+			<url>http://nexus.verasoft.es/nexus/content/repositories/public</url>
 			<layout>default</layout>
 		</repository>
 	</repositories>
-	-->
 	<pluginRepositories>
 		<pluginRepository>
 			<id>central</id>
@@ -99,7 +89,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-site-plugin</artifactId>
-					<version>3.2</version>
+					<version>3.3</version>
 					<dependencies>
 						<dependency>
 							<groupId>org.apache.maven.wagon</groupId>
@@ -144,28 +134,26 @@
             </plugin>							
 		</plugins>
 	</build>
-	<!-- 
 	<distributionManagement>
-		<downloadUrl>http://mscsed.verasoft.es/downloads</downloadUrl>
+		<downloadUrl>http://cbi4api.verasoft.es/downloads</downloadUrl>
 		<repository>
-			<id>mscsed</id>
-			<name>MScSED Releases Repository</name>
-			<url>scp://mscsed.verasoft.es/var/opt/nexus/sonatype-work/nexus/storage/releases</url>
+			<id>verasoft</id>
+			<name>VeraSoft Releases Repository</name>
+			<url>http://nexus.verasoft.es/nexus/content/repositories/releases</url>
 			<uniqueVersion>false</uniqueVersion>
 		</repository>
 		<snapshotRepository>
-			<id>mscsed</id>
-			<name>MScSED Snapshots Repository</name>
-			<url>scp://mscsed.verasoft.es/var/opt/nexus/sonatype-work/nexus/storage/snapshots</url>
+			<id>verasoft</id>
+			<name>VeraSoft Snapshots Repository</name>
+			<url>http://nexus.verasoft.es/nexus/content/repositories/snapshots</url>
 			<uniqueVersion>false</uniqueVersion>
 		</snapshotRepository>
 		<site>
-			<id>mscsed</id>
-			<name>MScSED Development Site</name>
-			<url>scp://mscsed.verasoft.es/var/www/mscsed/doc/f4bpa-ode</url>
+			<id>verasoft</id>
+			<name>VeraSoft Development Site</name>
+			<url>scp://cbi4api.verasoft.es/var/www/cbi4api/doc</url>
 		</site>
 	</distributionManagement>
-	 -->
 	<reporting>
 		<plugins>
 			<plugin>
@@ -190,7 +178,7 @@
 	<developers>
 		<developer>
 			<id>averab</id>
-			<name>Alejandro Vera Baquero</name>
+			<name>Alejandro Vera-Baquero</name>
 			<email>alejandro.vera@alumnos.uc3m.es</email>
 			<organization>Universidad Carlos III de Madrid</organization>
 			<roles>

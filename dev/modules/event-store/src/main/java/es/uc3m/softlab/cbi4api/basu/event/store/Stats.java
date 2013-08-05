@@ -28,8 +28,7 @@ import es.uc3m.softlab.cbi4api.basu.event.store.entity.HSequenceGenerator;
 /**
  * Class that configures the global application. It takes
  * the configuration parameters from the pair (key, value) 
- * specified at the <i>event-publisher.properties</i> file 
- * located under the 'conf' directory. 
+ * specified at the <i>event-store.properties</i> file. 
  *
  * @author averab
  */
@@ -54,6 +53,9 @@ public class Stats {
     /** Configuration object */
     @Autowired private Config config;	
 
+    /**
+     * Post-constructor method to initialize the stats process.
+     */
     @PostConstruct
     public void init() {
 		try {

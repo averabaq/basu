@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="dev/modules/event-store/src/test/java"/>
+	<classpathentry kind="src" path="dev/modules/mxml-event-publisher/src/test/java"/>
+	<classpathentry kind="src" path="dev/modules/mxml-event-publisher/src/main/java"/>
+	<classpathentry kind="src" path="dev/modules/xes-event-publisher/src/main/java"/>
+	<classpathentry kind="src" path="dev/modules/xes-event-publisher/src/test/java"/>
 	<classpathentry kind="src" path="dev/modules/event-store/src/main/java"/>
 	<classpathentry kind="src" path="dev/modules/event-subscriber/src/test/java"/>
 	<classpathentry kind="src" path="dev/modules/event-subscriber/src/main/java"/>
@@ -38,7 +42,7 @@
 	<classpathentry kind="var" path="M2_REPO/commons-collections/commons-collections/3.2.1/commons-collections-3.2.1.jar"/>
 	<classpathentry kind="var" path="M2_REPO/commons-fileupload/commons-fileupload/1.1.1/commons-fileupload-1.1.1.jar"/>
 	<classpathentry kind="var" path="M2_REPO/commons-httpclient/commons-httpclient/3.1/commons-httpclient-3.1.jar"/>
-	<classpathentry kind="var" path="M2_REPO/commons-io/commons-io/1.2/commons-io-1.2.jar"/>
+	<classpathentry kind="var" path="M2_REPO/commons-io/commons-io/2.4/commons-io-2.4.jar"/>
 	<classpathentry kind="var" path="M2_REPO/commons-lang/commons-lang/2.4/commons-lang-2.4.jar"/>
 	<classpathentry kind="var" path="M2_REPO/commons-logging/commons-logging/1.1/commons-logging-1.1.jar"/>
 	<classpathentry kind="var" path="M2_REPO/commons-net/commons-net/2.0/commons-net-2.0.jar"/>

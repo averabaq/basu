@@ -14,18 +14,15 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import es.uc3m.softlab.cbi4api.basu.event.store.StaticResources;
-
 /**
  * Class that configures the global application. It takes
  * the configuration parameters from the pair (key, value) 
- * specified at the <i>event-publisher.properties</i> file 
- * located under the 'conf' directory. 
+ * specified at the <i>event-store.properties</i> file. 
  *
  * @author averab
  */
 @Scope(value=BeanDefinition.SCOPE_SINGLETON)
-@Component(value="config")
+@Component(value=StaticResources.COMPONENT_NAME_CONFIG)
 public class Config {
     /** Log for tracing */
     private static final Logger logger = Logger.getLogger(Config.class);  

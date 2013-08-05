@@ -30,6 +30,8 @@ public class StaticResources {
     /** Bundle key for stats active flag */
     public static final String BUNDLE_CONFIG_STATS_ACTIVE_KEY="cbi4api.basu.event.store.stats.active";
     
+	/** Component name for the event store configuration */
+	public static final String COMPONENT_NAME_CONFIG = "eventStoreConfig";
 	/** Component name for event data access object */
 	public static final String COMPONENT_NAME_EVENT_DAO = "/cbi4api-basu/event-store/dao/EventDAO";
 	/** Component name for source data access object */

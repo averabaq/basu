@@ -7,7 +7,7 @@
 		<ProcessDefinitionID>org:group</ProcessDefinitionID>
 		<ProcessInstanceID>concept:name</ProcessInstanceID>
 		<ProcessName>concept:name</ProcessName>
-		<Timestamp>time:timestamp</Timestamp>
+		<Timestamp>REG_DATE</Timestamp>
 		<Correlation>xes:correlation</Correlation>
 		<Payload>xes:payload</Payload>
 	</Trace>

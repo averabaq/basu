@@ -1,16 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="dev/modules/event-store/src/test/java"/>
-	<classpathentry kind="src" path="dev/modules/mxml-event-publisher/src/test/java"/>
-	<classpathentry kind="src" path="dev/modules/mxml-event-publisher/src/main/java"/>
-	<classpathentry kind="src" path="dev/modules/xes-event-publisher/src/main/java"/>
-	<classpathentry kind="src" path="dev/modules/xes-event-publisher/src/test/java"/>
 	<classpathentry kind="src" path="dev/modules/event-store/src/main/java"/>
 	<classpathentry kind="src" path="dev/modules/event-subscriber/src/test/java"/>
 	<classpathentry kind="src" path="dev/modules/event-subscriber/src/main/java"/>
 	<classpathentry kind="src" path="dev/modules/event-publisher/src/test/java"/>
 	<classpathentry kind="src" path="dev/modules/event-publisher/src/main/java"/>
-	<classpathentry kind="src" path="domain"/>
 	<classpathentry kind="var" path="M2_REPO/javax/activation/activation/1.1/activation-1.1.jar"/>
 	<classpathentry kind="var" path="M2_REPO/javax/mail/mail/1.4/mail-1.4.jar"/>
 	<classpathentry kind="var" path="M2_REPO/javax/persistence/persistence-api/1.0.2/persistence-api-1.0.2.jar"/>

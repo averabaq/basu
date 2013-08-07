@@ -89,15 +89,15 @@ public class EventPublisherTest extends AbstractShowcaseTest {
     
     @Test
     public void testETLProcess() throws Throwable {
-    	final byte[] xes = IOUtils.toByteArray(getClass().getResourceAsStream("/event-logs/Hospital_log.xes"));
+    	final byte[] xes = IOUtils.toByteArray(getClass().getResourceAsStream("/event-logs/BPI_Challenge_2012.xes"));
 		logger.info("Performing ETL process...");
 		etl.process(xes);
 		logger.info("ETL process performed.");
     }
     
     @Test
-    public void testXESMessagePublisher() throws Throwable {     
-    	final byte[] xes = IOUtils.toByteArray(getClass().getResourceAsStream("/event-logs/BPI_Challenge_2012.xes"));
+    public void testXESMessagePublisher() throws Throwable {   
+    	final byte[] xes = IOUtils.toByteArray(getClass().getResourceAsStream("/event-logs/Hospital_log.xes"));
      	jmsTemplate.send(xesDestination, new MessageCreator() {
 			public Message createMessage(Session session)
 			throws JMSException {

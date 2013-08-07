@@ -13,6 +13,7 @@ import java.io.OutputStreamWriter;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -87,359 +88,147 @@ public class XESEventConverterImpl implements XESEventConverter {
 		XESMap xesMap = getMap();
     	// creates a new list of events 
     	List<Event> events = new ArrayList<Event>();
-		for (Object object : xes.getStringOrDateOrInt()) {
-			if (object instanceof AttributeStringType) {
-				AttributeStringType attr = (AttributeStringType)object;	
-				logger.debug("ROOT: ( " + attr.getKey() + ", " + attr.getValue() + ")");
-			} else if (object instanceof AttributeDateType) {
-				AttributeDateType attr = (AttributeDateType)object;	
-				logger.debug("ROOT: ( " + attr.getKey() + ", " + attr.getValue() + ")");
-			} else if (object instanceof AttributeIntType) {
-				AttributeIntType attr = (AttributeIntType)object;	
-				logger.debug("ROOT: ( " + attr.getKey() + ", " + attr.getValue() + ")");
-			} else if (object instanceof AttributeFloatType) {
-				AttributeFloatType attr = (AttributeFloatType)object;	
-				logger.debug("ROOT: ( " + attr.getKey() + ", " + attr.getValue() + ")");
-			} else if (object instanceof AttributeBooleanType) {
-				AttributeBooleanType attr = (AttributeBooleanType)object;	
-				logger.debug("ROOT: ( " + attr.getKey() + ", " + attr.isValue() + ")");											
-			}				
-		}	
+    	// process traces (global processes)
 		for (TraceType trace : xes.getTrace()) {
 			// process instance level
 			Event event = new Event();	
 			event.setEventID(UUID.randomUUID().toString());
 			event.setServerID(config.getSourceId());
+			Map<String, State> processStateMap = new HashMap<String, State>();			
 			for (Object object : trace.getStringOrDateOrInt()) {				
-				processXESTraceAttribute(xesMap, object, event);
+				processXES(XESMapType.TRACE, xesMap, object, event);
 			}
+			// gets previous activity from map
+			State processPreviousState = processStateMap.get(event.getProcessName());
+			// gets current state from the event
+			State processCurrentState = null;
+			if (event.getEventDetails() != null)
+				processCurrentState = event.getEventDetails().getCurrentState();
+			// set previous state for process
+			if (event.getEventDetails() != null)
+				event.getEventDetails().setPreviousState(processPreviousState);
+			// update previous state for process
+			processStateMap.put(event.getProcessName(), processCurrentState);
+			// add the event to the returning list
 			events.add(event);
+			
+			// save process data for being set in subprocesses (activities)
 			String processName = event.getProcessName();
 			String processInstanceID = event.getProcessInstanceID();
-			String processDefinitionID = event.getProcessDefinitionID();
+			String processDefinitionID = event.getProcessDefinitionID();			
 			// activity instance level
-			event = new Event();
-			event.setEventID(UUID.randomUUID().toString());
-			event.setServerID(config.getSourceId());
-			event.setProcessName(processName);
-			event.setProcessInstanceID(processInstanceID);
-			event.setProcessDefinitionID(processDefinitionID);
-			for (EventType eventType : trace.getEvent()) {
+			Map<String, State> activityStateMap = new HashMap<String, State>();
+			for (EventType eventType : trace.getEvent()) {	
+				event = new Event();
+				event.setEventID(UUID.randomUUID().toString());
+				event.setServerID(config.getSourceId());
+				event.setProcessName(processName);
+				event.setProcessInstanceID(processInstanceID);
+				event.setProcessDefinitionID(processDefinitionID);				
 				for (Object object : eventType.getStringOrDateOrInt()) {
-					processXESEventAttribute(xesMap, object, event);			
-				}
-			}
-			events.add(event);
+					processXES(XESMapType.EVENT, xesMap, object, event);			
+				}				
+				// gets previous activity from map
+				State activityPreviousState = activityStateMap.get(event.getActivityName());
+				State activityCurrentState = null;
+				if (event.getEventDetails() != null)
+					activityCurrentState = event.getEventDetails().getCurrentState();
+				// set previous state for activity
+				if (event.getEventDetails() != null)
+					event.getEventDetails().setPreviousState(activityPreviousState);
+				// update previous state for activity
+				activityStateMap.put(event.getActivityName(), activityCurrentState);
+				events.add(event);
+			}			
 		}
-    	for (GlobalsType global : xes.getGlobal()) {
-        	for (Object object : global.getStringOrDateOrInt()) {
-        		if (object instanceof AttributeStringType) {
-    				AttributeStringType attr = (AttributeStringType)object;	
-    				logger.debug("GLOBALS: ( " + attr.getKey() + ", " + attr.getValue() + ")");
-    			} else if (object instanceof AttributeDateType) {
-    				AttributeDateType attr = (AttributeDateType)object;	
-    				logger.debug("GLOBALS: ( " + attr.getKey() + ", " + attr.getValue() + ")");
-    			} else if (object instanceof AttributeIntType) {
-    				AttributeIntType attr = (AttributeIntType)object;	
-    				logger.debug("GLOBALS: ( " + attr.getKey() + ", " + attr.getValue() + ")");
-    			} else if (object instanceof AttributeFloatType) {
-    				AttributeFloatType attr = (AttributeFloatType)object;	
-    				logger.debug("GLOBALS: ( " + attr.getKey() + ", " + attr.getValue() + ")");
-    			} else if (object instanceof AttributeBooleanType) {
-    				AttributeBooleanType attr = (AttributeBooleanType)object;	
-    				logger.debug("GLOBALS: ( " + attr.getKey() + ", " + attr.isValue() + ")");											
-    			} else {
-    				logger.debug("GLOBALS: ( " + object.getClass().getName() + ")");	
-    			}
-        	}
-    	}		
-    	for (Object object : xes.getClassifier()) {
-    		if (object instanceof AttributeStringType) {
-				AttributeStringType attr = (AttributeStringType)object;	
-				logger.debug("CLASSIFIER: ( " + attr.getKey() + ", " + attr.getValue() + ")");
-			} else if (object instanceof AttributeDateType) {
-				AttributeDateType attr = (AttributeDateType)object;	
-				logger.debug("CLASSIFIER: ( " + attr.getKey() + ", " + attr.getValue() + ")");
-			} else if (object instanceof AttributeIntType) {
-				AttributeIntType attr = (AttributeIntType)object;	
-				logger.debug("CLASSIFIER: ( " + attr.getKey() + ", " + attr.getValue() + ")");
-			} else if (object instanceof AttributeFloatType) {
-				AttributeFloatType attr = (AttributeFloatType)object;	
-				logger.debug("CLASSIFIER: ( " + attr.getKey() + ", " + attr.getValue() + ")");
-			} else if (object instanceof AttributeBooleanType) {
-				AttributeBooleanType attr = (AttributeBooleanType)object;	
-				logger.debug("CLASSIFIER: ( " + attr.getKey() + ", " + attr.isValue() + ")");											
-			} else {			
-				logger.debug("CLASSIFIER: ( " + object.getClass().getName() + ")");	
-			}
-    	}
-    	for (ExtensionType ext : xes.getExtension()) {
-    		logger.debug("EXTENSION ( " + ext.getName() + ", " + ext.getPrefix() + ", " + ext.getUri() + ")");
-    	}	
-    	
-    	
-    	
-		JAXBContext context;
-		try {
-			context = JAXBContext.newInstance(Event.class);
-		
-		Marshaller marshaller = context.createMarshaller();
-		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-    	for (Event _event : events) {
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(baos));  
-    		marshaller.marshal(_event, writer);
-    		writer.close();
-    		baos.close();
-    		final byte[] xml = baos.toByteArray();
-			logger.error(new String(xml));
-		}
-		} catch (JAXBException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		// log xes info
+		logXESInfo(xes);
 		return events;		
-    }  
+    }
     /**
-     * Process XES trace attributes to convert them into BPAF event object model.
+     * Process XES attributes to convert them into BPAF event object model.
+     * @param type XES map type (TRACE/EVENT).
+     * @param xesMap XES mapping convertor.
      * @param object XES object attribute.
      * @param event BPAF event model object converted.
      */
-    private void processXESTraceAttribute(XESMap xesMap, Object object, Event event) {
-		Map<String,Set<BPAFMapType>> attrMap = xesMap.getSemantic().get(XESMapType.TRACE);
-		Set<String> correlationSet = xesMap.getCorrelation().get(XESMapType.TRACE);
-		Set<String> payloadSet = xesMap.getPayload().get(XESMapType.TRACE);
+    private void processXES(XESMapType type, XESMap xesMap, Object object, Event event) {
+		Map<String,Set<BPAFMapType>> attrMap = xesMap.getSemantic().get(type);
+		Set<String> correlationSet = xesMap.getCorrelation().get(type);
+		Set<String> payloadSet = xesMap.getPayload().get(type);
 		Map<String, BPAFState> stateMap = xesMap.getState();
 		
     	if (object instanceof AttributeStringType) {
 			AttributeStringType attr = (AttributeStringType)object;	
 			if (attr.isSetKey()) {
-				if (attrMap.containsKey(attr.getKey())) {
-					// converts attributes
-					setEventAttribute(event, attrMap.get(attr.getKey()), attr.getValue());
-				} else if (xesMap.getTransitionKey().equals(attr.getKey())) {					
-					if (!event.isSetEventDetails()) {
-						event.setEventDetails(new EventDetails());
-					}
-					State currentState = null;
-					if (stateMap.containsKey(attr.getValue().toUpperCase())) {
-						try {
-							currentState = State.fromValue(stateMap.get(attr.getValue().toUpperCase()).value());
-						} catch (IllegalArgumentException iaex) {
-							logger.error("BPAF State " + stateMap.get(attr.getValue().toUpperCase()).value() + " does not exist. Please review XES map descriptor file. " + iaex.getMessage());
-						}
-					}
-					event.getEventDetails().setCurrentState(currentState);
-				} else if (correlationSet != null && correlationSet.contains(attr.getKey())) { 
-			    	// converts correlation
-			    	setEventCorrelation(event, attr.getKey(), attr.getValue());		    	
-			    } else if (payloadSet != null && payloadSet.contains(attr.getKey())) { 
-			    	// converts payload
-			    	setEventPayload(event, attr.getKey(), attr.getValue());			    	
-			    } else {
-			    	// converts data element
-					setEventDataElement(event, attr.getKey(), attr.getValue());
-				}
+				processXESAttribute(xesMap, attrMap, correlationSet, payloadSet, stateMap, event, attr.getKey(), attr.getValue());
 			}
 			logger.debug("TRACE: ( " + attr.getKey() + ", " + attr.getValue() + ")");
 		} else if (object instanceof AttributeDateType) {
 			AttributeDateType attr = (AttributeDateType)object;	
 			if (attr.isSetKey()) {
-				if (attrMap.containsKey(attr.getKey())) {
-					// converts attributes
-					setEventAttribute(event, attrMap.get(attr.getKey()), attr.getValue());
-				} else if (correlationSet != null && correlationSet.contains(attr.getKey())) { 
-			    	// converts correlation
-			    	setEventCorrelation(event, attr.getKey(), attr.getValue());		    	
-			    } else if (payloadSet != null && payloadSet.contains(attr.getKey())) { 
-			    	// converts payload
-			    	setEventPayload(event, attr.getKey(), attr.getValue());			    	
-			    } else {
-					DataElement element = new DataElement();
-					element.setKey(attr.getKey());
-					TimeStampAdapter adapter = new TimeStampAdapter();
-					element.setValue(adapter.marshal(attr.getValue()));
-					event.getDataElement().add(element);
-				}
+				processXESAttribute(xesMap, attrMap, correlationSet, payloadSet, stateMap, event, attr.getKey(), attr.getValue());
 			}
 			logger.debug("TRACE: ( " + attr.getKey() + ", " + attr.getValue() + ")");
 		} else if (object instanceof AttributeIntType) {
 			AttributeIntType attr = (AttributeIntType)object;	
 			if (attr.isSetKey()) {
-				if (attrMap.containsKey(attr.getKey())) {
-					// converts attributes
-					setEventAttribute(event, attrMap.get(attr.getKey()), attr.getValue());
-				}  else if (correlationSet != null && correlationSet.contains(attr.getKey())) { 
-			    	// converts correlation
-			    	setEventCorrelation(event, attr.getKey(), attr.getValue());		    	
-			    } else if (payloadSet != null && payloadSet.contains(attr.getKey())) { 
-			    	// converts payload
-			    	setEventPayload(event, attr.getKey(), attr.getValue());			    	
-			    } else {
-			    	// converts data element
-					setEventDataElement(event, attr.getKey(), attr.getValue());
-				}
+				processXESAttribute(xesMap, attrMap, correlationSet, payloadSet, stateMap, event, attr.getKey(), attr.getValue());
 			}
 			logger.debug("TRACE: ( " + attr.getKey() + ", " + attr.getValue() + ")");
 		} else if (object instanceof AttributeFloatType) {
 			AttributeFloatType attr = (AttributeFloatType)object;	
 			if (attr.isSetKey()) {
-				if (attrMap.containsKey(attr.getKey())) {
-					// converts attributes
-					setEventAttribute(event, attrMap.get(attr.getKey()), attr.getValue());
-				} else if (correlationSet != null && correlationSet.contains(attr.getKey())) { 
-			    	// converts correlation
-			    	setEventCorrelation(event, attr.getKey(), attr.getValue());		    	
-			    } else if (payloadSet != null && payloadSet.contains(attr.getKey())) { 
-			    	// converts payload
-			    	setEventPayload(event, attr.getKey(), attr.getValue());			    	
-			    } else {
-			    	// converts data element
-					setEventDataElement(event, attr.getKey(), attr.getValue());
-				}
+				processXESAttribute(xesMap, attrMap, correlationSet, payloadSet, stateMap, event, attr.getKey(), attr.getValue());
 			}					
 			logger.debug("TRACE: ( " + attr.getKey() + ", " + attr.getValue() + ")");
 		} else if (object instanceof AttributeBooleanType) {
 			AttributeBooleanType attr = (AttributeBooleanType)object;	
 			if (attr.isSetKey()) {		
-				if (attrMap.containsKey(attr.getKey())) {
-					// converts attributes
-					setEventAttribute(event, attrMap.get(attr.getKey()), attr.isValue());
-				} else if (correlationSet != null && correlationSet.contains(attr.getKey())) { 
-			    	// converts correlation
-			    	setEventCorrelation(event, attr.getKey(), attr.isValue());		    	
-			    } else if (payloadSet != null && payloadSet.contains(attr.getKey())) { 
-			    	// converts payload
-			    	setEventPayload(event, attr.getKey(), attr.isValue());			    	
-			    } else {
-			    	// converts data element
-					setEventDataElement(event, attr.getKey(), attr.isValue());
-				}
+				processXESAttribute(xesMap, attrMap, correlationSet, payloadSet, stateMap, event, attr.getKey(), attr.isValue());
 			}
 			logger.debug("TRACE: ( " + attr.getKey() + ", " + attr.isValue() + ")");											
 		}				
     }
     /**
-     * Process XES event attributes to convert them into BPAF event object model.
-     * @param object XES object attribute.
-     * @param event BPAF event model object converted.
+     * Process the XES attributes received from the XES input data.
+     * @param xesMap XES mapping convertor structure.
+     * @param attrMap attribute mapping convertor.
+     * @param correlationSet correlation mapping set. 
+     * @param payloadSet payload mapping set.
+     * @param stateMap state transition mapping.
+     * @param event BPAF event converted.
+     * @param key XES key attribute.
+     * @param value XES value attribute.
      */
-    private void processXESEventAttribute(XESMap xesMap, Object object, Event event) {
-		Map<String,Set<BPAFMapType>> attrMap = xesMap.getSemantic().get(XESMapType.EVENT);
-		Set<String> correlationSet = xesMap.getCorrelation().get(XESMapType.EVENT);
-		Set<String> payloadSet = xesMap.getPayload().get(XESMapType.EVENT);
-		Map<String, BPAFState> stateMap = xesMap.getState();
-		if (object instanceof AttributeStringType) {
-			AttributeStringType attr = (AttributeStringType)object;	
-			if (attr.isSetKey()) {				
-				if (attrMap.containsKey(attr.getKey())) {
-					// converts attributes
-					setEventAttribute(event, attrMap.get(attr.getKey()), attr.getValue());
-				} else if (xesMap.getTransitionKey().equals(attr.getKey())) {					
-					if (!event.isSetEventDetails()) {
-						event.setEventDetails(new EventDetails());
-					}
-					State currentState = null;
-					if (stateMap.containsKey(attr.getValue().toUpperCase())) {
-						try {
-							currentState = State.fromValue(stateMap.get(attr.getValue().toUpperCase()).value());
-						} catch (IllegalArgumentException iaex) {
-							logger.error("BPAF State " + stateMap.get(attr.getValue().toUpperCase()).value() + " does not exist. Please review XES map descriptor file. " + iaex.getMessage());
-						}
-					}
-					event.getEventDetails().setCurrentState(currentState);
-				} else if (correlationSet != null && correlationSet.contains(attr.getKey())) { 
-			    	// converts correlation
-			    	setEventCorrelation(event, attr.getKey(), attr.getValue());		    	
-			    } else if (payloadSet != null && payloadSet.contains(attr.getKey())) { 
-			    	// converts payload
-			    	setEventPayload(event, attr.getKey(), attr.getValue());			    	
-			    } else {
-			    	// converts data element
-					setEventDataElement(event, attr.getKey(), attr.getValue());
+    private void processXESAttribute(XESMap xesMap, Map<String,Set<BPAFMapType>> attrMap, Set<String> correlationSet, Set<String> payloadSet, Map<String, BPAFState> stateMap, Event event, String key, Object value) {
+		if (attrMap.containsKey(key)) {
+			// converts attributes
+			setEventAttribute(event, attrMap.get(key), value);
+		} else if (xesMap.getTransitionKey().equals(key)) {					
+			if (!event.isSetEventDetails()) {
+				event.setEventDetails(new EventDetails());
+			}
+			State currentState = null;
+			if (stateMap.containsKey(String.valueOf(value).toUpperCase())) {
+				try {
+					currentState = State.fromValue(stateMap.get((String.valueOf(value)).toUpperCase()).value());
+				} catch (IllegalArgumentException iaex) {
+					logger.error("BPAF State " + stateMap.get((String.valueOf(value)).toUpperCase()).value() + " does not exist. Please review XES map descriptor file. " + iaex.getMessage());
 				}
 			}
-			logger.debug("EVENT: ( " + attr.getKey() + ", " + attr.getValue() + ")");
-		} else if (object instanceof AttributeDateType) {
-			AttributeDateType attr = (AttributeDateType)object;	
-			if (attr.isSetKey()) {
-				if (attrMap.containsKey(attr.getKey())) {
-					// converts attributes
-					setEventAttribute(event, attrMap.get(attr.getKey()), attr.getValue());
-				} else if (correlationSet != null && correlationSet.contains(attr.getKey())) { 
-			    	// converts correlation
-			    	setEventCorrelation(event, attr.getKey(), attr.getValue());		    	
-			    } else if (payloadSet != null && payloadSet.contains(attr.getKey())) { 
-			    	// converts payload
-			    	setEventPayload(event, attr.getKey(), attr.getValue());			    	
-			    } else {
-					DataElement element = new DataElement();
-					element.setKey(attr.getKey());
-					TimeStampAdapter adapter = new TimeStampAdapter();
-					element.setValue(adapter.marshal(attr.getValue()));
-					event.getDataElement().add(element);
-				}
-			}
-			logger.debug("EVENT: ( " + attr.getKey() + ", " + attr.getValue() + ")");
-		} else if (object instanceof AttributeIntType) {
-			AttributeIntType attr = (AttributeIntType)object;	
-			if (attr.isSetKey()) {
-				if (attrMap.containsKey(attr.getKey())) {
-					// converts attributes
-					setEventAttribute(event, attrMap.get(attr.getKey()), attr.getValue());
-				} else if (correlationSet != null && correlationSet.contains(attr.getKey())) { 
-			    	// converts correlation
-			    	setEventCorrelation(event, attr.getKey(), attr.getValue());		    	
-			    } else if (payloadSet != null && payloadSet.contains(attr.getKey())) { 
-			    	// converts payload
-			    	setEventPayload(event, attr.getKey(), attr.getValue());			    	
-			    } else {
-			    	// converts data element
-					setEventDataElement(event, attr.getKey(), attr.getValue());
-				}
-			}
-			logger.debug("EVENT: ( " + attr.getKey() + ", " + attr.getValue() + ")");
-		} else if (object instanceof AttributeFloatType) {
-			AttributeFloatType attr = (AttributeFloatType)object;	
-			if (attr.isSetKey()) {
-				if (attrMap.containsKey(attr.getKey())) {
-					// converts attributes
-					setEventAttribute(event, attrMap.get(attr.getKey()), attr.getValue());
-				} else if (correlationSet != null && correlationSet.contains(attr.getKey())) { 
-			    	// converts correlation
-			    	setEventCorrelation(event, attr.getKey(), attr.getValue());		    	
-			    } else if (payloadSet != null && payloadSet.contains(attr.getKey())) { 
-			    	// converts payload
-			    	setEventPayload(event, attr.getKey(), attr.getValue());			    	
-			    } else {
-			    	// converts data element
-					setEventDataElement(event, attr.getKey(), attr.getValue());
-				}
-			}					
-			logger.debug("EVENT: ( " + attr.getKey() + ", " + attr.getValue() + ")");
-		} else if (object instanceof AttributeBooleanType) {
-			AttributeBooleanType attr = (AttributeBooleanType)object;
-			if (attr.isSetKey()) {						
-				if (attrMap.containsKey(attr.getKey())) {
-					// converts attributes
-					setEventAttribute(event, attrMap.get(attr.getKey()), attr.isValue());
-				} else if (correlationSet != null && correlationSet.contains(attr.getKey())) { 
-			    	// converts correlation
-			    	setEventCorrelation(event, attr.getKey(), attr.isValue());		    	
-			    } else if (payloadSet != null && payloadSet.contains(attr.getKey())) { 
-			    	// converts payload
-			    	setEventPayload(event, attr.getKey(), attr.isValue());			    	
-			    } else {
-			    	// converts data element
-					setEventDataElement(event, attr.getKey(), attr.isValue());
-				}
-			}					
-			logger.debug("EVENT: ( " + attr.getKey() + ", " + attr.isValue() + ")");											
-		}				
-    }  
+			event.getEventDetails().setCurrentState(currentState);
+		} else if (correlationSet != null && correlationSet.contains(key)) { 
+	    	// converts correlation
+	    	setEventCorrelation(event, key, value);		    	
+	    } else if (payloadSet != null && payloadSet.contains(key)) { 
+	    	// converts payload
+	    	setEventPayload(event, key, value);			    	
+	    } else {
+	    	// converts data element
+			setEventDataElement(event, key, value);
+		}
+    }    
     /**
      * Sets the event attributes to a particular event
      * @param event event to assign the attributes values to
@@ -498,8 +287,13 @@ public class XESEventConverterImpl implements XESEventConverter {
     private void setEventDataElement(Event event, String key, Object value) {
     	DataElement element = new DataElement();
 		element.setKey(key);
-		element.setValue(String.valueOf(value));
-		event.getDataElement().add(element);  	
+		if (value instanceof Calendar) {
+			TimeStampAdapter adapter = new TimeStampAdapter();
+			element.setValue(adapter.marshal((Calendar)value));
+		} else {
+			element.setValue(String.valueOf(value));			
+		}
+		event.getDataElement().add(element);
     } 
 	/**
 	 * Get the XES map structure.
@@ -534,5 +328,82 @@ public class XESEventConverterImpl implements XESEventConverter {
 			logger.error(ioex.fillInStackTrace());
 			throw new XESException(ioex);
 		}
+	}
+	/**
+	 * Log specific XES info set within the head of the XES xml data file
+	 * @param xes XES data
+	 */
+	private void logXESInfo(LogType xes) {
+		// log principal XES attributes
+		logger.debug("=================== PRINCIPALS ===================");
+		for (Object object : xes.getStringOrDateOrInt()) {
+			if (object instanceof AttributeStringType) {
+				AttributeStringType attr = (AttributeStringType)object;	
+				logger.debug("PRINCIPAL: ( " + attr.getKey() + ", " + attr.getValue() + ")");
+			} else if (object instanceof AttributeDateType) {
+				AttributeDateType attr = (AttributeDateType)object;	
+				logger.debug("PRINCIPAL: ( " + attr.getKey() + ", " + attr.getValue() + ")");
+			} else if (object instanceof AttributeIntType) {
+				AttributeIntType attr = (AttributeIntType)object;	
+				logger.debug("PRINCIPAL: ( " + attr.getKey() + ", " + attr.getValue() + ")");
+			} else if (object instanceof AttributeFloatType) {
+				AttributeFloatType attr = (AttributeFloatType)object;	
+				logger.debug("PRINCIPAL: ( " + attr.getKey() + ", " + attr.getValue() + ")");
+			} else if (object instanceof AttributeBooleanType) {
+				AttributeBooleanType attr = (AttributeBooleanType)object;	
+				logger.debug("PRINCIPAL: ( " + attr.getKey() + ", " + attr.isValue() + ")");											
+			}				
+		}	
+		// log global XES declarations
+		logger.debug("=================== GLOBALS ===================");
+    	for (GlobalsType global : xes.getGlobal()) {
+        	for (Object object : global.getStringOrDateOrInt()) {
+        		if (object instanceof AttributeStringType) {
+    				AttributeStringType attr = (AttributeStringType)object;	
+    				logger.debug("GLOBALS: ( " + attr.getKey() + ", " + attr.getValue() + ")");
+    			} else if (object instanceof AttributeDateType) {
+    				AttributeDateType attr = (AttributeDateType)object;	
+    				logger.debug("GLOBALS: ( " + attr.getKey() + ", " + attr.getValue() + ")");
+    			} else if (object instanceof AttributeIntType) {
+    				AttributeIntType attr = (AttributeIntType)object;	
+    				logger.debug("GLOBALS: ( " + attr.getKey() + ", " + attr.getValue() + ")");
+    			} else if (object instanceof AttributeFloatType) {
+    				AttributeFloatType attr = (AttributeFloatType)object;	
+    				logger.debug("GLOBALS: ( " + attr.getKey() + ", " + attr.getValue() + ")");
+    			} else if (object instanceof AttributeBooleanType) {
+    				AttributeBooleanType attr = (AttributeBooleanType)object;	
+    				logger.debug("GLOBALS: ( " + attr.getKey() + ", " + attr.isValue() + ")");											
+    			} else {
+    				logger.debug("GLOBALS: ( " + object.getClass().getName() + ")");	
+    			}
+        	}
+    	}	
+    	// log XES classifiers
+    	logger.debug("=================== CLASSIFIERS ===================");
+    	for (Object object : xes.getClassifier()) {
+    		if (object instanceof AttributeStringType) {
+				AttributeStringType attr = (AttributeStringType)object;	
+				logger.debug("CLASSIFIER: ( " + attr.getKey() + ", " + attr.getValue() + ")");
+			} else if (object instanceof AttributeDateType) {
+				AttributeDateType attr = (AttributeDateType)object;	
+				logger.debug("CLASSIFIER: ( " + attr.getKey() + ", " + attr.getValue() + ")");
+			} else if (object instanceof AttributeIntType) {
+				AttributeIntType attr = (AttributeIntType)object;	
+				logger.debug("CLASSIFIER: ( " + attr.getKey() + ", " + attr.getValue() + ")");
+			} else if (object instanceof AttributeFloatType) {
+				AttributeFloatType attr = (AttributeFloatType)object;	
+				logger.debug("CLASSIFIER: ( " + attr.getKey() + ", " + attr.getValue() + ")");
+			} else if (object instanceof AttributeBooleanType) {
+				AttributeBooleanType attr = (AttributeBooleanType)object;	
+				logger.debug("CLASSIFIER: ( " + attr.getKey() + ", " + attr.isValue() + ")");											
+			} else {			
+				logger.debug("CLASSIFIER: ( " + object.getClass().getName() + ")");	
+			}
+    	}
+    	// log XES classifiers
+    	logger.debug("=================== EXTENSIONS ===================");
+    	for (ExtensionType ext : xes.getExtension()) {
+    		logger.debug("EXTENSION: ( " + ext.getName() + ", " + ext.getPrefix() + ", " + ext.getUri() + ")");
+    	}	    			
 	}
 }

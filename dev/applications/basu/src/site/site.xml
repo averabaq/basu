@@ -21,22 +21,21 @@
 	</bannerRight>
  
 	<bannerLeft>
-		<name>NUI Galway</name>
-		<src>http://www.nuigalway.ie/images/logos/logo.png</src>
-		<href>http://www.nuigalway.ie</href>
+		<name>Universidad Carlos III de Madrid</name>
+		<src>http://www.uc3m.es/portal/page/portal/repositorio_archivos/Imagenes/logo_0.png</src>
+		<href>http://www.uc3m.es</href>
 	</bannerLeft>	
 
 	<body>
 		<links>
-			<item name="NUI Galway" href="http://www.nuigalway.ie" />
-			<item name="IT Department" href="http://www.it.nuigalway.ie" />
+			<item name="Universidad Carlos III de Madrid" href="http://www.uc3m.es" />
+			<item name="IT Department" href="http://www.inf.uc3m.es" />
 			<item name="Apache" href="http://www.apache.org" />
 			<item name="Maven" href="http://maven.apache.org" />
     		</links>
 
 		<menu name="Product">
 			<!--						
-			<item name="System Access" href="http://{project-address}/f4bpa"/>
 			<item name="Introduction" href="index.html"/>
 			<item name="Download" href="download.html"/>
 			<item name="Release Notes" href="release-notes.html" />

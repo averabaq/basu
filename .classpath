@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="dev/modules/event-store/src/test/java"/>
+	<classpathentry kind="src" path="dev/modules/ode-event-publisher/src/main/java"/>
+	<classpathentry kind="src" path="dev/modules/xes-event-publisher/src/main/java"/>
+	<classpathentry kind="src" path="dev/modules/xes-event-publisher/src/test/java"/>
+	<classpathentry kind="src" path="dev/modules/ode-event-publisher/src/test/java"/>
 	<classpathentry kind="src" path="dev/modules/event-store/src/main/java"/>
 	<classpathentry kind="src" path="dev/modules/event-subscriber/src/test/java"/>
 	<classpathentry kind="src" path="dev/modules/event-subscriber/src/main/java"/>
-	<classpathentry kind="src" path="dev/modules/event-publisher/src/test/java"/>
-	<classpathentry kind="src" path="dev/modules/event-publisher/src/main/java"/>
 	<classpathentry kind="var" path="M2_REPO/javax/activation/activation/1.1/activation-1.1.jar"/>
 	<classpathentry kind="var" path="M2_REPO/javax/mail/mail/1.4/mail-1.4.jar"/>
 	<classpathentry kind="var" path="M2_REPO/javax/persistence/persistence-api/1.0.2/persistence-api-1.0.2.jar"/>
@@ -101,6 +103,8 @@
 	<classpathentry kind="var" path="M2_REPO/xalan/xalan/2.7.0/xalan-2.7.0.jar"/>
 	<classpathentry kind="var" path="M2_REPO/xmlbeans/xbean/2.2.0/xbean-2.2.0.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/apache/xbean/xbean-spring/3.8/xbean-spring-3.8.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/camel/camel-core/2.11.1/camel-core-2.11.1.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/camel/camel-spring-javaconfig/2.11.1/camel-spring-javaconfig-2.11.1.jar"/>	
 	<classpathentry kind="var" path="M2_REPO/xerces/xercesImpl/2.9.0/xercesImpl-2.9.0.jar"/>
 	<classpathentry kind="var" path="M2_REPO/xml-apis/xml-apis/1.3.04/xml-apis-1.3.04.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/apache/xmlbeans/xmlbeans/2.3.0/xmlbeans-2.3.0.jar"/>

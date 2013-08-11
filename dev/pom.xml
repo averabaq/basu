@@ -139,19 +139,19 @@
 	<distributionManagement>
 		<downloadUrl>http://cbi4api.verasoft.es/downloads</downloadUrl>
 		<repository>
-			<id>verasoft</id>
+			<id>releases</id>
 			<name>VeraSoft Releases Repository</name>
 			<url>http://nexus.verasoft.es/nexus/content/repositories/releases</url>
 			<uniqueVersion>false</uniqueVersion>
 		</repository>
 		<snapshotRepository>
-			<id>verasoft</id>
+			<id>snapshots</id>
 			<name>VeraSoft Snapshots Repository</name>
 			<url>http://nexus.verasoft.es/nexus/content/repositories/snapshots</url>
 			<uniqueVersion>false</uniqueVersion>
 		</snapshotRepository>
 		<site>
-			<id>verasoft</id>
+			<id>verasoft-site</id>
 			<name>VeraSoft Development Site</name>
 			<url>scp://cbi4api.verasoft.es/var/www/cbi4api/doc</url>
 		</site>
@@ -161,7 +161,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-site-plugin</artifactId>
-				<version>3.2</version>
+				<version>3.3</version>
 				<configuration>
 					<outputEncoding>utf-8</outputEncoding>					
 				</configuration>

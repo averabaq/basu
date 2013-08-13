@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:camel="http://camel.apache.org/schema/spring"	
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+                        http://www.springframework.org/schema/beans/spring-beans.xsd
+                        http://www.springframework.org/schema/context 
+                        http://www.springframework.org/schema/context/spring-context.xsd
+                        http://camel.apache.org/schema/spring 
+                        http://camel.apache.org/schema/spring/camel-spring.xsd">
+
+	<!-- enabling annotation driven configuration -->
+	<context:annotation-config />
+	
+	<camel:camelContext id="xesPublisherCamelContext">
+		<camel:propertyPlaceholder id="properties" location="camel.properties" /> 
+		<camel:contextScan/>		        
+		<camel:template id="basuTemplate" defaultEndpoint="basu-activemq:queue:es.uc3m.softlab.cbi4api.basu.event.bpaf" />
+
+		<camel:endpoint id="basu.xes.file.endpoint" uri="file:{{cbi4api.basu.xes.event.publisher.camel.pull.import.dir}}"/>
+        <camel:endpoint id="basu.xes.queue.endpoint" uri="basu-activemq:queue:es.uc3m.softlab.cbi4api.basu.event.xes"/>
+        <camel:endpoint id="basu.bpaf.queue.endpoint" uri="basu-activemq:queue:es.uc3m.softlab.cbi4api.basu.event.bpaf"/>
+		
+		<camel:route>
+			<camel:from	ref="basu.xes.file.endpoint" />
+		    <camel:convertBodyTo type="byte[]"/>
+			<camel:to ref="basu.xes.queue.endpoint" />
+		</camel:route>		
+		<camel:route>
+			<camel:from	ref="basu.xes.queue.endpoint" />
+			<camel:process ref="/cbi4api-basu/xes-event-publisher/service/xes-etl-processor" />
+		</camel:route>	
+	</camel:camelContext>
+	
+</beans>

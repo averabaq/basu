@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:amq="http://activemq.apache.org/schema/core"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+                        http://www.springframework.org/schema/beans/spring-beans.xsd
+                        http://www.springframework.org/schema/context 
+                        http://www.springframework.org/schema/context/spring-context.xsd
+                        http://activemq.apache.org/schema/core 
+                        http://activemq.apache.org/schema/core/activemq-core.xsd">
+
+	<!-- enabling annotation driven configuration -->
+	<context:annotation-config />
+
+	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<value>classpath:xes-event-publisher.properties</value>
+		</property>
+	</bean>
+	  
+	<!-- BASU activemq connection factory --> 
+	<amq:connectionFactory id="basuConnectionFactory">
+		<property name="brokerURL" value="${cbi4api.basu.xes.event.publisher.activemq.broker.url}" />
+	</amq:connectionFactory>
+
+	<!-- BASU activemq pooled connection factory -->
+	<bean id="basuPooledConnectionFactory" class="org.apache.activemq.pool.PooledConnectionFactory"
+		init-method="start" destroy-method="stop">
+		<property name="maxConnections" value="8" />
+		<property name="connectionFactory" ref="basuConnectionFactory" />
+	</bean>
+
+	<!-- BASU activemq jms configuration through a pooled connection -->
+	<bean id="basuJmsConfig" class="org.apache.camel.component.jms.JmsConfiguration">
+		<property name="connectionFactory" ref="basuPooledConnectionFactory" />
+		<property name="concurrentConsumers" value="10" />
+	</bean>
+
+	<!-- BASU activemq endpoint -->
+	<bean id="basu-activemq" class="org.apache.activemq.camel.component.ActiveMQComponent">
+		<property name="configuration" ref="basuJmsConfig" />
+	</bean>
+ 	
+ 	<!-- BASU activemq configuration without pooling 
+	<bean id="basu-activemq" class="org.apache.activemq.camel.component.ActiveMQComponent">
+		<property name="connectionFactory">
+    		<bean class="org.apache.activemq.ActiveMQConnectionFactory">
+      			<property name="brokerURL" value="#{xesEventPublisherConfig.brokerUrl}"/>
+    		</bean>
+  		</property>
+	</bean> 		
+    -->	
+	
+</beans>

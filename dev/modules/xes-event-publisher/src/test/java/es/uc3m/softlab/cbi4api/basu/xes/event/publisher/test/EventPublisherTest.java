@@ -5,71 +5,103 @@
  */
 package es.uc3m.softlab.cbi4api.basu.xes.event.publisher.test;
 
-import es.uc3m.softlab.cbi4api.basu.xes.event.publisher.Config;
-import es.uc3m.softlab.cbi4api.basu.xes.event.publisher.ETLEvent;
+import es.uc3m.softlab.cbi4api.basu.xes.event.publisher.ETLProcessor;
+import es.uc3m.softlab.cbi4api.basu.xes.event.publisher.XESEventConverter;
+import es.uc3m.softlab.cbi4api.basu.xes.event.publisher.XESEventReader;
 import es.uc3m.softlab.cbi4api.basu.xes.event.publisher.XESEventWriter;
 import es.uc3m.softlab.cbi4api.basu.xes.event.publisher.xsd.basu.event.Event;
+import es.uc3m.softlab.cbi4api.basu.xes.event.publisher.xsd.xes.LogType;
 
+import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.ObjectMessage;
-import javax.jms.Session;
-import javax.jms.Topic;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Unmarshaller;
 
-import org.apache.activemq.broker.BrokerService;
+import org.apache.camel.CamelContext;
+import org.apache.camel.Endpoint;
+import org.apache.camel.EndpointInject;
+import org.apache.camel.Exchange;
+import org.apache.camel.PollingConsumer;
+import org.apache.camel.component.mock.MockEndpoint;
+import org.apache.camel.impl.DefaultExchange;
 import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.Assert;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jms.core.JmsTemplate;
-import org.springframework.jms.core.MessageCreator;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"classpath:applicationContext-test.xml"})
 public class EventPublisherTest extends AbstractShowcaseTest {
-	/** ActiveMQ broker service */
-	private BrokerService broker = new BrokerService();
 	/** Configuration object */
-	@Autowired private Config config;
-	/** Event reader service */
-	@Autowired private ETLEvent etl;
-	/** Event sender to publish the data to the jms queue */
-	@Autowired private XESEventWriter sender;
-	/** JMS template */
-	@Autowired private JmsTemplate jmsTemplate;
-	/** JMS message XES queue/topic destination */
-	@Autowired private Topic xesDestination;
-	/** JMS message BPAF queue/topic destination */
-	@Autowired private Topic bpafDestination;
-	
+	@Autowired private CamelContext context;
+	/** ETL (Extract, Transform & Load) processor */
+	@Autowired private ETLProcessor etl;
+	/** ETL XES Extractor */
+	@Autowired private XESEventReader extractor;
+	/** ETL XES Loader */
+	@Autowired private XESEventWriter loader;
+	/** ETL XES Transformer */
+	@Autowired private XESEventConverter transformer;	
+	/** Mock source XES etl endpoint */
+    @EndpointInject(uri = "mock:xesSource")
+    protected MockEndpoint sourceEndpoint;
+    /** Mock target XES etl endpoint */
+    @EndpointInject(uri = "mock:bpafTarget")
+    protected MockEndpoint targetEndpoint;	
+    
 	@Before
 	public void setUp() {
-		try {			
-			/* configure the broker */
-			broker.addConnector(config.getBrokerUrl());
-			broker.setBrokerName("Broker1");
-			broker.setUseJmx(false);
-			broker.setPersistent(false);
-			broker.start();
-		} catch(Exception ex) {
-			ex.printStackTrace();
-		}
 	}	
+	
+	@Test
+	@DirtiesContext      
+    public void testETLProcess() throws Throwable {
+    	final byte[] xes = IOUtils.toByteArray(getClass().getResourceAsStream("/event-logs/BPI_Challenge_2012-test.xes"));
+		logger.info("Performing ETL process...");		
+		DefaultExchange exchange = new DefaultExchange(sourceEndpoint);
+		exchange.getIn().setBody(xes);
+		etl.process(exchange);
+		logger.info("ETL process performed.");		
+		sourceEndpoint.assertIsSatisfied();
+    }
     
-    @Test
-    public void testMessagePublisher() throws Throwable {    
+	@Test
+	@DirtiesContext 
+    public void testXESExtractor() throws Throwable { 
+    	final byte[] xes = IOUtils.toByteArray(getClass().getResourceAsStream("/event-logs/Hospital_log-test.xes"));
+    	DefaultExchange exchange = new DefaultExchange(sourceEndpoint);
+    	exchange.getIn().setBody(xes);
+    	LogType _xes = extractor.extractEvents(exchange);
+    	assert (_xes != null && _xes.isSetTrace());
+    }
+	
+	@Test
+	@DirtiesContext 
+    public void testXESConverter() throws Throwable {
+    	final byte[] xes = IOUtils.toByteArray(getClass().getResourceAsStream("/event-logs/Hospital_log-test.xes"));
+    	DefaultExchange exchange = new DefaultExchange(sourceEndpoint);
+    	exchange.getIn().setBody(xes);
+    	LogType _xes = extractor.extractEvents(exchange);   	
+    	assert (_xes == null || _xes.isSetTrace());
+    	List<Event> bpafEvents = transformer.transform(_xes);
+		assert (bpafEvents != null && !bpafEvents.isEmpty());		
+    }
+	
+	@Test
+    public void testXESLoader() throws Throwable {
 		List<Event> events = new ArrayList<Event>();
-		for (int i = 0; i < 10 ; i++) {
+		for (int i = 0; i < 25 ; i++) {
 			Event event = new Event();
 			event.setActivityDefinitionID(UUID.randomUUID().toString());
 			event.setActivityInstanceID(UUID.randomUUID().toString());
@@ -84,37 +116,34 @@ public class EventPublisherTest extends AbstractShowcaseTest {
 			event.setTimestamp(tstamp);
 			events.add(event);
 		}
-		sender.sendEvents(events);
-    }   
-    
-    @Test
-    public void testETLProcess() throws Throwable {
-    	final byte[] xes = IOUtils.toByteArray(getClass().getResourceAsStream("/event-logs/BPI_Challenge_2012.xes"));
-		logger.info("Performing ETL process...");
-		etl.process(xes);
-		logger.info("ETL process performed.");
+		DefaultExchange exchange = new DefaultExchange(targetEndpoint);
+		Assert.assertNotNull(loader);
+		loader.sendEvents(exchange, events);
+        // assert mock received the body
+		targetEndpoint.assertIsSatisfied();
     }
     
-    @Test
-    public void testXESMessagePublisher() throws Throwable {   
-    	final byte[] xes = IOUtils.toByteArray(getClass().getResourceAsStream("/event-logs/Hospital_log.xes"));
-     	jmsTemplate.send(xesDestination, new MessageCreator() {
-			public Message createMessage(Session session)
-			throws JMSException {
-				logger.info("Sending XES log event...");
-				ObjectMessage message = session.createObjectMessage(xes);
-				//message.setJMSReplyTo(arg0);
-				return message;
-			}
-		});
-    }
-    
+	@Test
+	public void testBPAFConsumer() throws Throwable {
+		Endpoint endpoint = context.getEndpoint("basu-activemq:queue:es.uc3m.softlab.cbi4api.basu.event.bpaf");
+		PollingConsumer consumer = endpoint.createPollingConsumer();
+		Exchange exchange = consumer.receive(5000);		
+		assert (exchange != null && exchange.getIn() != null);
+		String xml = (String)exchange.getIn().getBody();
+		assert (xml != null);
+		logger.debug(xml);
+		ByteArrayInputStream bios = new ByteArrayInputStream(xml.getBytes());
+		/* create a JAXBContext capable of handling classes */ 
+		JAXBContext jc = JAXBContext.newInstance("es.uc3m.softlab.cbi4api.basu.xes.event.publisher.xsd.basu.event");			
+		/* create an Unmarshaller */
+		Unmarshaller u = jc.createUnmarshaller();        					
+		/* unmarshal an instance document into a tree of Java content objects. */			
+		Event event = (Event) u.unmarshal(bios);
+		logger.debug(event);
+		assert (event != null);
+	}
+	  
 	@After
 	public void tearDown() {
-		try {						
-			broker.stop();
-		} catch(Exception ex) {
-			ex.printStackTrace();			
-		}
 	}	
 }

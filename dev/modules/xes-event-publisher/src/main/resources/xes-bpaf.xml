@@ -24,17 +24,41 @@
 		<Payload>xes:payload</Payload>
 	</Event> 
 	<StateTransitions key="lifecycle:transition">
-		<State xes="SCHEDULE" bpaf="Open.NotRunning" />
-		<State xes="COMPLETE" bpaf="Closed.Completed" />
-		<State xes="START" bpaf="Open.Running" />
-		<State xes="ASSIGN" bpaf="Open.NotRunning.Assigned" />
-		<State xes="REASSIGN" bpaf="Open.NotRunning.Assigned" />
-		<State xes="AUTOSKIP" bpaf="Closed.Cancelled.Exited" />
-		<State xes="MANUALSKIP" bpaf="Closed.Cancelled.Exited" />
-		<State xes="WITHDRAW" bpaf="Closed.Cancelled.Aborted" />
-		<State xes="SUSPEND" bpaf="Open.Running.Suspended" />
-		<State xes="RESUME" bpaf="Open.Running.InProgress" />
-		<State xes="ATE_ABORT" bpaf="Closed.Cancelled.Aborted" />
-		<State xes="PI_ABORT" bpaf="Closed.Cancelled.Aborted" />
+		<State xes="SCHEDULE">
+			<bpaf target="Open.NotRunning.Ready" />	
+		</State>
+		<State xes="COMPLETE">
+			<bpaf source="Open" target="Closed.Completed" />	
+		</State>
+		<State xes="START">
+			<bpaf source="Open.NotRunning" target="Open.Running" />	
+		</State>
+		<State xes="ASSIGN">
+			<bpaf source="Open.NotRunning.Ready" target="Open.NotRunning.Assigned" />	
+		</State>
+		<State xes="REASSIGN">
+			<bpaf source="Open.NotRunning.Ready" target="Open.NotRunning.Assigned" />	
+		</State>
+		<State xes="AUTOSKIP">
+			<bpaf source="Open" target="Closed.Cancelled" />	
+		</State>
+		<State xes="MANUALSKIP">
+			<bpaf source="Open" target="Closed.Cancelled.Exited" />	
+		</State>
+		<State xes="WITHDRAW">
+			<bpaf source="Open.NotRunning.Assigned" target="Open.NotRunning.Ready" />	
+		</State>
+		<State xes="SUSPEND">
+			<bpaf source="Open.Running" target="Open.Running.Suspended" />	
+		</State>
+		<State xes="RESUME">
+			<bpaf source="Open.Running.Suspended" target="Open.Running" />	
+		</State>
+		<State xes="ATE_ABORT">
+			<bpaf source="Open" target="Closed.Cancelled.Aborted" />	
+		</State>
+		<State xes="PI_ABORT">
+			<bpaf source="Open" target="Closed.Cancelled.Aborted" />	
+		</State>
 	</StateTransitions>          
 </xesmap:XesMap>

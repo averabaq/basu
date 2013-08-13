@@ -12,7 +12,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 
-import es.uc3m.softlab.cbi4api.basu.xes.event.publisher.xsd.xes.map.BPAFState;
+import es.uc3m.softlab.cbi4api.basu.xes.event.publisher.XESMap.BPAFStateXesMap;
 import es.uc3m.softlab.cbi4api.basu.xes.event.publisher.xsd.xes.map.StateTransitions;
 import es.uc3m.softlab.cbi4api.basu.xes.event.publisher.xsd.xes.map.XesMap;
 
@@ -185,19 +185,20 @@ public class XESMapFactory {
     	// maps state transitions
     	if (xesmap.isSetStateTransitions()) {
     		_xesmap.setTransitionKey(xesmap.getStateTransitions().getKey());
-    		_xesmap.setState(new HashMap<String, BPAFState>());
+    		_xesmap.setState(new HashMap<String, BPAFStateXesMap>());
     		for (StateTransitions.State state : xesmap.getStateTransitions().getState()) {
     			String xesState = null;
-    			BPAFState bpafState = null;
+    			BPAFStateXesMap bpafStateXesMap = null;
     			if (state.isSetXes())
     				xesState = state.getXes();
-    			if (state.isSetBpaf())
-    				bpafState = state.getBpaf();
-     			if (bpafState == null) {
-    				logger.warn("BPAF state transition '" + state.getBpaf() + "' is not a valid BPAF state. Please, review the XES xml map configuration.");
-    				throw new XESException("BPAF state transition '" + state.getBpaf() + "' is not a valid BPAF state. Please, review the XES xml map configuration."); 
+    			if (state.isSetBpaf()) {
+    				bpafStateXesMap = _xesmap.new BPAFStateXesMap(state.getBpaf().getSource(), state.getBpaf().getTarget());
+    			}
+     			if (bpafStateXesMap == null) {
+    				logger.warn("No BPAF state transition '" + state.getBpaf() + "' defined. Please, review the XES xml map configuration.");
+    				throw new XESException("No BPAF state transition '" + state.getBpaf() + "' defined. Please, review the XES xml map configuration."); 
      			}
-     			_xesmap.getState().put(xesState, bpafState);
+     			_xesmap.getState().put(xesState, bpafStateXesMap);
 			} 
     	}
     	logger.debug("XES map structure generated successfully.");

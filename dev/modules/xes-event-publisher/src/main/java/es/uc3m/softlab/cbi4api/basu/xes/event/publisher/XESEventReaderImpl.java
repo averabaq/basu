@@ -6,20 +6,21 @@
 package es.uc3m.softlab.cbi4api.basu.xes.event.publisher;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
+import org.apache.camel.Exchange;
 import org.apache.log4j.Logger;
-
 import org.springframework.stereotype.Component;
 
 import es.uc3m.softlab.cbi4api.basu.xes.event.publisher.xsd.xes.LogType;
 
 /**
- * Component implementation for retrieving the incoming events in F4BPA-BPAF format 
+ * Component implementation for retrieving the incoming events in BASU-BPAF format 
  * from the message queue. 
  * This interface defines all methods for accessing to the <strong>event</strong> 
  * entity data based upon the Spring framework.
@@ -42,11 +43,12 @@ public class XESEventReaderImpl implements XESEventReader {
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	public LogType extractEvents(byte[] xml) throws XESEventReaderException {
+	public LogType extractEvents(Exchange exchange) throws XESEventReaderException {
+		byte[] xml = (byte[])exchange.getIn().getBody();
+		
 		LogType logType = null;
+		ByteArrayInputStream bais = new ByteArrayInputStream(xml);		
 		try {		
-			//logger.info(new String(xml));
-			ByteArrayInputStream bais = new ByteArrayInputStream(xml);
 			/* create a JAXBContext capable of handling classes */ 
 			JAXBContext jc = JAXBContext.newInstance("es.uc3m.softlab.cbi4api.basu.xes.event.publisher.xsd.xes");			
 			/* create an Unmarshaller */
@@ -60,11 +62,19 @@ public class XESEventReaderImpl implements XESEventReader {
 			JAXBElement<LogType> log = (JAXBElement<LogType>) u.unmarshal(bais);			
 			logger.debug("Unmarshalled XES file sucessfully: " + log);
 			logType = log.getValue();			
-			logger.debug("XES event message version " + logType.getOpenxesVersion() + ".");
+			logger.debug("XES event message version " + logType.getOpenxesVersion() + ".");	
 		} catch (JAXBException jaxb) {
 			logger.error(jaxb.fillInStackTrace());
 			throw new XESEventReaderException(jaxb);
-		} 
+		} finally {
+			if (bais != null) {			
+				try {
+					bais.close();
+				} catch (IOException ioex) {
+					logger.error(ioex.fillInStackTrace());
+				}
+			}
+		}
 		return logType;
 	}
 }

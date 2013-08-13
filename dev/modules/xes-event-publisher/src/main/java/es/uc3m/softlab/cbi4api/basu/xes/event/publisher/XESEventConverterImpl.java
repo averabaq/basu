@@ -27,6 +27,7 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
+import es.uc3m.softlab.cbi4api.basu.xes.event.publisher.XESMap.BPAFStateXesMap;
 import es.uc3m.softlab.cbi4api.basu.xes.event.publisher.xsd.TimeStampAdapter;
 import es.uc3m.softlab.cbi4api.basu.xes.event.publisher.xsd.basu.event.Correlation;
 import es.uc3m.softlab.cbi4api.basu.xes.event.publisher.xsd.basu.event.CorrelationElement;
@@ -93,22 +94,10 @@ public class XESEventConverterImpl implements XESEventConverter {
 			// process instance level
 			Event event = new Event();	
 			event.setEventID(UUID.randomUUID().toString());
-			event.setServerID(config.getSourceId());
-			Map<String, State> processStateMap = new HashMap<String, State>();			
+			event.setServerID(config.getSourceId());		
 			for (Object object : trace.getStringOrDateOrInt()) {				
 				processXES(XESMapType.TRACE, xesMap, object, event);
 			}
-			// gets previous activity from map
-			State processPreviousState = processStateMap.get(event.getProcessName());
-			// gets current state from the event
-			State processCurrentState = null;
-			if (event.getEventDetails() != null)
-				processCurrentState = event.getEventDetails().getCurrentState();
-			// set previous state for process
-			if (event.getEventDetails() != null)
-				event.getEventDetails().setPreviousState(processPreviousState);
-			// update previous state for process
-			processStateMap.put(event.getProcessName(), processCurrentState);
 			// add the event to the returning list
 			events.add(event);
 			
@@ -117,7 +106,6 @@ public class XESEventConverterImpl implements XESEventConverter {
 			String processInstanceID = event.getProcessInstanceID();
 			String processDefinitionID = event.getProcessDefinitionID();			
 			// activity instance level
-			Map<String, State> activityStateMap = new HashMap<String, State>();
 			for (EventType eventType : trace.getEvent()) {	
 				event = new Event();
 				event.setEventID(UUID.randomUUID().toString());
@@ -128,16 +116,6 @@ public class XESEventConverterImpl implements XESEventConverter {
 				for (Object object : eventType.getStringOrDateOrInt()) {
 					processXES(XESMapType.EVENT, xesMap, object, event);			
 				}				
-				// gets previous activity from map
-				State activityPreviousState = activityStateMap.get(event.getActivityName());
-				State activityCurrentState = null;
-				if (event.getEventDetails() != null)
-					activityCurrentState = event.getEventDetails().getCurrentState();
-				// set previous state for activity
-				if (event.getEventDetails() != null)
-					event.getEventDetails().setPreviousState(activityPreviousState);
-				// update previous state for activity
-				activityStateMap.put(event.getActivityName(), activityCurrentState);
 				events.add(event);
 			}			
 		}
@@ -156,7 +134,7 @@ public class XESEventConverterImpl implements XESEventConverter {
 		Map<String,Set<BPAFMapType>> attrMap = xesMap.getSemantic().get(type);
 		Set<String> correlationSet = xesMap.getCorrelation().get(type);
 		Set<String> payloadSet = xesMap.getPayload().get(type);
-		Map<String, BPAFState> stateMap = xesMap.getState();
+		Map<String, BPAFStateXesMap> stateMap = xesMap.getState();
 		
     	if (object instanceof AttributeStringType) {
 			AttributeStringType attr = (AttributeStringType)object;	
@@ -201,7 +179,7 @@ public class XESEventConverterImpl implements XESEventConverter {
      * @param key XES key attribute.
      * @param value XES value attribute.
      */
-    private void processXESAttribute(XESMap xesMap, Map<String,Set<BPAFMapType>> attrMap, Set<String> correlationSet, Set<String> payloadSet, Map<String, BPAFState> stateMap, Event event, String key, Object value) {
+    private void processXESAttribute(XESMap xesMap, Map<String,Set<BPAFMapType>> attrMap, Set<String> correlationSet, Set<String> payloadSet, Map<String, BPAFStateXesMap> stateMap, Event event, String key, Object value) {
 		if (attrMap.containsKey(key)) {
 			// converts attributes
 			setEventAttribute(event, attrMap.get(key), value);
@@ -210,13 +188,24 @@ public class XESEventConverterImpl implements XESEventConverter {
 				event.setEventDetails(new EventDetails());
 			}
 			State currentState = null;
+			State previousState = null;
 			if (stateMap.containsKey(String.valueOf(value).toUpperCase())) {
-				try {
-					currentState = State.fromValue(stateMap.get((String.valueOf(value)).toUpperCase()).value());
+				BPAFState sourceState = stateMap.get((String.valueOf(value)).toUpperCase()).getSource();
+				try {					
+					if (sourceState != null)
+						previousState = State.fromValue(sourceState.value());
 				} catch (IllegalArgumentException iaex) {
-					logger.error("BPAF State " + stateMap.get((String.valueOf(value)).toUpperCase()).value() + " does not exist. Please review XES map descriptor file. " + iaex.getMessage());
+					logger.error("BPAF State " + sourceState.value() + " does not exist. Please review XES map descriptor file. " + iaex.getMessage());
+				}
+				BPAFState targetState = stateMap.get((String.valueOf(value)).toUpperCase()).getTarget();
+				try {					
+					if (targetState != null)
+						currentState = State.fromValue(targetState.value());
+				} catch (IllegalArgumentException iaex) {
+					logger.error("BPAF State " + targetState.value() + " does not exist. Please review XES map descriptor file. " + iaex.getMessage());
 				}
 			}
+			event.getEventDetails().setPreviousState(previousState);
 			event.getEventDetails().setCurrentState(currentState);
 		} else if (correlationSet != null && correlationSet.contains(key)) { 
 	    	// converts correlation
@@ -301,14 +290,15 @@ public class XESEventConverterImpl implements XESEventConverter {
 	 * @throws XESException if any XES map configuration error is found.
 	 */
 	private XESMap getMap() throws XESException {
+		ByteArrayInputStream bais = null;
 		try {
 			byte[] xml = IOUtils.toByteArray(getClass().getResourceAsStream(StaticResources.XES_MAP_XML_CLASSPATH_FILE));
-			ByteArrayInputStream bais = new ByteArrayInputStream(xml);
+			bais = new ByteArrayInputStream(xml);
 			/* create a JAXBContext capable of handling classes */ 
 			JAXBContext jc = JAXBContext.newInstance("es.uc3m.softlab.cbi4api.basu.xes.event.publisher.xsd.xes.map");	
 			/* create an Unmarshaller */
-			Unmarshaller u = jc.createUnmarshaller();        			
-			/* Performs an xml validation against the OpenXES schema */ 
+			Unmarshaller u = jc.createUnmarshaller();
+			/* Performs an xml validation against the OpenXES schema */
 			SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 			URL xsd = getClass().getResource(StaticResources.XES_MAP_XML_SCHEMA_CLASSPATH_FILE);
 			Schema schema = factory.newSchema(xsd);
@@ -324,9 +314,17 @@ public class XESEventConverterImpl implements XESEventConverter {
 		} catch (SAXException sex) {
 			logger.error(sex.fillInStackTrace());
 			throw new XESException(sex);
-		} catch(IOException ioex) {
+		} catch (IOException ioex) {
 			logger.error(ioex.fillInStackTrace());
 			throw new XESException(ioex);
+		} finally {
+			if (bais != null) {			
+				try {
+					bais.close();
+				} catch (IOException ioex) {
+					logger.error(ioex.fillInStackTrace());
+				}
+			}
 		}
 	}
 	/**

@@ -1,87 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-	xmlns:p="http://www.springframework.org/schema/p"
 	xmlns:context="http://www.springframework.org/schema/context"
-	xmlns:jms="http://www.springframework.org/schema/jms" 
-	xmlns:task="http://www.springframework.org/schema/task" 
-	xmlns:amq="http://activemq.apache.org/schema/core"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans 
                         http://www.springframework.org/schema/beans/spring-beans.xsd
                         http://www.springframework.org/schema/context 
-                        http://www.springframework.org/schema/context/spring-context.xsd
-                        http://www.springframework.org/schema/jms 
-                        http://www.springframework.org/schema/jms/spring-jms.xsd
-                        http://www.springframework.org/schema/task 
-                        http://www.springframework.org/schema/task/spring-task.xsd
-                        http://activemq.apache.org/schema/core 
-                        http://activemq.apache.org/schema/core/activemq-core.xsd">
+                        http://www.springframework.org/schema/context/spring-context.xsd">
 
+    <!-- register and startup the activemq embedded broker for unit testing 
+      -- This must be provided by the main application context
+	<import resource="classpath:broker.xml"/>
+	<import resource="classpath:activemq-context.xml"/>
+	-->
+
+	<!-- register the camel context -->
+	<import resource="classpath:camel-context.xml"/>	  
+	
 	<!-- enabling annotation driven configuration -->
 	<context:annotation-config />
 	<context:component-scan base-package="es.uc3m.softlab.cbi4api.basu.xes.event.publisher" />
-
-	<!-- activemq connection factory -->
-	<amq:connectionFactory id="amqConnectionFactory">
-		<property name="brokerURL" value="#{xesEventPublisherConfig.brokerUrl}" />
-	</amq:connectionFactory> 	 
 	
-	<!-- XES message listener container -->
-	<bean id="xesConnectionFactory" class="org.springframework.jms.connection.CachingConnectionFactory">
-		<constructor-arg ref="amqConnectionFactory" />
-		<property name="sessionCacheSize" value="100" />
-	</bean>
-	
-	<!-- XES message listener container -->
-	<bean id="xesJmsContainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
-		<property name="connectionFactory" ref="xesConnectionFactory"/>
-		<property name="destination" ref="xesDestination"/>
-		<property name="messageListener" ref="/cbi4api-basu/xes-event-publisher/service/xes-listener" />
-	</bean>
- 	
- 	<!-- XES events jms destination -->
-	<bean id="xesDestination" class="org.apache.activemq.command.ActiveMQTopic">
-		<constructor-arg value="es.uc3m.softlab.cbi4api.basu.event.xes" />
-	</bean>
-	
-	<!-- BPAF connection factory -->
-	<bean id="bpafConnectionFactory" class="org.apache.activemq.pool.PooledConnectionFactory">
-		<constructor-arg ref="amqConnectionFactory" />
-	</bean>
-
-	<!-- BPAF jms template -->
-	<bean id="jmsTemplate" class="org.springframework.jms.core.JmsTemplate">
-		<constructor-arg ref="bpafConnectionFactory" />
-		<property name="sessionTransacted" value="false" />
-		<property name="receiveTimeout" value="5000" />
-	</bean> 
- 	
- 	<!-- BPAF jms topic message destination -->
-	<bean id="bpafDestination" class="org.apache.activemq.command.ActiveMQTopic">
-		<constructor-arg value="es.uc3m.softlab.cbi4api.basu.event.bpaf" />
-	</bean>
-	
-	<!-- task for the event scheduler executor -->
-	<task:annotation-driven executor="eventPublisherExecutor" scheduler="eventPublisherScheduler"/>
-
-	<task:executor id="eventPublisherExecutor" pool-size="15" />
-
-	<task:scheduler id="eventPublisherScheduler" pool-size="10"/>
-
-	<task:scheduled-tasks scheduler="eventPublisherScheduler">
-		<task:scheduled ref="eventScheduler" method="run" 
-			fixed-rate="#{T(java.lang.Long).valueOf(xesEventPublisherConfig.timerFixedRate)}"/>
-	</task:scheduled-tasks>
-
-	<!-- to enable a cron based schedule instead of a fixed-rate, 
-	     remove this comment block and comment out that one referring to a
-	     fixed-rate. 
-	<task:scheduled-tasks scheduler="eventPublisherScheduler">
-		<task:scheduled ref="eventScheduler" method="run" 
-		    cron="#{config.timerCron}" /> 
-	</task:scheduled-tasks>
-	 -->
-	 
-	<bean id="eventScheduler" class="es.uc3m.softlab.cbi4api.basu.xes.event.publisher.EventPublisherScheduler"/>
-	 	
 </beans>

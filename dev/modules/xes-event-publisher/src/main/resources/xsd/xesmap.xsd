@@ -31,9 +31,16 @@
 	<xs:complexType name="StateTransitions" xmlns="http://www.uc3m.es/softlab/basu/xesmap">
 		<xs:sequence>
 			<xs:element name="State" minOccurs="1" maxOccurs="unbounded">
-				<xs:complexType>
+				<xs:complexType>	
+					<xs:sequence>				
+						<xs:element name="bpaf" minOccurs="1" maxOccurs="1">						
+							<xs:complexType>
+								<xs:attribute name="source" type="xesmap:BPAFState" use="optional"/>
+								<xs:attribute name="target" type="xesmap:BPAFState" use="required"/>
+							</xs:complexType>
+						</xs:element>						
+					</xs:sequence>
 					<xs:attribute name="xes" type="xs:string" use="required"/>
-					<xs:attribute name="bpaf" type="xesmap:BPAFState" use="required"/>
 				</xs:complexType>
 			</xs:element>
 		</xs:sequence>

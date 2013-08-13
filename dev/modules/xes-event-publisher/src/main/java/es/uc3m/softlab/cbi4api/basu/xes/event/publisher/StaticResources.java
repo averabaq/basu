@@ -34,15 +34,12 @@ public class StaticResources {
 	/** Component name for the event reader service */
 	public static final String COMPONENT_NAME_EVENT_SENDER = "/cbi4api-basu/xes-event-publisher/component/EventSender";
 	
-	/** Service name for the event publisher ETL (Extract, Transform & Load) module */
-	public static final String SERVICE_NAME_EVENT_ETL = "/cbi4api-basu/xes-event-publisher/service/EventETL";
-	/** Service name for the XES event listener ETL (Extract, Transform & Load) module */
-	public static final String SERVICE_NAME_XES_LISTENER = "/cbi4api-basu/xes-event-publisher/service/xes-listener";	
+	/** Service name for the XES ETL (Extract, Transform & Load) event processor */
+	public static final String SERVICE_NAME_XES_ETL_PROCESSOR = "/cbi4api-basu/xes-event-publisher/service/xes-etl-processor";	
 	/** Component name for the XES event writer */
 	public static final String COMPONENT_NAME_XES_EVENT_WRITER = "/cbi4api-basu/event-publisher/component/XESEventWriter";
 	/** Component name for the XES event reader service */
 	public static final String COMPONENT_NAME_XES_EVENT_READER = "/cbi4api-basu/event-publisher/component/XESEventReader";
 	/** Component name for the XES event converter service */
 	public static final String COMPONENT_NAME_XES_EVENT_CONVERTER = "/cbi4api-basu/event-publisher/component/XESEventConverter";
-
 }

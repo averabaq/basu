@@ -39,7 +39,7 @@
 	</scm>
 	<ciManagement>
 		<system>teamcity</system>
-		<url>http://teamcity.verasoft.es/teamcity</url>
+		<url>http://teamcity.verasoft.es</url>
 		<notifiers>
 			<notifier>
 				<type>mail</type>
@@ -66,7 +66,7 @@
 			<artifactId>commons-io</artifactId>
 			<version>2.4</version>
 			<scope>compile</scope>
-		</dependency>			    	
+		</dependency>					    	
 		<dependency>
 			<groupId>org.apache.activemq</groupId>
 			<artifactId>activemq-all</artifactId>
@@ -92,7 +92,19 @@
 			<artifactId>camel-core</artifactId>
 			<version>${org.apache.camel.version}</version>
 			<scope>compile</scope>
-		</dependency>		
+		</dependency>	
+		<dependency>
+			<groupId>org.apache.camel</groupId>
+			<artifactId>camel-spring</artifactId>
+			<version>${org.apache.camel.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.springframework</groupId>
+					<artifactId>spring-aop</artifactId>
+				</exclusion>
+			</exclusions>			
+			<scope>compile</scope>
+		</dependency>			
 		<dependency>
 			<groupId>org.apache.camel</groupId>
 			<artifactId>camel-spring-integration</artifactId>
@@ -116,12 +128,6 @@
 			<artifactId>spring-test</artifactId>
 			<version>${org.springframework.version}</version>
 			<scope>test</scope>
-		</dependency>	
-		<dependency>
-			<groupId>commons-pool</groupId>
-			<artifactId>commons-pool</artifactId>
-			<version>1.6</version>
-			<scope>runtime</scope>
 		</dependency>			
 		<dependency>
 			<groupId>postgresql</groupId>
@@ -159,7 +165,7 @@
 			<artifactId>spring-jms</artifactId>
 			<version>${org.springframework.version}</version>
 			<scope>compile</scope>
-		</dependency>					
+		</dependency>				
 		<dependency>
 			<groupId>org.apache.xbean</groupId>
 			<artifactId>xbean-spring</artifactId>
@@ -309,6 +315,9 @@
 			<testResource>
 				<directory>src/test/resources</directory>
 				<filtering>true</filtering>	
+				<excludes>
+					<exclude>event-logs/complete/**</exclude>
+				</excludes>
 			</testResource>
 		</testResources>
 	</build>

@@ -11,20 +11,15 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.List;
 
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.ObjectMessage;
-import javax.jms.Session;
-import javax.jms.Topic;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
 import org.apache.log4j.Logger;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jms.core.JmsTemplate;
-import org.springframework.jms.core.MessageCreator;
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import org.apache.camel.Produce;
+import org.apache.camel.ProducerTemplate;
 import org.springframework.stereotype.Component;
 
 import es.uc3m.softlab.cbi4api.basu.xes.event.publisher.xsd.basu.event.Event;
@@ -42,49 +37,52 @@ public class XESEventWriterImpl implements XESEventWriter {
 	/** Logger for tracing */
 	private Logger logger = Logger.getLogger(XESEventWriterImpl.class);
 	/** JMS template */
-	@Autowired private JmsTemplate jmsTemplate;
-	/** JMS message queue/topic destination */
-	@Autowired private Topic bpafDestination;
+	@Produce(property="basuTemplate", ref="basu.bpaf.queue.endpoint")
+	private ProducerTemplate producer; 
 
 	/**
-	 * Publish a list of BPAF events in extended format throughout the publisher
-	 * jms queue.
+	 * Send a list of BPAF events in extended format throughout a camel route.
 	 * 
 	 * @param events list of {@link es.uc3m.softlab.cbi4api.basu.xes.event.publisher.xsd.basu.event.Event}
 	 * objects to send in XML representation.
+	 * @param exchange exchange data object to route.
 	 * @throws XESEventWriterException if any illegal data access or inconsistent event data error occurred.
 	 */
-	@Override
-	public void sendEvents(List<Event> events) throws XESEventWriterException {
+	public void sendEvents(Exchange exchange, List<Event> events) throws XESEventWriterException {
 		for (Event event : events) {
-			try {
-				ByteArrayOutputStream baos = new ByteArrayOutputStream();
-				BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(baos));  	    	
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(baos));  
+			try {									    	
 				JAXBContext context = JAXBContext.newInstance(Event.class);
 				Marshaller marshaller = context.createMarshaller();
 				marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
 				logger.debug("Marshalling event " + event + "...");
 				marshaller.marshal(event, writer);
-				writer.close();
-				baos.close();
 				final byte[] xml = baos.toByteArray();								
-				jmsTemplate.send(bpafDestination, new MessageCreator() {
-					public Message createMessage(Session session)
-					throws JMSException {
-						logger.info("Sending xml event: " + new String(xml) + " to " + bpafDestination.getTopicName());
-						ObjectMessage message = session.createObjectMessage(xml);						
-						//message.setJMSReplyTo(arg0);
-						return message;
+				producer.send(new Processor() {
+					public void process(Exchange outExchange) {
+						outExchange.getIn().setBody(xml, String.class);
 					}
 				});
 			} catch(JAXBException jaxbex) {
 				logger.error("Cannot send event " + event + " due to a JAXB marshalling error.");
 				logger.error(jaxbex.fillInStackTrace());
 				throw new XESEventWriterException(jaxbex.getLocalizedMessage());
-			} catch(IOException ioex) {
-				logger.error("Cannot send event " + event + " due to an input/out error marshalling the event.");
-				logger.error(ioex.fillInStackTrace());
-				throw new XESEventWriterException(ioex.getLocalizedMessage());
+			} finally {
+				if (writer != null) {
+					try {
+						writer.close();
+					} catch(IOException ioex) {
+						logger.error(ioex.fillInStackTrace());
+					}
+				}
+				if (baos != null) {
+					try {
+						baos.close();
+					} catch(IOException ioex) {
+						logger.error(ioex.fillInStackTrace());
+					}
+				}
 			}
 		}
 	} 

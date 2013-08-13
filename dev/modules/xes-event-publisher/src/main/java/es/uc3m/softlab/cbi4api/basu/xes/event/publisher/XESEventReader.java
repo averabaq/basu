@@ -5,6 +5,8 @@
  */
 package es.uc3m.softlab.cbi4api.basu.xes.event.publisher;
 
+import org.apache.camel.Exchange;
+
 import es.uc3m.softlab.cbi4api.basu.xes.event.publisher.xsd.xes.LogType;
 
 /**
@@ -22,9 +24,9 @@ public interface XESEventReader {
 	 * Extract the events in XES format from messages retrieved from 
 	 * the jms queue.
 	 * 
-	 * @param xml event message xml containing events in XES format.
+	 * @param exchange event message xml containing events in XES format.
 	 * @return XES log events extracted from the message.
 	 * @throws XESEventReaderException if any error occurred during event information retrieval.
 	 */
-	public LogType extractEvents(byte[] xml) throws XESEventReaderException ;
+	public LogType extractEvents(Exchange exchange) throws XESEventReaderException ;
 }

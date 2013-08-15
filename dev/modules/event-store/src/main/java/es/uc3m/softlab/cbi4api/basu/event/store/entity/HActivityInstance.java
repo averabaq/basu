@@ -38,10 +38,10 @@ import javax.persistence.Column;
 @Table(name="activity_instance", schema="event_store")
 @PersistenceUnit(name=StaticResources.PERSISTENCE_NAME_EVENT_STORE, unitName=StaticResources.PERSISTENCE_UNIT_NAME_EVENT_STORE)
 @SequenceGenerator(name="activity_instance_sequence", sequenceName="activity_instance_id_seq")
-@NamedQueries({
+/*@NamedQueries({
 	@NamedQuery(name="activityFromProcessInstanceAndActivityName", 
-		        query="select e.activityInstance from event-store.Event e where e.processInstance = :process and e.activityInstance.name = :activityName")
-})
+		        query="select e.activityInstance from event-store.HEvent e where e.processInstance = :process and e.activityInstance.name = :activityName")
+})*/
 public class HActivityInstance implements Serializable {
 	/** Serial Version UID */
 	private static final long serialVersionUID = 54947203468236181L;

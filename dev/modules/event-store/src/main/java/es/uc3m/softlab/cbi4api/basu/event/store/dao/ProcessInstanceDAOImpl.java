@@ -241,7 +241,7 @@ public class ProcessInstanceDAOImpl implements ProcessInstanceDAO {
 		}
 		if (instance.getId() != null) {
 			long ini = System.nanoTime();
-			/* checks for the process instance existence */
+			// checks for the process instance existence 
 			HProcessInstance _hprocessInstance = entityManager.find(HProcessInstance.class, instance.getId());		
 			long end = System.nanoTime();
 			stats.writeStat(Stats.Operation.READ_BY_ID, _hprocessInstance, ini, end);
@@ -258,14 +258,15 @@ public class ProcessInstanceDAOImpl implements ProcessInstanceDAO {
 			}
 		}
 		logger.debug("Process instance " + instance.getId() + " does not exists. Saving process instance...");
-		/* saves the model */	
+		// saves the model 	
 		modelDAO.save(instance.getModel());
-		/* saves the instance */
+		// saves the instance 
 		HProcessInstance hprocessInstance = BusinessObjectAssembler.getInstance().toEntity(instance);
+		// checks the sequence
 		long ini = System.nanoTime();
 		HSequenceGenerator hsequenceGenerator = entityManager.find(HSequenceGenerator.class, HSequenceGenerator.Type.PROCESS_INSTANCE);
 		long end = System.nanoTime();
-		stats.writeStat(Stats.Operation.READ_MAX_ID, hsequenceGenerator, ini, end);
+		stats.writeStat(Stats.Operation.READ_BY_ID, hsequenceGenerator, ini, end);
 		if (hsequenceGenerator == null) {
 			logger.debug("There are not process instances defined at the datastore.");	
 			hsequenceGenerator = new HSequenceGenerator(HSequenceGenerator.Type.PROCESS_INSTANCE, 0L);
@@ -274,16 +275,18 @@ public class ProcessInstanceDAOImpl implements ProcessInstanceDAO {
 			end = System.nanoTime();
 			stats.writeStat(Stats.Operation.WRITE, hsequenceGenerator, ini, end);
 		}
-
+		// update sequence
 		hprocessInstance.setId(hsequenceGenerator.getNextSeq());
+		ini = System.nanoTime();
+		entityManager.merge(hsequenceGenerator);
+		end = System.nanoTime();
+		stats.writeStat(Stats.Operation.UPDATE, hsequenceGenerator, ini, end);
+		// updates the current instance back with the new assigned identifier
 		instance.setId(hprocessInstance.getId());
 		ini = System.nanoTime();
 		entityManager.persist(hprocessInstance);
 		end = System.nanoTime();
 		stats.writeStat(Stats.Operation.WRITE, hprocessInstance, ini, end);
-		/* increase sequence */
-		hsequenceGenerator.increase();
-		entityManager.merge(hsequenceGenerator);
 		logger.debug("Process instance " + instance + " saved successfully.");
 	}	
 	/**

@@ -92,6 +92,8 @@ public enum State {
 	CLOSED_CANCELLED("Closed.Cancelled"),
 	/** State Closed cancelled exited. */
 	CLOSED_CANCELLED_EXITED("Closed.Cancelled.Exited"),
+	/** State Closed cancelled error. */
+	CLOSED_CANCELLED_ERROR("Closed.Cancelled.Error"),	
 	/** State Closed cancelled obsolete. */
 	CLOSED_CANCELLED_OBSOLETE("Closed.Cancelled.Obsolete"),
 	/** State Closed cancelled aborted. */

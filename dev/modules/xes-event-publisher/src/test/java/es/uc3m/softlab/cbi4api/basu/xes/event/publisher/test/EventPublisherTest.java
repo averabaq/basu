@@ -129,10 +129,10 @@ public class EventPublisherTest extends AbstractShowcaseTest {
 		PollingConsumer consumer = endpoint.createPollingConsumer();
 		Exchange exchange = consumer.receive(5000);		
 		assert (exchange != null && exchange.getIn() != null);
-		String xml = (String)exchange.getIn().getBody();
+		byte[] xml = (byte[])exchange.getIn().getBody();
 		assert (xml != null);
 		logger.debug(xml);
-		ByteArrayInputStream bios = new ByteArrayInputStream(xml.getBytes());
+		ByteArrayInputStream bios = new ByteArrayInputStream(xml);
 		/* create a JAXBContext capable of handling classes */ 
 		JAXBContext jc = JAXBContext.newInstance("es.uc3m.softlab.cbi4api.basu.xes.event.publisher.xsd.basu.event");			
 		/* create an Unmarshaller */

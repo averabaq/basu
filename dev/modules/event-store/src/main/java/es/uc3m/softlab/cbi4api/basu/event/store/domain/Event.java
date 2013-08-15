@@ -95,21 +95,30 @@ public class Event implements Comparable<Event>, Serializable {
 	/** Serial Version UID */
 	private static final long serialVersionUID = 431274381493517L;
     /** Event identifier */
-    protected long eventID;
+	@XmlAttribute(name = "EventID", required = true)
+	private long eventID;
     /** Event process instance */
-    protected ProcessInstance processInstance;
+	@XmlTransient
+	private ProcessInstance processInstance;
     /** Event activity instance */
-    protected ActivityInstance activityInstance;
+    @XmlTransient
+	private ActivityInstance activityInstance;
     /** Event timestamp */
-    protected Date timestamp;
+    @XmlAttribute(name = "Timestamp", required = true)
+    @XmlSchemaType(name = "dateTime")
+	private Date timestamp;
 	/** Event details */
-    protected EventDetail eventDetails;
+    @XmlElement(name = "EventDetails", required = true)
+	private EventDetail eventDetails;
     /** Event payload */    
-    protected Set<EventPayload> payload;
-    /** Event correlation data */    
-    protected Set<EventCorrelation> correlations;
-    /** Event data elements */    
-    protected Set<EventData> data;
+    @XmlTransient
+	private Set<EventPayload> payload;
+    /** Event correlation data */ 
+    @XmlTransient
+	private Set<EventCorrelation> correlations;
+    /** Event data elements */ 
+    @XmlElement(name = "DataElement")
+	private Set<EventData> dataElement;
 
 	/**
 	 * Creates a new object with null property values. 	 
@@ -123,8 +132,6 @@ public class Event implements Comparable<Event>, Serializable {
      *     possible object is
      *     {@link String }
      */
-    @XmlAttribute(name = "EventID", required = true)
-    @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
     public long getEventID() {
         return eventID;
     }
@@ -285,8 +292,6 @@ public class Event implements Comparable<Event>, Serializable {
      *     {@link java.util.Date}
      *     
      */
-    @XmlAttribute(name = "Timestamp", required = true)
-    @XmlSchemaType(name = "dateTime")
     public Date getTimestamp() {
         return timestamp;
     }
@@ -309,7 +314,6 @@ public class Event implements Comparable<Event>, Serializable {
      *     {@link EventDetail}
      *     
      */
-    @XmlElement(name = "EventDetails", required = true)
     public EventDetail getEventDetails() {
     	if (eventDetails == null) {
     		eventDetails = new EventDetail();
@@ -381,29 +385,28 @@ public class Event implements Comparable<Event>, Serializable {
      * Objects of the following type(s) are allowed in the list {@link Object }
      * 
      */    
-    @XmlElement(name = "DataElement")
-    public Set<EventData> getData() {
-        if (data == null) {
-            data = new HashSet<EventData>();
+    public Set<EventData> getDataElement() {
+        if (dataElement == null) {
+        	dataElement = new HashSet<EventData>();
         }
-        return this.data;
+        return this.dataElement;
     }
 	/**
-	 * Sets the {@link #data} property.
-	 * @param data the {@link #data} property to set.
+	 * Sets the {@link #dataElement} property.
+	 * @param data the {@link #dataElement} property to set.
 	 */
-	public void setData(Set<EventData> data) {
-		this.data = data;
+	public void setDataElement(Set<EventData> dataElement) {
+		this.dataElement = dataElement;
 	}
 	/**
-	 * Gets the {@link #data} property as an ordered list object.
-	 * @return the {@link #data} property as an ordered list object.
+	 * Gets the {@link #dataElement} property as an ordered list object.
+	 * @return the {@link #dataElement} property as an ordered list object.
 	 */
 	public List<EventData> getEventDataList() {
-		if (this.data == null)
+		if (this.dataElement == null)
 			return null;
-		EventData _data[] = new EventData[this.data.size()];
-		this.data.toArray(_data);
+		EventData _data[] = new EventData[this.dataElement.size()];
+		this.dataElement.toArray(_data);
 		Arrays.sort(_data);		
 		return Arrays.asList(_data);
 	}	

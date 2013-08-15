@@ -14,7 +14,6 @@ import javax.persistence.Id;
 import javax.persistence.PersistenceUnit;
 import javax.persistence.Table;
 import javax.persistence.Column;
-import javax.persistence.UniqueConstraint;
 
 /**
  * HModel entity class. This class is bound to the
@@ -31,8 +30,7 @@ import javax.persistence.UniqueConstraint;
  * @author averab
  */
 @Entity(name="event-store.HModel")
-@Table(name="model", schema="event_store", 
-	   uniqueConstraints={@UniqueConstraint(columnNames={"model_src_id", "source"})})
+@Table(name="model", schema="event_store") 
 @PersistenceUnit(name=StaticResources.PERSISTENCE_NAME_EVENT_STORE, unitName=StaticResources.PERSISTENCE_UNIT_NAME_EVENT_STORE)
 public class HModel implements Serializable {
 	/** Serial Version UID */
@@ -122,7 +120,7 @@ public class HModel implements Serializable {
 	 * Gets the {@link #source} property.
 	 * @return the {@link #source} property.
 	 */
-	@Column(name="id", length=150, nullable=false)
+	@Column(name="source", length=150, nullable=false)
 	public String getSource() {
 		return source;
 	}

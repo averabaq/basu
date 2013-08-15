@@ -12,12 +12,8 @@ import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
 import javax.persistence.PersistenceUnit;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
 /**
  * <p>Event entity class. This class is bound to the <strong>event</strong> table at the data base 
@@ -49,18 +45,18 @@ import javax.persistence.TemporalType;
 @Entity(name="event-store.Event")
 @Table(name="event", schema="event_store")
 @PersistenceUnit(name=StaticResources.PERSISTENCE_NAME_EVENT_STORE, unitName=StaticResources.PERSISTENCE_UNIT_NAME_EVENT_STORE)
-@NamedQueries({
+/*@NamedQueries({
 	@NamedQuery(name="eventsFromProcessInstance", 
-		        query="select e from event-store.Event e where e.processInstance = :process order by timestamp desc"),
+		        query="select e from event-store.HEvent e where e.processInstance = :process order by timestamp desc"),
   	@NamedQuery(name="activityEventsFromProcessInstance", 
-		        query="select e from event-store.Event e where e.processInstance = :process and e.activityInstance = :activity order by timestamp desc"),
+		        query="select e from event-store.HEvent e where e.processInstance = :process and e.activityInstance = :activity order by timestamp desc"),
    	@NamedQuery(name="processEventsFromProcessInstanceAtOrigin", 
-		        query="select e from event-store.Event e where e.processInstance.instanceSrcId = :sourceId and e.processInstance.model.source = :source and e.activityInstance is null order by timestamp desc"),		        
+		        query="select e from event-store.HEvent e where e.processInstance.instanceSrcId = :sourceId and e.processInstance.model.source = :source and e.activityInstance is null order by timestamp desc"),		        
    	@NamedQuery(name="processEventOfActivityInstance", 
-		        query="select distinct e.processInstance from event-store.Event e where e.activityInstance = :activityInstance"),
+		        query="select distinct e.processInstance from event-store.HEvent e where e.activityInstance = :activityInstance"),
    	@NamedQuery(name="instancesOfModelOrderedByExecutionTimeline", 
-		        query="select e.processInstance.id from event-store.Event e where e.processInstance.model = :model group by e.processInstance.id order by min(e.timestamp), max(e.timestamp) asc")		        
-})
+		        query="select e.processInstance.id from event-store.HEvent e where e.processInstance.model = :model group by e.processInstance.id order by min(e.timestamp), max(e.timestamp) asc")		        
+})*/
 public class HEvent implements Comparable<HEvent>, Serializable {
 	/** Serial Version UID */
 	private static final long serialVersionUID = 8504720225072841L;
@@ -139,7 +135,7 @@ public class HEvent implements Comparable<HEvent>, Serializable {
 	 * Gets the {@link #timestamp} property.
 	 * @return the timestamp property.
 	 */
-	@Temporal(TemporalType.TIMESTAMP)
+	//@Temporal(TemporalType.TIMESTAMP)
 	@Column(name="tstamp", nullable=false, updatable=false)
 	public Long getTimestamp() {
 		return timestamp;

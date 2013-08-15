@@ -61,7 +61,7 @@ public class XESEventWriterImpl implements XESEventWriter {
 				final byte[] xml = baos.toByteArray();								
 				producer.send(new Processor() {
 					public void process(Exchange outExchange) {
-						outExchange.getIn().setBody(xml, String.class);
+						outExchange.getIn().setBody(xml, byte[].class);
 					}
 				});
 			} catch(JAXBException jaxbex) {

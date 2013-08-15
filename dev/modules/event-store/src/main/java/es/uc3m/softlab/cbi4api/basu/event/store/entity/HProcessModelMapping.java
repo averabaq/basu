@@ -33,10 +33,10 @@ import javax.persistence.Column;
 @Entity(name="event-store.ProcessModelMapping")
 @Table(name="process_model_mapping", schema="event_store")
 @PersistenceUnit(name=StaticResources.PERSISTENCE_NAME_EVENT_STORE, unitName=StaticResources.PERSISTENCE_UNIT_NAME_EVENT_STORE)
-@NamedQueries({
+/*@NamedQueries({
 	@NamedQuery(name="getProcessMappingSequence", 
 		        query="from event-store.ProcessModelMapping m where m.mapping = :mapping order by m.sequence asc")
-})
+})*/
 public class HProcessModelMapping implements Comparable<HProcessModelMapping>, Serializable {
 	/** Serial Version UID */
 	private static final long serialVersionUID = 19293806384692541L;

@@ -5,22 +5,14 @@
  */
 package es.uc3m.softlab.cbi4api.basu.event.store.dao;
 
-import es.uc3m.softlab.cbi4api.basu.event.store.Config;
 import es.uc3m.softlab.cbi4api.basu.event.store.StaticResources;
 import es.uc3m.softlab.cbi4api.basu.event.store.Stats;
-import es.uc3m.softlab.cbi4api.basu.event.store.domain.ActivityInstance;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.Model;
-import es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessInstance;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.Source;
-import es.uc3m.softlab.cbi4api.basu.event.store.entity.HEvent;
 import es.uc3m.softlab.cbi4api.basu.event.store.entity.HModel;
 import es.uc3m.softlab.cbi4api.basu.event.store.entity.HProcessInstance;
 import es.uc3m.softlab.cbi4api.basu.event.store.entity.HSequenceGenerator;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -213,23 +205,32 @@ public class ModelDAOImpl implements ModelDAO {
 		}
 		logger.debug("Model " + model.getId() + " does not exists. Saving model...");
 		/* TODO: check source */
+		
+		long ini = System.nanoTime();
 		HSequenceGenerator hsequenceGenerator = entityManager.find(HSequenceGenerator.class, HSequenceGenerator.Type.MODEL);
+		long end = System.nanoTime();
+		stats.writeStat(Stats.Operation.READ_BY_ID, hsequenceGenerator, ini, end);
 		if (hsequenceGenerator == null) {
 			logger.debug("There are not models defined at the datastore.");	
 			hsequenceGenerator = new HSequenceGenerator(HSequenceGenerator.Type.MODEL, 0L);
+			ini = System.nanoTime();
 			entityManager.persist(hsequenceGenerator);
-		}
-		
+			end = System.nanoTime();
+			stats.writeStat(Stats.Operation.WRITE, hsequenceGenerator, ini, end);
+		}			
 		HModel hmodel = BusinessObjectAssembler.getInstance().toEntity(model);
+		// update sequence
 		hmodel.setId(hsequenceGenerator.getNextSeq());
-		model.setId(hmodel.getId());
-		long ini = System.nanoTime();
-		entityManager.persist(hmodel);	
-		long end = System.nanoTime();
-		stats.writeStat(Stats.Operation.WRITE, hmodel, ini, end);
-		/* increase sequence */
-		hsequenceGenerator.increase();
+		ini = System.nanoTime();
 		entityManager.merge(hsequenceGenerator);
+		end = System.nanoTime();
+		stats.writeStat(Stats.Operation.UPDATE, hsequenceGenerator, ini, end);
+		//updates the model back with the new identifier
+		model.setId(hmodel.getId());
+		ini = System.nanoTime();
+		entityManager.persist(hmodel);	
+		end = System.nanoTime();
+		stats.writeStat(Stats.Operation.WRITE, hmodel, ini, end);
 		logger.debug("Model " + model + " saved successfully.");
 	}	
 }

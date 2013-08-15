@@ -124,7 +124,7 @@ public class ActivityInstanceDAOImpl implements ActivityInstanceDAO {
 		Model _model = modelDAO.findBySourceData(model.getModelSrcId(), model.getSource());
 		if (_model == null)
 			return null;
-		Query query = entityManager.createQuery("select p from " + HActivityInstance.class.getName() + " p where p.instanceSrcId = :sourceId and p.model = :modelId");
+		Query query = entityManager.createQuery("select a from " + HActivityInstance.class.getName() + " a where a.instanceSrcId = :sourceId and a.model = :modelId");
 		query.setParameter("sourceId", activityId);
 		query.setParameter("modelId", _model.getId());
 		HActivityInstance hinstance = null;
@@ -268,7 +268,7 @@ public class ActivityInstanceDAOImpl implements ActivityInstanceDAO {
 		long ini = System.nanoTime();
 		HSequenceGenerator hsequenceGenerator = entityManager.find(HSequenceGenerator.class, HSequenceGenerator.Type.ACTIVITY_INSTANCE);
 		long end = System.nanoTime();
-		stats.writeStat(Stats.Operation.READ_MAX_ID, hsequenceGenerator, ini, end);
+		stats.writeStat(Stats.Operation.READ_BY_ID, hsequenceGenerator, ini, end);
 		if (hsequenceGenerator == null) {
 			logger.debug("There are not activity instances defined at the datastore.");	
 			hsequenceGenerator = new HSequenceGenerator(HSequenceGenerator.Type.ACTIVITY_INSTANCE, 0L);
@@ -277,16 +277,18 @@ public class ActivityInstanceDAOImpl implements ActivityInstanceDAO {
 			end = System.nanoTime();
 			stats.writeStat(Stats.Operation.WRITE, hsequenceGenerator, ini, end);
 		}
-
+		// update sequence
 		hactivityInstance.setId(hsequenceGenerator.getNextSeq());
+		ini = System.nanoTime();
+		entityManager.merge(hsequenceGenerator);
+		end = System.nanoTime();
+		stats.writeStat(Stats.Operation.UPDATE, hsequenceGenerator, ini, end);
+		// insert activity
 		instance.setId(hactivityInstance.getId());
 		ini = System.nanoTime();
 		entityManager.persist(hactivityInstance);
 		end = System.nanoTime();
 		stats.writeStat(Stats.Operation.WRITE, hactivityInstance, ini, end);
-		/* increase sequence */
-		hsequenceGenerator.increase();
-		entityManager.merge(hsequenceGenerator);
 		logger.debug("Activity instance " + instance + " saved successfully.");
 	}	
 	/**

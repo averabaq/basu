@@ -162,8 +162,8 @@ public class EventFacadeImpl implements EventFacade {
 		 * removes the not included event data elements to be merged 
 		 * and updated with the new ones passed by arguments. 
 		 */
-		for (EventData element : _event.getData()) { 
-			if (!event.getData().contains(element))
+		for (EventData element : _event.getDataElement()) { 
+			if (!event.getDataElement().contains(element))
 				entityManager.remove(element);		
 		}
 		/* 

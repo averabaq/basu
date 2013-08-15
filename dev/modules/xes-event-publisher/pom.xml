@@ -470,43 +470,7 @@
 			</plugin>					
 		</plugins>
 	</reporting>
-	<profiles>
-		<profile>
-			<id>dev</id>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-			</activation>	
-			<build>				
-				<filters>
-					<filter>src/main/filters/filter-dev.properties</filter>
-					<filter>src/test/filters/filter.properties</filter>
-				</filters>
-			</build>
-		</profile>
-		<profile>
-			<id>test</id>
-			<activation>
-				<activeByDefault>false</activeByDefault>
-			</activation>
-			<build>
-				<filters>
-					<filter>src/main/filters/filter-test.properties</filter>
-					<filter>src/test/filters/filter.properties</filter>
-				</filters>				
-			</build>
-		</profile>
-		<profile>
-			<id>prod</id>
-			<activation>
-				<activeByDefault>false</activeByDefault>
-			</activation>
-			<build>
-				<filters>
-					<filter>src/main/filters/filter-prod.properties</filter>
-					<filter>src/test/filters/filter.properties</filter>
-				</filters>
-			</build>
-		</profile>				
+	<profiles>			
 		<profile>
 			<id>jaxb-gen</id>
 			<build>

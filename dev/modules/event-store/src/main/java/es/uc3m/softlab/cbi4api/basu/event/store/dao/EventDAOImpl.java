@@ -208,18 +208,18 @@ public class EventDAOImpl implements EventDAO {
 			end = System.nanoTime();
 			stats.writeStat(Stats.Operation.WRITE, hsequenceGenerator, ini, end);
 		}
+		// update sequence
 		hevent.setEventID(hsequenceGenerator.getNextSeq());
+		ini = System.nanoTime();
+		entityManager.merge(hsequenceGenerator);
+		end = System.nanoTime();
+		stats.writeStat(Stats.Operation.UPDATE, hsequenceGenerator, ini, end);
+		// insert event
 		event.setEventID(hevent.getEventID());
 		ini = System.nanoTime();
 		entityManager.persist(hevent);
 		end = System.nanoTime();
 		stats.writeStat(Stats.Operation.WRITE, hevent, ini, end);
-		/* increase sequence */
-		hsequenceGenerator.increase();
-		ini = System.nanoTime();
-		entityManager.merge(hsequenceGenerator);
-		end = System.nanoTime();
-		stats.writeStat(Stats.Operation.UPDATE, hsequenceGenerator, ini, end);
 		logger.debug("Event " + event + " saved successfully.");
 	}	
 	/**
@@ -282,7 +282,7 @@ public class EventDAOImpl implements EventDAO {
 		logger.debug("Loading event data elements from event " + event + " ...");				
 		Query query = entityManager.createQuery("select elements(e.data) from " + Event.class.getName() + " as e where e.eventID = :eventID");
 		query.setParameter("eventID", event.getEventID());
-		event.setData(new HashSet<EventData>(query.getResultList()));
+		event.setDataElement(new HashSet<EventData>(query.getResultList()));
 		logger.debug("Data elements from event " + event + " loaded successfully.");				
 	}			
 }

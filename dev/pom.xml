@@ -17,7 +17,7 @@
 	<description>
 		Cloud-based Infrastructure for Advanced Process Intelligence (BASU)
 	</description>
-	<url>http://cbi4api.verasoft.es/doc</url>
+	<url>http://cbi4api.verasoft.es/doc/basu</url>
 	<licenses>
 		<license>
 			<name>UC3M Propietary</name>			
@@ -44,7 +44,7 @@
 	</scm>
 	<ciManagement>
 		<system>teamcity</system>
-		<url>http://teamcity.verasoft.es/teamcity</url>
+		<url>http://teamcity.verasoft.es</url>
 		<notifiers>
 			<notifier>
 				<type>mail</type>
@@ -153,7 +153,7 @@
 		<site>
 			<id>verasoft-site</id>
 			<name>VeraSoft Development Site</name>
-			<url>scp://cbi4api.verasoft.es/var/www/cbi4api/doc</url>
+			<url>scp://cbi4api.verasoft.es/var/www/cbi4api/doc/basu</url>
 		</site>
 	</distributionManagement>
 	<reporting>

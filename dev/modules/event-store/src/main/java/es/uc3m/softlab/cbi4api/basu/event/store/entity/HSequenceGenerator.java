@@ -91,7 +91,7 @@ public class HSequenceGenerator implements Serializable {
 	 * @return the the next sequence.
 	 */	
 	@Transient
-	synchronized public long getNextSeq() {
+	synchronized public long getNextSeq() {		
 		increase();
 		return seq;
 	}
@@ -99,7 +99,7 @@ public class HSequenceGenerator implements Serializable {
 	 * Increase the sequence.
 	 */
 	@Transient
-	synchronized public void increase() {
+	synchronized private void increase() {
 		this.seq++;
 	}
 	/**

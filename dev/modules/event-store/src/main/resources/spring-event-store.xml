@@ -39,10 +39,12 @@
 		</property>
 	</bean>
 
+    <!--  
 	<bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
 		<property name="entityManagerFactory" ref="eventStoreEntityManagerFactory" />
 	</bean>
- 
+	-->
+	 
 	<bean id="eventStoreDataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
 		<property name="driverClassName" value="${cbi4api.basu.event.store.hbase.driver}"/>
 		<property name="url" value="${cbi4api.basu.event.store.hbase.url}"/>

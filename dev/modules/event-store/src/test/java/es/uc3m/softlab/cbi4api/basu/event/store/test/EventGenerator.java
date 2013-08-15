@@ -87,7 +87,7 @@ public class EventGenerator extends Thread {
 			element.setKey(UUID.randomUUID().toString());
 			element.setValue(UUID.randomUUID().toString());
 			element.setEvent(event);
-			event.getData().add(element);
+			event.getDataElement().add(element);
 		}
 		try {				
 			eventFacade.storeEvent(event);	

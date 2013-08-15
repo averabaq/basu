@@ -104,7 +104,7 @@ public class BusinessObjectAssembler {
     	event.setEventDetails(new EventDetail());
     	event.getEventDetails().setCurrentState(State.valueOf(hevent.getCurrentState()));
     	event.getEventDetails().setPreviousState(State.valueOf(hevent.getPreviousState()));
-    	event.setData(new HashSet<EventData>());
+    	event.setDataElement(new HashSet<EventData>());
     	event.setCorrelations(new HashSet<EventCorrelation>());
     	event.setPayload(new HashSet<EventPayload>());
     	return event;
@@ -152,7 +152,7 @@ public class BusinessObjectAssembler {
     	hprocessInstance.setDescription(processInstance.getDescription());
     	hprocessInstance.setModel(processInstance.getModel().getId());
     	hprocessInstance.setInstanceSrcId(processInstance.getInstanceSrcId());
-    	hprocessInstance.setCorrelatorId(processInstance.getCorrelatorId());
+    	hprocessInstance.setCorrelatorId((processInstance.getCorrelatorId() == null)? 0 : processInstance.getCorrelatorId());
     	return hprocessInstance;
     }    
     /**

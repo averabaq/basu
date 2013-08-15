@@ -53,8 +53,10 @@ public class EventDetail implements Serializable {
 	/** Serial Version UID */
 	private static final long serialVersionUID = 91504827318153973L;
 	/** Event current state. */
+	@XmlAttribute(name="CurrentState", required=true)
 	private State currentState;
 	/** Event previous state. */
+	@XmlAttribute(name="PreviousState")
 	private State previousState;
 
 	/**
@@ -65,8 +67,7 @@ public class EventDetail implements Serializable {
 	/**
 	 * Gets the {@link #currentState} property.
 	 * @return the {@link #currentState} property.
-	 */
-	@XmlAttribute(name="CurrentState", required=true)
+	 */	
 	public State getCurrentState() {
 		return currentState;
 	}
@@ -80,8 +81,7 @@ public class EventDetail implements Serializable {
 	/**
 	 * Gets the {@link #previousState} property.
 	 * @return the {@link #previousState} property.
-	 */
-	@XmlAttribute(name="PreviousState")
+	 */	
 	public State getPreviousState() {
 		return previousState;
 	}

@@ -6,12 +6,15 @@
 package es.uc3m.softlab.cbi4api.basu.event.store;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 
 import javax.annotation.PostConstruct;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -59,8 +62,13 @@ public class Stats {
     @PostConstruct
     public void init() {
 		try {
-			if (config.isStatsActive()) {
-				String statsFile = config.getString(StaticResources.BUNDLE_CONFIG_STATS_FILE_KEY);
+			if (config.isStatsActive()) {				
+				String statsPropFile = config.getString(StaticResources.BUNDLE_CONFIG_STATS_FILE_KEY);
+				String statsFile = FilenameUtils.normalize(statsPropFile);
+				File file = new File(statsFile);
+				if (!file.exists()) {
+					FileUtils.forceMkdir(file.getParentFile());
+				}
 				this.writer = new PrintWriter(new BufferedWriter(new FileWriter(statsFile, true)));
 			} 
 		} catch (IOException ex) {			

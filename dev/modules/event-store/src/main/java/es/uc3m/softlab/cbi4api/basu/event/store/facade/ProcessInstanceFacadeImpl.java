@@ -14,7 +14,6 @@ import es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessInstance;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessMapping;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessModel;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessModelMapping;
-import es.uc3m.softlab.cbi4api.basu.event.store.domain.Source;
 
 import java.util.List;
 import java.util.ListIterator;
@@ -81,11 +80,12 @@ public class ProcessInstanceFacadeImpl implements ProcessInstanceFacade {
 	 * @throws ProcessInstanceException if any process instance error occurred.
 	 */
     public ProcessInstance getProcessInstance(String processId, Model model) throws ProcessInstanceException {
-		logger.debug("Retrieving process instance with source data as pairs of (" + processId + ", " + model.getSource() + ")...");
 		if (processId == null) 
 			throw new ProcessInstanceException(StaticResources.WARN_GET_PROCESS_INSTANCE_WITHOUT_INSTANCE_SRC_ID,"Cannot retrieve process instance if the source process instance id is not properly provided.");
 		if (model.getSource() == null) 
 			throw new ProcessInstanceException(StaticResources.WARN_GET_PROCESS_INSTANCE_WITHOUT_SOURCE,"Cannot retrieve process instance if the source is not properly provided.");
+		
+		logger.debug("Retrieving process instance with source data as pairs of (" + processId + ", " + model.getSource() + ")...");
 		/* retrieve the process instance associated with the source information provided */
 		ProcessInstance instance = processInstanceDAO.findBySourceData(processId, model);
 		if (instance == null) {

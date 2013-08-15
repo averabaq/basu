@@ -9,13 +9,8 @@ import es.uc3m.softlab.cbi4api.basu.event.store.StaticResources;
 
 import java.io.Serializable;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
 import javax.persistence.PersistenceUnit;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
@@ -42,10 +37,10 @@ import javax.persistence.Column;
 @Table(name="process_instance", schema="event_store")
 @PersistenceUnit(name=StaticResources.PERSISTENCE_NAME_EVENT_STORE, unitName=StaticResources.PERSISTENCE_UNIT_NAME_EVENT_STORE)
 @SequenceGenerator(name="process_instance_sequence", sequenceName="process_instance_id_seq")
-@NamedQueries({
+/*@NamedQueries({
     @NamedQuery(name="getLastCorrelatorIdOfModel", 
-		        query="select max(p.correlatorId) from event-store.ProcessInstance p where p.model = :model")		        
-})
+		        query="select max(p.correlatorId) from event-store.HProcessInstance p where p.model = :model")		        
+})*/
 public class HProcessInstance implements Comparable<HProcessInstance>, Serializable {
 	/** Serial Version UID */
 	private static final long serialVersionUID = 793843691244028471L;
@@ -117,8 +112,8 @@ public class HProcessInstance implements Comparable<HProcessInstance>, Serializa
 	 * Gets the {@link #model} property.
 	 * @return the {@link #model} property.
 	 */
-	@ManyToOne(cascade={CascadeType.PERSIST, CascadeType.REFRESH}, optional=false)
-	@JoinColumn(name="model", nullable=false, updatable=false)
+	//@ManyToOne(cascade={CascadeType.PERSIST, CascadeType.REFRESH}, optional=false)
+	@Column(name="model", nullable=false, updatable=false)
 	public long getModel() {
 		return model;
 	}

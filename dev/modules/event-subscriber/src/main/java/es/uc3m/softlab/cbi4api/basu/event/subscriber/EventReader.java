@@ -7,10 +7,10 @@ package es.uc3m.softlab.cbi4api.basu.event.subscriber;
 
 import es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.basu.event.Event;
 
-import javax.jms.Message;
+import org.apache.camel.Exchange;
 
 /**
- * Component interface for retrieving the incoming events in F4BPA-BPAF format 
+ * Component interface for retrieving the incoming events in BASU-BPAF format 
  * from the message queue. 
  * This interface defines all methods for accessing to the <strong>event</strong> 
  * entity data based upon the Spring framework.
@@ -26,9 +26,9 @@ public interface EventReader {
 	 * Extract the events in f4bpa-bpaf extension format from messages retrieved from 
 	 * the jms queue.
 	 * 
-	 * @param msg event message object containing events in bpaf-f4bpa format.
-	 * @return all bpaf-f4bpa events extracted from the message.
+	 * @param exchange payload exchange message containing events in basu-bpaf format.
+	 * @return basu-bpaf event extracted from the message.
 	 * @throws EventReaderException if any error occurred during event information retrieval.
 	 */
-	public Event extractEvent(Message msg) throws EventReaderException;
+	public Event extractEvent(Exchange exchange) throws EventReaderException;
 }

@@ -1,42 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-	xmlns:p="http://www.springframework.org/schema/p"
 	xmlns:context="http://www.springframework.org/schema/context"
-	xmlns:jms="http://www.springframework.org/schema/jms" 
-	xmlns:amq="http://activemq.apache.org/schema/core"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans 
                         http://www.springframework.org/schema/beans/spring-beans.xsd
                         http://www.springframework.org/schema/context 
-                        http://www.springframework.org/schema/context/spring-context.xsd
-                        http://www.springframework.org/schema/jms 
-                        http://www.springframework.org/schema/jms/spring-jms.xsd
-                        http://activemq.apache.org/schema/core 
-                        http://activemq.apache.org/schema/core/activemq-core.xsd">
+                        http://www.springframework.org/schema/context/spring-context.xsd">
 
+    <!-- register and startup the activemq embedded broker for unit testing 
+      -- This must be provided by the main application context
+	<import resource="classpath:broker.xml"/>
+	<import resource="classpath:activemq-context.xml"/>
+	-->
+
+	<!-- register the camel context -->
+	<import resource="classpath:camel-context.xml"/>	  
+	
 	<!-- enabling annotation driven configuration -->
 	<context:annotation-config />
 	<context:component-scan base-package="es.uc3m.softlab.cbi4api.basu.event.subscriber" />
-
-	<!-- activemq connection factory -->
-	<amq:connectionFactory id="amqConnectionFactory">
-		<property name="brokerURL" value="#{eventSubscriberConfig.brokerUrl}" />
-	</amq:connectionFactory>
 	
-	<bean id="connectionFactory" class="org.springframework.jms.connection.CachingConnectionFactory">
-		<constructor-arg ref="amqConnectionFactory" />
-		<property name="sessionCacheSize" value="100" />
-	</bean>
-		
-	<!-- message listener container -->
-	<bean id="jmsContainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
-		<property name="connectionFactory" ref="connectionFactory"/>
-		<property name="destination" ref="destination"/>
-		<property name="messageListener" ref="/cbi4api-basu/event-subscriber/service/etlEvent" />
-	</bean>
- 	
-	<bean id="destination" class="org.apache.activemq.command.ActiveMQTopic">
-		<constructor-arg value="es.uc3m.softlab.cbi4api.basu.event.bpaf" />
-	</bean>
-
 </beans>

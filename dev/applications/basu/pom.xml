@@ -45,7 +45,7 @@
 	</scm>
 	<ciManagement>
 		<system>teamcity</system>
-		<url>http://teamcity.verasoft.es/teamcity</url>
+		<url>http://teamcity.verasoft.es</url>
 		<notifiers>
 			<notifier>
 				<type>mail</type>

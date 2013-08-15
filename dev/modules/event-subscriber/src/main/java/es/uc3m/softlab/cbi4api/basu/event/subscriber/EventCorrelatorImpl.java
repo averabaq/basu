@@ -31,8 +31,6 @@ import org.apache.log4j.Logger;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Component implementation for correlating events before being stored into 
@@ -43,7 +41,6 @@ import org.springframework.transaction.annotation.Transactional;
  * @author averab
  * @version 1.0.0
  */
-@Transactional(propagation=Propagation.MANDATORY)
 @Component(value=EventCorrelator.COMPONENT_NAME)
 public class EventCorrelatorImpl implements EventCorrelator {
 	/** Logger for tracing */
@@ -73,7 +70,10 @@ public class EventCorrelatorImpl implements EventCorrelator {
     	ProcessInstance processInstance = null;
 		/* gets the process model */
 		ProcessModel processModel = (ProcessModel)modelFacade.getModel(event.getProcessDefinitionID(), source);
-		
+		if (processModel == null) {
+			logger.error("The model " + event.getProcessDefinitionID() + " of source " + source + " could not be found in the repository. Is it defined?");
+			throw new ModelException(StaticResources.ERROR_GENERIC_EVENT_SUBSCRIBER_UNEXPECTED_EXCEPTION, "The model " + event.getProcessDefinitionID() + " of source " + source + " could not be found in the repository. Is it defined?");
+		}
 		/* If the process instance identifier is provided at source */
 		if (event.getProcessInstanceID() != null) {
 			logger.debug("Incoming event with id " + event.getEventID() + " comes from a bpel engine or alternative system that provides a source process instance identifier.");

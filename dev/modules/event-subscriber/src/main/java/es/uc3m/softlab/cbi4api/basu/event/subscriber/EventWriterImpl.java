@@ -5,16 +5,23 @@
  */
 package es.uc3m.softlab.cbi4api.basu.event.subscriber;
 
+import java.io.BufferedWriter;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.Event;
 import es.uc3m.softlab.cbi4api.basu.event.store.facade.EventException;
 import es.uc3m.softlab.cbi4api.basu.event.store.facade.EventFacade;
 
+import org.apache.camel.Exchange;
 import org.apache.log4j.Logger;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Component implementation for writing events to the global data store. 
@@ -24,7 +31,6 @@ import org.springframework.transaction.annotation.Transactional;
  * @author averab
  * @version 1.0.0
  */
-@Transactional(propagation=Propagation.MANDATORY)
 @Component(value=EventWriter.COMPONENT_NAME)
 public class EventWriterImpl implements EventWriter {
 	/** Logger for tracing */
@@ -32,25 +38,52 @@ public class EventWriterImpl implements EventWriter {
 	/** Event session facade */
     @Autowired private EventFacade eventFacade;
 	
-	/**
-	 * Gets the {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Event} entity 
-	 * object associated to the  
-	 * {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Event#getEventID()} as primary key.
-	 * 
-	 * @param id event's identifier
-	 * @return {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Event} entity 
-	 * object associated.
-	 * @throws EventException if any event error occurred.
-	 */
-    public Event getEvent(long id) throws EventException {
-		logger.debug("Retrieving event with identifier " + id + "...");
-		Event event = eventFacade.getEvent(id);
-		logger.debug("Event " + event + " retrieved successfully.");
-		return event;
-	}      
+    /**
+     * Stores the event in the data source and sets the processed event back to be forwarded to the
+     * output the channel in xml format.  
+     * @param exchange exchange data object to route. 
+     * @param event event {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Event}
+	 * entity object to forward in xml format to the output channel.
+     * @throws EventException if any illegal data access or inconsistent event data error occurred.
+     */
+    public void loadEvent(Exchange exchange, Event event) throws EventException {
+    	// store the event in the data source
+    	storeEvent(event);
+    	// marshall back the processed event 
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(baos));  	    
+    	try {
+    		JAXBContext context = JAXBContext.newInstance(Event.class);
+    		Marshaller marshaller = context.createMarshaller();
+    		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+    		logger.debug("Marshalling event " + event + "...");
+    		marshaller.marshal(event, writer);
+    		final byte[] xml = baos.toByteArray();
+    		// sets the objects back to the channel
+    		exchange.getOut().setBody(xml, byte[].class);  
+    	} catch (JAXBException jaxbex) {
+    		logger.error(jaxbex.fillInStackTrace());
+    		throw new EventException(jaxbex);
+    	} finally {
+			if (writer != null) {			
+				try {
+					writer.close();
+				} catch (IOException ioex) {
+					logger.error(ioex.fillInStackTrace());
+				}
+			}    		
+			if (baos != null) {			
+				try {
+					baos.close();
+				} catch (IOException ioex) {
+					logger.error(ioex.fillInStackTrace());
+				}
+			}
+		}
+    }
 	/**
 	 * Saves and synchronizes the {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Event}
-	 * entity object state with the data base.
+	 * entity object state with the data source.
 	 * 
 	 * @param event {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Event}
 	 * entity object to save.

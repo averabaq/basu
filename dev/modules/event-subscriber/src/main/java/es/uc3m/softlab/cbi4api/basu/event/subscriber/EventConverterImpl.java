@@ -109,7 +109,7 @@ public class EventConverterImpl implements EventConverter {
 		/* adds the event payload */
 		evt.setPayload(transformPayload(evt, event.getPayload()));
 		/* adds the additional data */
-		evt.setData(transformData(evt, event.getDataElement()));
+		evt.setDataElement(transformData(evt, event.getDataElement()));
 		/* if the event supply correlation data in detriment of the source process instance */
 		if (event.getCorrelation() != null) {
 			/* adds the event correlation data */

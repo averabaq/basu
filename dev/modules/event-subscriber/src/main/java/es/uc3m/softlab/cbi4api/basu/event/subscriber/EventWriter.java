@@ -5,6 +5,8 @@
  */
 package es.uc3m.softlab.cbi4api.basu.event.subscriber;
 
+import org.apache.camel.Exchange;
+
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.Event;
 import es.uc3m.softlab.cbi4api.basu.event.store.facade.EventException;
 
@@ -20,17 +22,15 @@ public interface EventWriter {
  	/** Spring component name */
     public static final String COMPONENT_NAME = StaticResources.COMPONENT_NAME_EVENT_WRITER;        
 
-	/**
-	 * Gets the {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Event} entity 
-	 * object associated to the  
-	 * {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Event#getEventID()} as primary key.
-	 * 
-	 * @param id event's identifier
-	 * @return {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Event} entity 
-	 * object associated.
-	 * @throws EventException if any event error occurred.
-	 */
-    public Event getEvent(long id) throws EventException;
+    /**
+     * Stores the event in the data source and sets the processed event back to be forwarded to the
+     * output the channel in xml format.  
+     * @param exchange exchange data object to route. 
+     * @param event event {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Event}
+	 * entity object to forward in xml format to the output channel.
+     * @throws EventException if any illegal data access or inconsistent event data error occurred.
+     */
+    public void loadEvent(Exchange exchange, Event event) throws EventException;
 	/**
 	 * Saves and synchronizes the {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Event}
 	 * entity object state with the data base.

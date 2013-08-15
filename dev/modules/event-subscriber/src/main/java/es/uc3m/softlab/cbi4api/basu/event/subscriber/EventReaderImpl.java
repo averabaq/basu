@@ -8,10 +8,8 @@ package es.uc3m.softlab.cbi4api.basu.event.subscriber;
 import es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.basu.event.Event;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.ObjectMessage;
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -19,12 +17,13 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
+import org.apache.camel.Exchange;
 import org.apache.log4j.Logger;
-
 import org.springframework.stereotype.Component;
+import org.xml.sax.SAXException;
 
 /**
- * Component implementation for retrieving the incoming events in F4BPA-BPAF format 
+ * Component implementation for retrieving the incoming events in BASU-BPAF format 
  * from the message queue. 
  * This interface defines all methods for accessing to the <strong>event</strong> 
  * entity data based upon the Spring framework.
@@ -38,43 +37,46 @@ public class EventReaderImpl implements EventReader {
 	private Logger logger = Logger.getLogger(EventReaderImpl.class);
 	
 	/**
-	 * Extract the events in F4BPA-BPAF extension format from messages retrieved from 
+	 * Extract the events in f4bpa-bpaf extension format from messages retrieved from 
 	 * the jms queue.
 	 * 
-	 * @param msg event message object containing events in F4BPA-BPAF format.
-	 * @return all F4BPA-BPAF events extracted from the message.
+	 * @param exchange payload exchange message containing events in basu-bpaf format.
+	 * @return basu-bpaf event extracted from the message.
 	 * @throws EventReaderException if any error occurred during event information retrieval.
 	 */
 	@Override
-	public Event extractEvent(Message msg) throws EventReaderException {
+	public Event extractEvent(Exchange exchange) throws EventReaderException {		
+		logger.debug("Extracing incoming event message with ID " + exchange.getIn().getMessageId());
+		byte[] xml = (byte[])exchange.getIn().getBody();						
+		logger.debug(xml);
+		
 		Event event = null;
+		ByteArrayInputStream bios = new ByteArrayInputStream(xml);		
 		try {
-			logger.debug("JMS message ID: " + msg.getJMSMessageID());
-			Object xmlEvent = ((ObjectMessage)msg).getObject();				
-			byte[] xml = (byte[])xmlEvent;			
-			logger.info(new String(xml));
-
-			ByteArrayInputStream bios = new ByteArrayInputStream(xml);
-			/* create a JAXBContext capable of handling classes */ 
+			// create a JAXBContext capable of handling classes  
 			JAXBContext jc = JAXBContext.newInstance("es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.basu.event");			
-			/* create an Unmarshaller */
+			// create an Unmarshaller 
 			Unmarshaller u = jc.createUnmarshaller();        			
-			/* Performs an xml validation against the F4BPA-BPAF schema */ 
+			// Performs an xml validation against the BASU-BPAF schema 
 			SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 			Schema schema = factory.newSchema(getClass().getResource(StaticResources.BASU_EVENT_BPAF_XML_SCHEMA_CLASSPATH_FILE));
 			u.setSchema(schema);			
-			/* unmarshal an instance document into a tree of Java content objects. */			
-			event = (Event) u.unmarshal(bios);
-			logger.debug("Processing event message: " + event.getEventID());
-		} catch(JMSException jmsex) {
-			logger.error(jmsex.fillInStackTrace());	
-			throw new EventReaderException(jmsex);
+			// unmarshal an instance document into a tree of Java content objects. 			
+			event = (Event) u.unmarshal(bios);		
 		} catch (JAXBException jaxb) {
 			logger.error(jaxb.fillInStackTrace());
 			throw new EventReaderException(jaxb);
-		} catch(Exception ioex) {
-			logger.error(ioex.fillInStackTrace());
-			throw new EventReaderException(ioex);
+		} catch(SAXException saxex) {
+			logger.error(saxex.fillInStackTrace());
+			throw new EventReaderException(saxex);
+		} finally {
+			if (bios != null) {			
+				try {
+					bios.close();
+				} catch (IOException ioex) {
+					logger.error(ioex.fillInStackTrace());
+				}
+			}
 		}
 		return event;
 	}

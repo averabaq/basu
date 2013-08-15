@@ -11,34 +11,30 @@ import es.uc3m.softlab.cbi4api.basu.event.store.facade.ModelException;
 import es.uc3m.softlab.cbi4api.basu.event.store.facade.ProcessInstanceException;
 import es.uc3m.softlab.cbi4api.basu.event.store.facade.SourceException;
 
-import javax.jms.Message;
-import javax.jms.MessageListener;
-
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
 import org.apache.log4j.Logger;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Specific ETL (Extract, Transform & Load) service interface for F4BPA-BPAF  
+ * Specific ETL (Extract, Transform & Load) service interface for BASU-BPAF  
  * events as an extension of <a href="http://www.wfmc.org/business-process-analytics-format.html">BPAF</a>.
  * 
  * <p> This class follows the  
  * <a href="http://www.wfmc.org/business-process-analytics-format.html"> BPAF
  * (Business Process Analytics Format)</a> specification standard published by
  * the <a href="http://www.wfmc.org">WfMC (Workflow Management Coalition) by
- * extracting the event data from heterogeneous systems, transforming its F4BPA-BPAF xml content 
+ * extracting the event data from heterogeneous systems, transforming its BASU-BPAF xml content 
  * into the BPAF entity object model, and loading the results into the database.</a>. 
  * 
  * @author averab
  * @version 1.0.0
  */
-@Transactional
-@Service(value=StaticResources.SERVICE_NAME_EVENT_ETL)
-public class ETLEvent implements MessageListener {
+@Service(value=StaticResources.SERVICE_NAME_ETL_PROCESSOR)
+public class ETLProcessor implements Processor {
     /** Log for tracing */
-    private static final Logger logger = Logger.getLogger(ETLEvent.class);  
+    private static final Logger logger = Logger.getLogger(ETLProcessor.class);  
     /** Event reader to extract the event data from the jms messages */
 	@Autowired private EventReader extractor;
     /** Event converter to transform  into the database */
@@ -46,25 +42,25 @@ public class ETLEvent implements MessageListener {
     /** Event writer to store the formatted event into the database */
     @Autowired private EventWriter loader; 
 
-    /**
-	 * Passes a message to the listener.
-	 * @param msg the message passed to the listener
+	/**
+	 * Passes exchange data object to this processor.
+	 * @param exchange data object to process.
 	 */
-	@Override
-	public void onMessage(Message msg) {
-		try {			
+    @Override
+	public void process(Exchange exchange) throws Exception {	
+		try {					
 			es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.basu.event.Event bpafEvent;			
-			/* extract event */
-			bpafEvent = extractor.extractEvent(msg);
-			/* transform event */
-			es.uc3m.softlab.cbi4api.basu.event.store.domain.Event event = transformer.transform(bpafEvent);
-			/* load the event into the database */
-			loader.storeEvent(event);	
-		} catch(EventException evex) {	
-			if (evex.getCode() == StaticResources.WARN_EVENT_WITH_NO_STATE_TRANSITION)
-				logger.warn(evex);
-			else
-				logger.error(evex.fillInStackTrace());			
+			// extract event 
+			bpafEvent = extractor.extractEvent(exchange);
+			// this block has to be synchronized as the events must be processed
+			// in strictly order as they arrive in order to guarantee the 
+			// correlation mechanism to work properly
+			synchronized(this) {
+				// transform event 
+				es.uc3m.softlab.cbi4api.basu.event.store.domain.Event event = transformer.transform(bpafEvent);			
+				// load the event into the data source and forwards event to the output channel
+				loader.loadEvent(exchange, event);	
+			}
 		} catch(ProcessInstanceException piex) {			
 			logger.error(piex.fillInStackTrace());			
 		} catch(ActivityInstanceException aiex) {			
@@ -75,6 +71,11 @@ public class ETLEvent implements MessageListener {
 			logger.error(sex.fillInStackTrace());		
 		} catch(ModelException mex) {
 			logger.error(mex.fillInStackTrace());		
+		} catch(EventException evex) {
+			if (evex.getCode() == StaticResources.WARN_EVENT_WITH_NO_STATE_TRANSITION) 
+				logger.warn(evex);
+			else
+				logger.error(evex.fillInStackTrace());		
 		} 
 	}
 }

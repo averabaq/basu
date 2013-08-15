@@ -35,7 +35,7 @@ public class StaticResources {
 	public static final String COMPONENT_NAME_EVENT_CORRELATOR = "/cbi4api-basu/event-subscriber/component/EventCorrelator";
 	
 	/** Service name for the event subscriber ETL (Extract, Transform & Load) module */
-	public static final String SERVICE_NAME_EVENT_ETL = "/cbi4api-basu/event-subscriber/service/etlEvent";
+	public static final String SERVICE_NAME_ETL_PROCESSOR = "/cbi4api-basu/event-subscriber/service/etl-event-processor";
 	
 	/** Facade warn login code for generic spring components exceptions */ 
 	public static final int ERROR_GENERIC_SPRING_COMPONENTS = 1;

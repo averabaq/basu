@@ -12,22 +12,7 @@
     	<jaxb:schemaBindings>    		
     		<jaxb:package name="es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.basu.event" />
     	</jaxb:schemaBindings>        
-    </jaxb:bindings>
-    <jaxb:bindings schemaLocation="xsd/basu-process.xsd">    	
-    	<jaxb:schemaBindings>    		
-    		<jaxb:package name="es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.basu.process" />
-    	</jaxb:schemaBindings>        
-    </jaxb:bindings>          
-    <jaxb:bindings schemaLocation="xsd/gbas-order-request.xsd">    	
-    	<jaxb:schemaBindings>    		
-    		<jaxb:package name="es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.gbas.request" />
-    	</jaxb:schemaBindings>        
-    </jaxb:bindings>    
-    <jaxb:bindings schemaLocation="xsd/gbas-order-response.xsd">    	
-    	<jaxb:schemaBindings>    		
-    		<jaxb:package name="es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.gbas.response" />
-    	</jaxb:schemaBindings>        
-    </jaxb:bindings>      
+    </jaxb:bindings> 
     <!-- 
     <jaxb:bindings schemaLocation="xsd/bpaf.xsd">    	
     	<jaxb:schemaBindings>    		

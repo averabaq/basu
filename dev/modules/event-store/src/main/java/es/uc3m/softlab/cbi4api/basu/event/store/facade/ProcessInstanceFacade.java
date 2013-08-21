@@ -9,7 +9,6 @@ import es.uc3m.softlab.cbi4api.basu.event.store.StaticResources;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.EventCorrelation;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.Model;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessInstance;
-import es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessModel;
 
 import java.util.List;
 import java.util.Set;
@@ -40,7 +39,7 @@ public interface ProcessInstanceFacade {
 	 * Gets the {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessInstance} entity 
 	 * object associated to the  
 	 * ({@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessInstance#getInstanceSrcId()} and
-	 *  {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessModel#getSource()} retrieve from 
+	 *  {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Model#getSource()} retrieve from 
 	 *  {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessInstance#getModel()}) 
 	 * as unique keys.
 	 * 
@@ -54,16 +53,16 @@ public interface ProcessInstanceFacade {
 	 * Gets the {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessInstance} entity 
 	 * object associated to the correlation information provided by a determined list of
 	 * ({@link es.uc3m.softlab.cbi4api.basu.event.store.domain.EventCorrelation} objects, 
-	 * a determined {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessModel}
+	 * a determined {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Model}
 	 * and a determined ({@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Source} given by
-	 * the {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessModel#getSource()}) property.
+	 * the {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Model#getSource()}) property.
 	 * 
 	 * @param correlation list of event correlation objects associated to the process instance that is trying to be found.
 	 * @param model process model associated to the process instance that is trying to be found.
 	 * @return {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessInstance} entity object associated.
 	 * @throws ProcessInstanceException if any process instance error occurred.
 	 */
-    public ProcessInstance getProcessInstance(Set<EventCorrelation> correlation, ProcessModel model) throws ProcessInstanceException;    
+    public ProcessInstance getProcessInstance(Set<EventCorrelation> correlation, Model model) throws ProcessInstanceException;    
 	/**
 	 * Gets all {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessInstance} entity 
 	 * objects defined at the data base.
@@ -100,6 +99,18 @@ public interface ProcessInstanceFacade {
 	 */
 	public void deleteProcessInstance(ProcessInstance instance) throws ProcessInstanceException;
 	/**
+	 * Gets the next correlation identifier for {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessInstance}
+	 * associated to the {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Model} entity object 
+	 * passed by arguments.
+	 * 
+	 * @param model {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Model} entity object to get the next
+	 * correlation identifier from.
+	 * @param correlation list of {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.EventCorrelation} entity objects
+	 * associated the all process instances aimed to correlate.
+	 * @throws ProcessInstanceException if any illegal data access or inconsistent process instance data error occurred.
+	 */
+	public long getCorrelationId(Model model, Set<EventCorrelation> correlation) throws ProcessInstanceException;	
+	/**
 	 * Loads the {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessInstance#events} associated
 	 * from the data base. This is needed due to the fetch property is set to lazy, and their associated 
 	 * objects are loaded out of synchronism when the {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessInstance} 
@@ -109,13 +120,4 @@ public interface ProcessInstanceFacade {
 	 * @throws ProcessInstanceException if any illegal data access or inconsistent process instance data error occurred.
 	 */	
     public void loadEvents(ProcessInstance instance) throws ProcessInstanceException;
-	/**
-	 * Correlates all {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessInstance}
-	 * entity objects defined by attending to the information stored and represented by
-	 * the {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessModelMapping} objects.
-	 * 
-	 * @throws ProcessInstanceException if any illegal data access or inconsistent process 
-	 * instance data error occurred during the correlation process.
-	 */
-	public void correlateAllProcessInstances() throws ProcessInstanceException;
 }

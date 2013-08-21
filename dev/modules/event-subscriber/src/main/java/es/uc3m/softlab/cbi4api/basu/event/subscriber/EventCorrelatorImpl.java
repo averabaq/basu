@@ -10,11 +10,10 @@ import java.util.List;
 import java.util.Set;
 
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.ActivityInstance;
-import es.uc3m.softlab.cbi4api.basu.event.store.domain.ActivityModel;
+import es.uc3m.softlab.cbi4api.basu.event.store.domain.Model;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.EventCorrelation;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.ModelType;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessInstance;
-import es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessModel;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.Source;
 import es.uc3m.softlab.cbi4api.basu.event.store.facade.ActivityInstanceException;
 import es.uc3m.softlab.cbi4api.basu.event.store.facade.ActivityInstanceFacade;
@@ -57,7 +56,7 @@ public class EventCorrelatorImpl implements EventCorrelator {
      * by obtaining an existing process instance or creating a new one if necessary. 
      * @param event {@link es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.bpaf.extension.Event} to get the associated
      * process instance if it exists, otherwise it creates a new one.
-     * @param processModel {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessModel} associated to the incoming 
+     * @param processModel {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Model} associated to the incoming 
      * {@link es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.bpaf.extension.Event}.
      * @return exact {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessInstance} associated to properly 
      * correlated the incoming {@link es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.bpaf.extension.Event}.
@@ -69,7 +68,7 @@ public class EventCorrelatorImpl implements EventCorrelator {
 		logger.debug("Correlating incoming event with id " + event.getEventID());
     	ProcessInstance processInstance = null;
 		/* gets the process model */
-		ProcessModel processModel = (ProcessModel)modelFacade.getModel(event.getProcessDefinitionID(), source);
+		Model processModel = modelFacade.getModel(event.getProcessDefinitionID(), source, ModelType.PROCESS);
 		if (processModel == null) {
 			logger.error("The model " + event.getProcessDefinitionID() + " of source " + source + " could not be found in the repository. Is it defined?");
 			throw new ModelException(StaticResources.ERROR_GENERIC_EVENT_SUBSCRIBER_UNEXPECTED_EXCEPTION, "The model " + event.getProcessDefinitionID() + " of source " + source + " could not be found in the repository. Is it defined?");
@@ -83,14 +82,17 @@ public class EventCorrelatorImpl implements EventCorrelator {
 	    	/* if the process instance has not been defined yet */
 	    	if (processInstance == null) {	    		
 	    		processInstance = new ProcessInstance();
-	    		/*
-	    		 * TODO: request process instance identifier to GBAS instance
-	    		 * processInstance.setId(new instance from GBAS); 
-	    		 */
 	    		processInstance.setInstanceSrcId(processInstanceId);
 	    		processInstance.setName(event.getProcessName());
 	    		processInstance.setModel(processModel);
-	    	}		 
+	    		// process instance correlation				
+				Correlation correlation = event.getCorrelation();	
+				if (correlation == null)
+					throw new EventException(StaticResources.ERROR_INCOMING_EVENT_EMPTY_CORRELATION_DATA, "No process exist in the repository for this instance. This entails a root level process which must supply some correlation data. The inter-relation of processes cannot be identified for this event as no correlation information has been provided, and so it will be ignored.");
+				Set<EventCorrelation> eventCorrelations = transformCorrelation(correlation.getCorrelationElement());
+				long correlationId = processInstanceFacade.getCorrelationId(processModel, eventCorrelations);
+	    		processInstance.setCorrelatorId(correlationId);	    		
+	    	}
 		} else {
 			logger.debug("Incoming event with id " + event.getEventID() + " does not provide a process instance identifier. Trying to correlate the event attending to the correlation data attached.");
 			/* 
@@ -108,13 +110,12 @@ public class EventCorrelatorImpl implements EventCorrelator {
 	    	/* if the process instance has not been defined yet */
 	    	if (processInstance == null) {
 	    		processInstance = new ProcessInstance();
-	    		/*
-	    		 * TODO: request process instance identifier to GBAS instance
-	    		 * processInstance.setId(new instance from GBAS); 
-	    		 */
 	    		processInstance.setInstanceSrcId(null);	    		
 	    		processInstance.setName(event.getProcessName());
 	    		processInstance.setModel(processModel);
+	    		// process instance correlation				
+				long correlationId = processInstanceFacade.getCorrelationId(processModel, eventCorrelations);
+	    		processInstance.setCorrelatorId(correlationId);	 
 	    	}		 
 		}  
 		return processInstance;
@@ -125,7 +126,7 @@ public class EventCorrelatorImpl implements EventCorrelator {
      * @param event {@link es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.bpaf.extension.Event} to get the associated
      * process instance if it exists, otherwise it creates a new one.
      * @param source {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Source} associated to the 
-     * {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ActivityModel} of the incoming 
+     * {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Model} of the incoming 
      * {@link es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.bpaf.extension.Event}.
      * @return right {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ActivityInstance} associated to properly 
      * correlated the incoming {@link es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.bpaf.extension.Event}.
@@ -140,10 +141,10 @@ public class EventCorrelatorImpl implements EventCorrelator {
 		if (event.getActivityInstanceID() != null) {
 			logger.debug("Incoming event with id " + event.getEventID() + " comes from a bpel engine or alternative system that provides a souce activity instance identifier.");
 			/* gets the activity model */
-			ActivityModel activityModel = (ActivityModel)modelFacade.getModel(event.getActivityDefinitionID(), source);
+			Model activityModel = (Model)modelFacade.getModel(event.getActivityDefinitionID(), source, ModelType.ACTIVITY);
 			/* if the activity model has not been defined */
 			if (activityModel == null) {
-				activityModel = new ActivityModel();
+				activityModel = new Model();
 				activityModel.setType(ModelType.ACTIVITY);
 				activityModel.setName(event.getActivityDefinitionID());	
 				activityModel.setModelSrcId(event.getActivityDefinitionID());
@@ -171,10 +172,10 @@ public class EventCorrelatorImpl implements EventCorrelator {
 			if (event.getActivityDefinitionID() != null) {	
 				logger.debug("Incoming event with id " + event.getEventID() + " does not provide an active instance identifier. Trying to correlate the event attending to the correlation data attached.");
 				/* gets the activity model */
-				ActivityModel activityModel = (ActivityModel)modelFacade.getModel(event.getActivityDefinitionID(), source);
+				Model activityModel = (Model)modelFacade.getModel(event.getActivityDefinitionID(), source, ModelType.ACTIVITY);
 				/* if the activity model has not been defined */
 				if (activityModel == null) {
-					activityModel = new ActivityModel();
+					activityModel = new Model();
 					activityModel.setType(ModelType.ACTIVITY);
 					activityModel.setName(event.getActivityDefinitionID());	
 					activityModel.setModelSrcId(event.getActivityDefinitionID());

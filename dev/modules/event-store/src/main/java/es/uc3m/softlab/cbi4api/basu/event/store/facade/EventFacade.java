@@ -35,13 +35,12 @@ public interface EventFacade {
     public Event getEvent(long id) throws EventException;
 	/**
 	 * Gets all {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Event} entity 
-	 * object associated to the  
-	 * {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Event#getEventID} as primary key.
+	 * objects.
 	 * 
 	 * @return all {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Event} entity 
-	 * objects defined at the data base.
+	 * objects.
 	 */
-	public List<Event> getAll();
+    public List<Event> getAll();    
 	/**
 	 * Gets all {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Event} entity 
 	 * objects of a determined process instance 
@@ -52,18 +51,7 @@ public interface EventFacade {
 	 * @return all {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Event} entity 
 	 * objects of a determined process instance identifier.
 	 */
-    public List<Event> getAllFromProcessInstId(String processInstId);
-	/**
-	 * Gets all {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Event} entity 
-	 * objects of a determined process name 
-	 * ({@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Event#getProcessName()}).
-	 * 
-	 * @param processInstId process name. 
-	 * ({@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Event#getProcessName()}) associated.
-	 * @return all {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Event} entity 
-	 * objects of a determined process name.
-	 */
-    public List<Event> getAllFromProcessName(String processInstId);
+    public List<Event> getAllFromProcessInstId(long processInstId);
 	/**
 	 * Saves and synchronizes the {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Event}
 	 * entity object state with the data base.

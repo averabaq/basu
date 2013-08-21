@@ -87,7 +87,7 @@ public class HSource implements Serializable {
 	 * Gets the {@link #description} property.
 	 * @return the {@link #description} property.
 	 */
-	@Column(name="description", columnDefinition="text")
+	@Column(name="description")
 	public String getDescription() {
 		return description;
 	}

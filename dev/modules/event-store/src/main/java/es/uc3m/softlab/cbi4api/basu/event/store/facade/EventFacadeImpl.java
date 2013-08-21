@@ -8,7 +8,6 @@ package es.uc3m.softlab.cbi4api.basu.event.store.facade;
 import es.uc3m.softlab.cbi4api.basu.event.store.StaticResources;
 import es.uc3m.softlab.cbi4api.basu.event.store.dao.EventDAO;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.Event;
-import es.uc3m.softlab.cbi4api.basu.event.store.domain.EventData;
 
 import java.util.Date;
 import java.util.List;
@@ -61,18 +60,24 @@ public class EventFacadeImpl implements EventFacade {
 	}
 	/**
 	 * Gets all {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Event} entity 
-	 * object associated to the  
-	 * {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Event#getEventID} as primary key.
+	 * objects.
 	 * 
 	 * @return all {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Event} entity 
-	 * objects defined at the data base.
+	 * objects.
 	 */
-	public List<Event> getAll() {
-		logger.debug("Retrieving all events...");
-		List<Event> events = eventDAO.findAll();
-		logger.debug("Events retrieved successfully.");
-		return events;
-	}         
+    public List<Event> getAll() {
+		logger.debug("Getting all events...");
+		List<Event> list = eventDAO.findAll();
+		/*
+		for (Event event : list) {
+			eventDAO.loadPayload(event);
+			eventDAO.loadCorrelation(event);
+			eventDAO.loadData(event);
+		}		
+		*/
+		logger.debug("All events retrieved successfully.");
+		return list;
+	}       
 	/**
 	 * Gets all {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Event} entity 
 	 * objects of a determined process instance 
@@ -83,38 +88,19 @@ public class EventFacadeImpl implements EventFacade {
 	 * @return all {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Event} entity 
 	 * objects of a determined process instance identifier.
 	 */
-    public List<Event> getAllFromProcessInstId(String processInstId) {
+    public List<Event> getAllFromProcessInstId(long processInstId) {
 		logger.debug("Getting all events from process instance with identifier " + processInstId + "...");
 		List<Event> list = eventDAO.findAllByProcessInstId(processInstId);
+		/*
 		for (Event event : list) {
 			eventDAO.loadPayload(event);
 			eventDAO.loadCorrelation(event);
 			eventDAO.loadData(event);
 		}		
+		*/
 		logger.debug("All events from process instance with identifier " + processInstId + " found successfully.");
 		return list;
-	}   
-	/**
-	 * Gets all {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Event} entity 
-	 * objects of a determined process name 
-	 * ({@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Event#getProcessName()}).
-	 * 
-	 * @param processInstId process name. 
-	 * ({@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Event#getProcessName()}) associated.
-	 * @return all {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Event} entity 
-	 * objects of a determined process name.
-	 */
-    public List<Event> getAllFromProcessName(String processInstId) {
-		logger.debug("Getting all events from process instance with identifier " + processInstId + "...");
-		List<Event> list = eventDAO.findAllByProcessInstId(processInstId);
-		for (Event event : list) {
-			eventDAO.loadPayload(event);
-			eventDAO.loadCorrelation(event);
-			eventDAO.loadData(event);
-		}	
-		logger.debug("All events from process instance with identifier " + processInstId + " found successfully.");
-		return list;
-	}       
+	}    
 	/**
 	 * Saves and synchronizes the {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Event}
 	 * entity object state with the data base.
@@ -158,17 +144,9 @@ public class EventFacadeImpl implements EventFacade {
 			logger.warn("Cannot update event. Event with identifier: " + event.getEventID() + " does not exist.");
 			throw new EventException(StaticResources.WARN_UPDATE_EVENT_NOT_EXIST, "Cannot update event. Event with identifier: " + event.getEventID() + " does not exist.");
 		}		
-		/*
-		 * removes the not included event data elements to be merged 
-		 * and updated with the new ones passed by arguments. 
-		 */
-		for (EventData element : _event.getDataElement()) { 
-			if (!event.getDataElement().contains(element))
-				entityManager.remove(element);		
-		}
 		/* 
-		 * The correlation and payload information is not managed by this 
-		 * method because it is supposed to not be updatable. 
+		 * The data elements, correlation and payload information is not managed by this 
+		 * method because it is supposed to do not be updatable. 
 		 */
 		eventDAO.merge(event);		
 		logger.info("Event " + event + " updated successfully.");

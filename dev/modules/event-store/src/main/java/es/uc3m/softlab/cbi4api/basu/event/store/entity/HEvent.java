@@ -11,6 +11,8 @@ import java.io.Serializable;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.PersistenceUnit;
 import javax.persistence.Table;
@@ -65,7 +67,7 @@ public class HEvent implements Comparable<HEvent>, Serializable {
     /** HEvent process instance */
     private long processInstance;
     /** HEvent activity instance */
-    private long activityInstance;
+    private Long activityInstance;
     /** HEvent timestamp */
     private Long timestamp;
 	/** HEvent current state. */
@@ -86,8 +88,8 @@ public class HEvent implements Comparable<HEvent>, Serializable {
      *     {@link String }
      */
 	@Id
-	@Column(name="event_id", nullable=false, updatable=false)
-	//@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@Column(name="event_id")
+	@GeneratedValue(strategy=GenerationType.AUTO)
     public long getEventID() {
         return eventID;
     }
@@ -121,14 +123,14 @@ public class HEvent implements Comparable<HEvent>, Serializable {
 	 * @return the activityInstance property.
 	 */
 	@Column(name="activity_instance", nullable=true, updatable=false)
-	public long getActivityInstance() {
+	public Long getActivityInstance() {
 		return activityInstance;
 	}
 	/**
 	 * Sets the {@link #activityInstance} property.
 	 * @param activityInstance the {@link #activityInstance} to set
 	 */
-	public void setActivityInstance(long activityInstance) {
+	public void setActivityInstance(Long activityInstance) {
 		this.activityInstance = activityInstance;
 	}
 	/**

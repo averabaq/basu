@@ -32,7 +32,7 @@ public interface EventCorrelator {
      * by obtaining an existing process instance or creating a new one if necessary. 
      * @param event {@link es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.bpaf.extension.Event} to get the associated
      * process instance if it exists, otherwise it creates a new one.
-     * @param processModel {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessModel} associated to the incoming 
+     * @param processModel {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Model} associated to the incoming 
      * {@link es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.bpaf.extension.Event}.
      * @return exact {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessInstance} associated to properly 
      * correlated the incoming {@link es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.bpaf.extension.Event}.
@@ -47,7 +47,7 @@ public interface EventCorrelator {
      * @param event {@link es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.bpaf.extension.Event} to get the associated
      * process instance if it exists, otherwise it creates a new one.
      * @param source {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Source} associated to the 
-     * {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ActivityModel} of the incoming 
+     * {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Model} of the incoming 
      * {@link es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.bpaf.extension.Event}.
      * @return right {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ActivityInstance} associated to properly 
      * correlated the incoming {@link es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.bpaf.extension.Event}.

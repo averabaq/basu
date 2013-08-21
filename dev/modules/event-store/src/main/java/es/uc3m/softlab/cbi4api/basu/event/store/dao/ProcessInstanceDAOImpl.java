@@ -10,11 +10,10 @@ import es.uc3m.softlab.cbi4api.basu.event.store.Stats;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.Event;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.EventCorrelation;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.Model;
+import es.uc3m.softlab.cbi4api.basu.event.store.domain.ModelType;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessInstance;
-import es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessModel;
 import es.uc3m.softlab.cbi4api.basu.event.store.entity.HModel;
 import es.uc3m.softlab.cbi4api.basu.event.store.entity.HProcessInstance;
-import es.uc3m.softlab.cbi4api.basu.event.store.entity.HSequenceGenerator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -76,7 +75,7 @@ public class ProcessInstanceDAOImpl implements ProcessInstanceDAO {
 			ProcessInstance instance = BusinessObjectAssembler.getInstance().toBusinessObject(hinstance);
 			HModel hprocessModel = entityManager.find(HModel.class, hinstance.getModel());
 			Model model = BusinessObjectAssembler.getInstance().toBusinessObject(hprocessModel);
-			instance.setModel((ProcessModel)model); 
+			instance.setModel((Model)model); 
 			instances.add(instance);
 		}
 		return instances;
@@ -97,7 +96,7 @@ public class ProcessInstanceDAOImpl implements ProcessInstanceDAO {
 		if (hinstance != null) {			
 			ProcessInstance instance = BusinessObjectAssembler.getInstance().toBusinessObject(hinstance);
 			Model model = modelDAO.findById(hinstance.getModel());
-			instance.setModel((ProcessModel)model);	
+			instance.setModel((Model)model);	
 			logger.debug("Process instance " + instance + " retrieved successfully.");
 			return instance;
 		} else {	
@@ -109,7 +108,7 @@ public class ProcessInstanceDAOImpl implements ProcessInstanceDAO {
 	 * Find the {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessInstance} entity 
 	 * object associated to the 
 	 * ({@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessInstance#getInstanceSrcId()} and
-	 *  {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessModel#getSource()} retrieve from 
+	 *  {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Model#getSource()} retrieve from 
 	 *  {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessInstance#getModel()}) 
 	 * as unique keys.
 	 * 
@@ -120,7 +119,7 @@ public class ProcessInstanceDAOImpl implements ProcessInstanceDAO {
 	 */
     public ProcessInstance findBySourceData(String processId, Model model) throws IllegalArgumentException {
 		logger.debug("Retrieving process instance with source data as pairs of (" + processId + ", " + model.getSource() + ")...");
-		Model _model = modelDAO.findBySourceData(model.getModelSrcId(), model.getSource());
+		Model _model = modelDAO.findBySourceData(model.getModelSrcId(), model.getSource(), ModelType.PROCESS);
 		if (_model == null)
 			return null;
 		Query query = entityManager.createQuery("select p from " + HProcessInstance.class.getName() + " p where p.instanceSrcId = :sourceId and p.model = :modelId");
@@ -146,11 +145,56 @@ public class ProcessInstanceDAOImpl implements ProcessInstanceDAO {
 	}   
 	/**
 	 * Find the {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessInstance} entity 
+	 * object associated to the 
+	 * ({@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessInstance#getInstanceSrcId()} and
+	 *  {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Model#getSource()} retrieve from 
+	 *  {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessInstance#getModel()}) 
+	 * as unique keys.
+	 * 
+	 * @param processId process instance identifier given at the original source.
+	 * @param model process instance model.
+	 * @return {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessInstance} entity object associated.
+	 * @throws IllegalArgumentException if an illegal argument error occurred.
+	 */
+    public ProcessInstance findByCorrelationData(Model model, Set<EventCorrelation> correlation) throws IllegalArgumentException {
+		// TODO: Complex query - Map Reduce JOB to get this process instance
+    	//logger.debug("Retrieving process instance with source data as pairs of (" + model + ", " + model.getSource() + ")...");
+		if (model == null) 
+			throw new IllegalArgumentException("Cannot find the correlated instance. Model cannot be null.");
+		
+		Model _model = modelDAO.findById(model.getId());
+		if (_model == null) 
+			throw new IllegalArgumentException("The model with id " + model.getId() + " does not exist in the repository.");
+			
+		Query query = entityManager.createQuery("select p from " + HProcessInstance.class.getName() + " p where p.instanceSrcId = :sourceId and p.model = :modelId");
+		query.setParameter("sourceId", _model.getSource().getId());
+		query.setParameter("modelId", _model.getId());		
+		HProcessInstance hinstance = null;
+		try {
+			long ini = System.nanoTime();
+			hinstance = (HProcessInstance)query.getSingleResult();
+			long end = System.nanoTime();
+			stats.writeStat(Stats.Operation.READ_BY_SOURCE_DATA, hinstance, ini, end);		
+			logger.debug("Process instance " + hinstance + " retrieved successfully.");
+		} catch(NoResultException nrex) {
+			logger.debug("Process instance with source data as pairs of (" + model + ", " + model.getSource() + ") does not exist.");
+			return null;
+		} catch(NonUniqueResultException nurex) {
+			logger.error(nurex.fillInStackTrace());
+			logger.fatal("This message should never appear. Inconsistence in the database has been found. There exists two or more different local process instances for a unique pair of source and source process instances.");			
+			throw new IllegalArgumentException("Inconsistence in the database has been found. There exists two or more different local process instances for a unique pair of source and source process instances.");
+		}
+		ProcessInstance instance = BusinessObjectAssembler.getInstance().toBusinessObject(hinstance);
+		return instance;
+	}   
+    
+	/**
+	 * Find the {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessInstance} entity 
 	 * object associated to the correlation information provided by a determined list of
 	 * ({@link es.uc3m.softlab.cbi4api.basu.event.store.domain.EventCorrelation} objects, 
-	 * a determined {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessModel}
+	 * a determined {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Model}
 	 * and a determined ({@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Source} given by
-	 * the {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessModel#getSource()}) property. 
+	 * the {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Model#getSource()}) property. 
 	 * 
 	 * @param correlation list of event correlation objects associated to the process instance that is trying to be found.
 	 * @param model process model associated to the process instance that is trying to be found.
@@ -158,7 +202,7 @@ public class ProcessInstanceDAOImpl implements ProcessInstanceDAO {
 	 * @throws IllegalArgumentException if an illegal argument error occurred.
 	 */
     @SuppressWarnings("unchecked")
-    public ProcessInstance findBySourceData(Set<EventCorrelation> correlation, ProcessModel model) throws IllegalArgumentException {
+    public ProcessInstance findBySourceData(Set<EventCorrelation> correlation, Model model) throws IllegalArgumentException {
     	logger.debug("Retrieving process instance associted to a determined correlation data from the model " + model + " associated to the source " + model.getSource() + "...");
 		if (correlation == null || correlation.size() == 0) {
 			throw new IllegalArgumentException("Cannot retrieve process instance because no correlation data has been provided.");
@@ -259,34 +303,16 @@ public class ProcessInstanceDAOImpl implements ProcessInstanceDAO {
 		}
 		logger.debug("Process instance " + instance.getId() + " does not exists. Saving process instance...");
 		// saves the model 	
-		modelDAO.save(instance.getModel());
+		modelDAO.save(instance.getModel());		
 		// saves the instance 
 		HProcessInstance hprocessInstance = BusinessObjectAssembler.getInstance().toEntity(instance);
-		// checks the sequence
 		long ini = System.nanoTime();
-		HSequenceGenerator hsequenceGenerator = entityManager.find(HSequenceGenerator.class, HSequenceGenerator.Type.PROCESS_INSTANCE);
-		long end = System.nanoTime();
-		stats.writeStat(Stats.Operation.READ_BY_ID, hsequenceGenerator, ini, end);
-		if (hsequenceGenerator == null) {
-			logger.debug("There are not process instances defined at the datastore.");	
-			hsequenceGenerator = new HSequenceGenerator(HSequenceGenerator.Type.PROCESS_INSTANCE, 0L);
-			ini = System.nanoTime();
-			entityManager.persist(hsequenceGenerator);
-			end = System.nanoTime();
-			stats.writeStat(Stats.Operation.WRITE, hsequenceGenerator, ini, end);
-		}
-		// update sequence
-		hprocessInstance.setId(hsequenceGenerator.getNextSeq());
-		ini = System.nanoTime();
-		entityManager.merge(hsequenceGenerator);
-		end = System.nanoTime();
-		stats.writeStat(Stats.Operation.UPDATE, hsequenceGenerator, ini, end);
-		// updates the current instance back with the new assigned identifier
-		instance.setId(hprocessInstance.getId());
-		ini = System.nanoTime();
 		entityManager.persist(hprocessInstance);
-		end = System.nanoTime();
+		long end = System.nanoTime();
 		stats.writeStat(Stats.Operation.WRITE, hprocessInstance, ini, end);
+		// updates the current instance back with the new assigned identifier
+		entityManager.refresh(hprocessInstance);
+		instance.setId(hprocessInstance.getId());
 		logger.debug("Process instance " + instance + " saved successfully.");
 	}	
 	/**

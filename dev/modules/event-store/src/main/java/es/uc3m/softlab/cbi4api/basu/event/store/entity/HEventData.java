@@ -70,7 +70,7 @@ public class HEventData implements Comparable<HEventData>, Serializable {
 	 * @return the {@link #value} property.
 	 */
 	@Id
-	@Column(name="value", columnDefinition="text", nullable=false, updatable=false)
+	@Column(name="value", nullable=false, updatable=false)
 	public String getValue() {
 		return value;
 	}

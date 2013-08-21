@@ -69,11 +69,6 @@
 			<url>http://www.datanucleus.org/downloads/maven2</url>
 			<layout>default</layout>
 		</repository>
-		<repository>
-			<id>ibiblio</id>
-			<url>http://mirrors.ibiblio.org/maven2</url>
-			<layout>default</layout>
-		</repository>	
 	</repositories>
 	<pluginRepositories>
 		<pluginRepository>
@@ -87,7 +82,6 @@
 			<groupId>org.apache.activemq</groupId>
 			<artifactId>activemq-all</artifactId>
 			<version>${org.apache.activemq.version}</version>
-			<type>jar</type>
 			<scope>provided</scope>
 		</dependency>	
 		<dependency>
@@ -97,9 +91,9 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>hsqldb</groupId>
+			<groupId>org.hsqldb</groupId>
 			<artifactId>hsqldb</artifactId>
-			<version>1.8.0.10</version>
+			<version>2.3.0</version>
 			<type>jar</type>
 			<scope>test</scope>
 		</dependency>
@@ -108,13 +102,13 @@
 			<artifactId>postgresql</artifactId>
 			<version>8.4-702.jdbc4</version>
 			<scope>test</scope>
-		</dependency>	  	
+		</dependency>	 
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-orm</artifactId>
 			<version>${org.springframework.version}</version>
 			<scope>test</scope>
-		</dependency>
+		</dependency>			 	
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-jdbc</artifactId>
@@ -132,14 +126,20 @@
 			<artifactId>spring-web</artifactId>
 			<version>${org.springframework.version}</version>
 			<scope>test</scope>
-		</dependency>														
+		</dependency>	
+		<dependency>
+			<groupId>org.datanucleus</groupId>
+			<artifactId>datanucleus-rdbms</artifactId>
+			<version>${org.datanucleus.version}</version>
+			<scope>test</scope>
+		</dependency>																		
 		<dependency>
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
 			<version>1.2.17</version>
 			<type>jar</type>
 			<scope>compile</scope>
-		</dependency>	 
+		</dependency>	
 		<dependency>
 			<groupId>org.apache.geronimo.specs</groupId>
 			<artifactId>geronimo-jpa_2.0_spec</artifactId>
@@ -169,7 +169,7 @@
 			<artifactId>spring-beans</artifactId>
 			<version>${org.springframework.version}</version>
 			<scope>compile</scope>
-		</dependency>				
+		</dependency>					
 		<dependency>
 			<groupId>org.apache.hadoop</groupId>
 			<artifactId>hadoop-core</artifactId>
@@ -180,9 +180,14 @@
 			<groupId>org.apache.hbase</groupId>
 			<artifactId>hbase</artifactId>
 			<version>${org.apache.hbase.version}</version>
-			<type>pom</type>
 			<scope>compile</scope>
-		</dependency>					
+		</dependency>	
+		<dependency>
+			<groupId>org.apache.hive</groupId>
+			<artifactId>hive-jdbc</artifactId>
+			<version>${org.apache.hive.version}</version>
+			<scope>compile</scope>
+		</dependency>							
 		<dependency>
 			<groupId>org.datanucleus</groupId>
 			<artifactId>datanucleus-core</artifactId>
@@ -219,16 +224,14 @@
 			<artifactId>datanucleus-enhancer</artifactId>
 			<version>${org.datanucleus.version}</version>
 			<scope>compile</scope>
-		</dependency>	
-		 -->
-		 <!-- 
+		</dependency>		
+		-->	
 		<dependency>
 			<groupId>org.apache.hbql</groupId>
 			<artifactId>hbql</artifactId>
 			<version>0.90.0.1</version>
 			<scope>compile</scope>
 		</dependency>
-		 -->														
 		<dependency>
 			<groupId>javax.xml.bind</groupId>
 			<artifactId>jaxb-api</artifactId>
@@ -274,7 +277,15 @@
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-resources-plugin</artifactId>
 					<version>2.6</version>
-				</plugin>				
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<version>2.16</version>
+					<configuration>
+						<runOrder>alphabetical</runOrder>
+					</configuration>
+				</plugin>								
 			</plugins>
 		</pluginManagement>		
 		<plugins>
@@ -338,6 +349,7 @@
 				<artifactId>datanucleus-maven-plugin</artifactId>
 				<version>3.3.0-release</version>
 				<configuration>
+					<log4jConfiguration>${basedir}/src/test/hbase-resources/log4j.properties</log4jConfiguration>
 					<fork>false</fork>					
 					<mappingIncludes>**/*.class</mappingIncludes>
 					<verbose>true</verbose>
@@ -596,9 +608,20 @@
 			</activation>	
 			<build>
 				<filters>
-					<filter>src/main/filters/filter-dev.properties</filter>
-					<filter>src/test/filters/filter.properties</filter>					
+					<filter>src/main/filters/filter-dev.properties</filter>			
 				</filters>
+				<testResources>
+					<!-- enable this to run the tests against an hbase instance					  
+					<testResource>
+						<directory>src/test/hbase-resources</directory>
+						<filtering>true</filtering>
+					</testResource>
+					 -->
+					<testResource>
+						<directory>src/test/hsqldb-resources</directory>
+						<filtering>true</filtering>
+					</testResource>					
+				</testResources>
 			</build>
 		</profile>
 		<profile>
@@ -609,7 +632,6 @@
 			<build>
 				<filters>
 					<filter>src/main/filters/filter-test.properties</filter>
-					<filter>src/test/filters/filter.properties</filter>
 				</filters>				
 			</build>
 		</profile>
@@ -621,17 +643,17 @@
 			<build>
 				<filters>
 					<filter>src/main/filters/filter-prod.properties</filter>
-					<filter>src/test/filters/filter.properties</filter>
 				</filters>
 			</build>
-		</profile>		
+		</profile>			
 	</profiles>	
 	<properties>
 		<vendor>Universidad Carlos III de Madrid</vendor>
 		<vendor-url>http://www.uc3m.es</vendor-url>	
-		<org.apache.hadoop.version>1.2.0</org.apache.hadoop.version>	
-		<org.apache.hbase.version>0.95.1-hadoop1</org.apache.hbase.version>
-		<org.datanucleus.version>3.2.2</org.datanucleus.version>
+		<org.apache.hadoop.version>1.1.1</org.apache.hadoop.version>	
+		<org.apache.hbase.version>0.94.4</org.apache.hbase.version>
+		<org.apache.hive.version>0.11.0</org.apache.hive.version>
+		<org.datanucleus.version>3.2.0-release</org.datanucleus.version>
 		<org.apache.activemq.version>5.8.0</org.apache.activemq.version>
 		<org.springframework.version>3.2.0.RELEASE</org.springframework.version>	
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

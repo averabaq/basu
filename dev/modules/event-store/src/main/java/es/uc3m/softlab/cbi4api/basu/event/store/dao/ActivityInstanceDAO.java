@@ -7,7 +7,7 @@ package es.uc3m.softlab.cbi4api.basu.event.store.dao;
 
 import es.uc3m.softlab.cbi4api.basu.event.store.StaticResources;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.ActivityInstance;
-import es.uc3m.softlab.cbi4api.basu.event.store.domain.ActivityModel;
+import es.uc3m.softlab.cbi4api.basu.event.store.domain.Model;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.EventCorrelation;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.Model;
 
@@ -52,7 +52,7 @@ public interface ActivityInstanceDAO {
 	 * Find the {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ActivityInstance} entity 
 	 * object associated to the 
 	 * ({@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ActivityInstance#getInstanceSrcId()} and
-	 *  {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ActivityModel#getSource()} retrieve from 
+	 *  {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Model#getSource()} retrieve from 
 	 *  {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ActivityInstance#getModel()}) 
 	 * as unique keys.
 	 * 
@@ -66,16 +66,16 @@ public interface ActivityInstanceDAO {
 	 * Find the {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ActivityInstance} entity 
 	 * object associated to the correlation information provided by a determined list of
 	 * ({@link es.uc3m.softlab.cbi4api.basu.event.store.domain.EventCorrelation} objects, 
-	 * a determined {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ActivityModel}
+	 * a determined {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Model}
 	 * and a determined ({@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Source} given by
-	 * the {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ActivityModel#getSource()}) property. 
+	 * the {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Model#getSource()}) property. 
 	 * 
 	 * @param correlation list of event correlation objects associated to the activity instance that is trying to be found.
 	 * @param model activity model associated to the activity instance that is trying to be found.
 	 * @return {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ActivityInstance} entity object associated.
 	 * @throws IllegalArgumentException if an illegal argument error occurred.
 	 */
-    public ActivityInstance findBySourceData(Set<EventCorrelation> correlation, ActivityModel model) throws IllegalArgumentException;    
+    public ActivityInstance findBySourceData(Set<EventCorrelation> correlation, Model model) throws IllegalArgumentException;    
 	/**
 	 * Merges and synchronizes the {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ActivityInstance}
 	 * entity object state with the data base.

@@ -37,7 +37,7 @@ public class ProcessInstance implements Comparable<ProcessInstance>, Serializabl
 	/** Process instance's description. */
 	private String description;
 	/** Process instance's model */
-	private ProcessModel model;
+	private Model model;
 	/** Process instance correlation identifier */
 	private Long correlatorId;
 	/** Process instance identifier at source */
@@ -96,14 +96,14 @@ public class ProcessInstance implements Comparable<ProcessInstance>, Serializabl
 	 * Gets the {@link #model} property.
 	 * @return the {@link #model} property.
 	 */
-	public ProcessModel getModel() {
+	public Model getModel() {
 		return model;
 	}
 	/**
 	 * Sets the {@link #model} property.
 	 * @param model the {@link #model} property to set.
 	 */
-	public void setModel(ProcessModel model) {
+	public void setModel(Model model) {
 		this.model = model;
 	}
 	/**

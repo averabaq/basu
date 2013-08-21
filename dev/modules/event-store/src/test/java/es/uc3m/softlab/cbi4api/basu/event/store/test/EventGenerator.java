@@ -66,7 +66,7 @@ public class EventGenerator extends Thread {
 		event.getEventDetails().setCurrentState(currentState);
 		event.getEventDetails().setPreviousState(previousState); 
 
-		for (int j = 0; j < ((int)(Math.random() * 10)); j++) {				
+		for (int j = 0; j < (1+((int)(Math.random() * 10))); j++) {				
 			EventPayload payload = new EventPayload();
 			payload.setKey(UUID.randomUUID().toString());
 			payload.setValue(UUID.randomUUID().toString());
@@ -74,7 +74,7 @@ public class EventGenerator extends Thread {
 			event.getPayload().add(payload);
 		}
 
-		for (int j = 0; j < ((int)(Math.random() * 10)); j++) {				
+		for (int j = 0; j < (1+((int)(Math.random() * 10))); j++) {				
 			EventCorrelation correlation = new EventCorrelation();
 			correlation.setKey(UUID.randomUUID().toString());
 			correlation.setValue(UUID.randomUUID().toString());
@@ -82,7 +82,7 @@ public class EventGenerator extends Thread {
 			event.getCorrelations().add(correlation);
 		}
 
-		for (int j = 0; j < ((int)(Math.random() * 10)); j++) {				
+		for (int j = 0; j < (1+((int)(Math.random() * 10))); j++) {				
 			EventData element = new EventData();
 			element.setKey(UUID.randomUUID().toString());
 			element.setValue(UUID.randomUUID().toString());

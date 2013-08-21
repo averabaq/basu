@@ -10,9 +10,10 @@ import es.uc3m.softlab.cbi4api.basu.event.store.StaticResources;
 import java.io.Serializable;
 
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.PersistenceUnit;
-import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Column;
 
@@ -36,7 +37,6 @@ import javax.persistence.Column;
 @Entity(name="event-store.ProcessInstance")
 @Table(name="process_instance", schema="event_store")
 @PersistenceUnit(name=StaticResources.PERSISTENCE_NAME_EVENT_STORE, unitName=StaticResources.PERSISTENCE_UNIT_NAME_EVENT_STORE)
-@SequenceGenerator(name="process_instance_sequence", sequenceName="process_instance_id_seq")
 /*@NamedQueries({
     @NamedQuery(name="getLastCorrelatorIdOfModel", 
 		        query="select max(p.correlatorId) from event-store.HProcessInstance p where p.model = :model")		        
@@ -67,6 +67,7 @@ public class HProcessInstance implements Comparable<HProcessInstance>, Serializa
 	 * @return the {@link #id} property.
 	 */
 	@Id
+	@GeneratedValue(strategy=GenerationType.AUTO)
 	public long getId() {
 		return id;
 	}
@@ -74,7 +75,6 @@ public class HProcessInstance implements Comparable<HProcessInstance>, Serializa
 	 * Sets the {@link #id} property.
 	 * @param id the {@link #id} property to set
 	 */
-	@Id
 	public void setId(long id) {
 		this.id = id;
 	}
@@ -97,7 +97,7 @@ public class HProcessInstance implements Comparable<HProcessInstance>, Serializa
 	 * Gets the {@link #description} property.
 	 * @return the {@link #description} property.
 	 */
-	@Column(name="description", columnDefinition="text", updatable=false)
+	@Column(name="description", updatable=false)
 	public String getDescription() {
 		return description;
 	}
@@ -112,7 +112,6 @@ public class HProcessInstance implements Comparable<HProcessInstance>, Serializa
 	 * Gets the {@link #model} property.
 	 * @return the {@link #model} property.
 	 */
-	//@ManyToOne(cascade={CascadeType.PERSIST, CascadeType.REFRESH}, optional=false)
 	@Column(name="model", nullable=false, updatable=false)
 	public long getModel() {
 		return model;

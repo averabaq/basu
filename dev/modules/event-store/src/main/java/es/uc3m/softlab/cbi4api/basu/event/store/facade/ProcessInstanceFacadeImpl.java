@@ -7,21 +7,15 @@ package es.uc3m.softlab.cbi4api.basu.event.store.facade;
 
 import es.uc3m.softlab.cbi4api.basu.event.store.StaticResources;
 import es.uc3m.softlab.cbi4api.basu.event.store.dao.ProcessInstanceDAO;
-import es.uc3m.softlab.cbi4api.basu.event.store.dao.ProcessMappingDAO;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.EventCorrelation;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.Model;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessInstance;
-import es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessMapping;
-import es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessModel;
-import es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessModelMapping;
 
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Set;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,8 +39,6 @@ public class ProcessInstanceFacadeImpl implements ProcessInstanceFacade {
     protected EntityManager entityManager;
     /** Process instance data access object */
     @Autowired private ProcessInstanceDAO processInstanceDAO;
-    /** Process mapping data access object */
-    @Autowired private ProcessMappingDAO processMappingDAO;
     
 	/**
 	 * Gets the {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessInstance} entity 
@@ -70,7 +62,7 @@ public class ProcessInstanceFacadeImpl implements ProcessInstanceFacade {
 	 * Gets the {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessInstance} entity 
 	 * object associated to the  
 	 * ({@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessInstance#getInstanceSrcId()} and
-	 *  {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessModel#getSource()} retrieve from 
+	 *  {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Model#getSource()} retrieve from 
 	 *  {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessInstance#getModel()}) 
 	 * as unique keys.
 	 * 
@@ -98,16 +90,16 @@ public class ProcessInstanceFacadeImpl implements ProcessInstanceFacade {
 	 * Gets the {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessInstance} entity 
 	 * object associated to the correlation information provided by a determined list of
 	 * ({@link es.uc3m.softlab.cbi4api.basu.event.store.domain.EventCorrelation} objects, 
-	 * a determined {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessModel}
+	 * a determined {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Model}
 	 * and a determined ({@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Source} given by
-	 * the {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessModel#getSource()}) property.
+	 * the {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Model#getSource()}) property.
 	 * 
 	 * @param correlation list of event correlation objects associated to the process instance that is trying to be found.
 	 * @param model process model associated to the process instance that is trying to be found.
 	 * @return {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessInstance} entity object associated.
 	 * @throws ProcessInstanceException if any process instance error occurred.
 	 */
-    public ProcessInstance getProcessInstance(Set<EventCorrelation> correlation, ProcessModel model) throws ProcessInstanceException {
+    public ProcessInstance getProcessInstance(Set<EventCorrelation> correlation, Model model) throws ProcessInstanceException {
 		logger.debug("Retrieving process instance associted to a determined correlation data from the model " + model + " and source associated...");
 		if (correlation == null || correlation.isEmpty()) 
 			throw new ProcessInstanceException(StaticResources.WARN_GET_PROCESS_INSTANCE_WITHOUT_CORRELATION_DATA,"Cannot retrieve process instance if the correlation data is not properly provided.");		
@@ -226,9 +218,31 @@ public class ProcessInstanceFacadeImpl implements ProcessInstanceFacade {
 		logger.info("Process instance " + _instance + " removed successfully.");
 	}	
 	/**
+	 * Gets the next correlation identifier for {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessInstance}
+	 * associated to the {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Model} entity object 
+	 * passed by arguments.
+	 * 
+	 * @param model {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Model} entity object to get the next
+	 * correlation identifier from.
+	 * @param correlations list of {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.EventCorrelation} entity objects
+	 * associated the all process instances aimed to correlate.
+	 * @throws ProcessInstanceException if any illegal data access or inconsistent process instance data error occurred.
+	 */
+	public long getCorrelationId(Model model, Set<EventCorrelation> correlations) throws ProcessInstanceException {
+		logger.debug("Getting correlation instance id for process model " + model + "...");	
+		/*Model _model = modelDAO.findById(instance.getId());
+		if (_instance == null) {
+			logger.warn("Cannot remove process instance. Process instance with identifier: " + instance.getId() + " does not exist.");
+			throw new ProcessInstanceException(StaticResources.WARN_DELETE_PROCESS_INSTANCE_NOT_EXIST, "Cannot remove process instance. Process instance with identifier: " + instance.getId() + " does not exist.");
+		}
+		processInstanceDAO.delete(_instance);		*/
+		logger.info("Correlation instance id for process model " + model + " retrieved successfully.");
+		return 1L;
+	}		
+	/**
 	 * Correlates all {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessInstance}
 	 * entity objects defined by attending to the information stored and represented by
-	 * the {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessModelMapping} objects.
+	 * the {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ModelMapping} objects.
 	 * 
 	 * <b>NOTE:</b> <i>This method is provided just for testing purposes on the event data test 
 	 * generation. It does not guarantee in any way that the process instances are properly
@@ -239,18 +253,18 @@ public class ProcessInstanceFacadeImpl implements ProcessInstanceFacade {
 	 * 
 	 * @throws ProcessInstanceException if any illegal data access or inconsistent process 
 	 * instance data error occurred during the correlation process.
-	 */
+	 *
 	@SuppressWarnings("unchecked")
 	public void correlateAllProcessInstances() throws ProcessInstanceException {
 		logger.debug("Correlating all process instances defined...");
 		List<ProcessMapping> mappings = processMappingDAO.findAll();
-		/* it correlates every process instance attending to the mapping information */
+		// it correlates every process instance attending to the mapping information 
 		for (ProcessMapping mapping : mappings) {
-			/* gets the mapping sequence */
+			// gets the mapping sequence 
 			Query query = entityManager.createNamedQuery("getProcessMappingSequence");
 			query.setParameter("mapping", mapping);
-			List<ProcessModelMapping> modelMappings = query.getResultList();
-			for (ProcessModelMapping modelMapping : modelMappings) {
+			List<ModelMapping> modelMappings = query.getResultList();
+			for (ModelMapping modelMapping : modelMappings) {
 				query = entityManager.createNamedQuery("instancesOfModelOrderedByExecutionTimeline");
 				query.setParameter("model", modelMapping.getModel());
 				List<Long> ids = query.getResultList();
@@ -263,5 +277,5 @@ public class ProcessInstanceFacadeImpl implements ProcessInstanceFacade {
 				}
 			}
 		}		
-	}	
+	}	*/
 }

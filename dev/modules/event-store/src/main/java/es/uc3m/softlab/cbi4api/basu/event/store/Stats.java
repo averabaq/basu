@@ -24,9 +24,11 @@ import org.springframework.stereotype.Component;
 import es.uc3m.softlab.cbi4api.basu.event.store.StaticResources;
 import es.uc3m.softlab.cbi4api.basu.event.store.entity.HActivityInstance;
 import es.uc3m.softlab.cbi4api.basu.event.store.entity.HEvent;
+import es.uc3m.softlab.cbi4api.basu.event.store.entity.HEventCorrelation;
+import es.uc3m.softlab.cbi4api.basu.event.store.entity.HEventData;
+import es.uc3m.softlab.cbi4api.basu.event.store.entity.HEventPayload;
 import es.uc3m.softlab.cbi4api.basu.event.store.entity.HModel;
 import es.uc3m.softlab.cbi4api.basu.event.store.entity.HProcessInstance;
-import es.uc3m.softlab.cbi4api.basu.event.store.entity.HSequenceGenerator;
 
 /**
  * Class that configures the global application. It takes
@@ -86,14 +88,18 @@ public class Stats {
     	if (config.isStatsActive()) {
     		if (obj instanceof HEvent)
     			writer.printf("%s,%s,%s,%s,%s,%s\n", op, "EVENT", ((HEvent)obj).getEventID(), start, end, (end - start));
+    		else if (obj instanceof HEventCorrelation)	
+    			writer.printf("%s,%s,%s,%s,%s,%s\n", op, "EVENT_CORRELATOR", ((HEventCorrelation)obj).getEventID(), start, end, (end - start));    		
+    		else if (obj instanceof HEventPayload)	
+    			writer.printf("%s,%s,%s,%s,%s,%s\n", op, "EVENT_PAYLOAD", ((HEventPayload)obj).getEventID(), start, end, (end - start));    		
+    		else if (obj instanceof HEventData)	
+    			writer.printf("%s,%s,%s,%s,%s,%s\n", op, "EVENT_DATA", ((HEventData)obj).getEventID(), start, end, (end - start));    		    		
     		else if (obj instanceof HProcessInstance)
     			writer.printf("%s,%s,%s,%s,%s,%s\n", op, "PROCESS_INSTANCE", ((HProcessInstance)obj).getInstanceSrcId(), start, end, (end - start));
     		else if (obj instanceof HActivityInstance)	
     			writer.printf("%s,%s,%s,%s,%s,%s\n", op, "ACTIVITY_INSTANCE", ((HActivityInstance)obj).getInstanceSrcId(), start, end, (end - start));
     		else if (obj instanceof HModel)	
     			writer.printf("%s,%s,%s,%s,%s,%s\n", op, "MODEL", ((HModel)obj).getModelSrcId(), start, end, (end - start));
-    		else if (obj instanceof HSequenceGenerator)	
-    			writer.printf("%s,%s,%s,%s,%s,%s\n", op, "SEQUENCE_GENERATOR", ((HSequenceGenerator)obj), start, end, (end - start));   		
     		else if (obj != null)
     			logger.warn("Unkown statistical performance object object '" + obj.getClass() + "'.");
     		writer.flush();

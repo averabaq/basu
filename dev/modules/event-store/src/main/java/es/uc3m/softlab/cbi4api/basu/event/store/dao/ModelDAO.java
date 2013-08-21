@@ -7,6 +7,7 @@ package es.uc3m.softlab.cbi4api.basu.event.store.dao;
 
 import es.uc3m.softlab.cbi4api.basu.event.store.StaticResources;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.Model;
+import es.uc3m.softlab.cbi4api.basu.event.store.domain.ModelType;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.Source;
 
 import java.util.List;
@@ -52,12 +53,13 @@ public interface ModelDAO {
 	 *  {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Model#getSource()}) 
 	 * as unique keys.
 	 * 
-	 * @param modelId model identifier given at the original source.
+	 * @param modelSrcId model identifier given at the original source.
 	 * @param source model's source.
+	 * @param type model's type.
 	 * @return {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Model} entity object associated.
 	 * @throws IllegalArgumentException if an illegal argument error occurred.
 	 */
-    public Model findBySourceData(String modelId, Source source) throws IllegalArgumentException;
+	public Model findBySourceData(String modelSrcId, Source source, ModelType type) throws IllegalArgumentException;
 	/**
 	 * Merges and synchronizes the {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Model}
 	 * entity object state with the data base.

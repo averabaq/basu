@@ -107,7 +107,7 @@ public class EventCorrelation implements Comparable<EventCorrelation>, Serializa
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("Data Element [event=");
+		builder.append("Correlation [event=");
 		builder.append(event);
 		builder.append(", key=");
 		builder.append(key);

@@ -36,7 +36,7 @@ public class ActivityInstance implements Serializable {
 	/** Activity description. */
 	private String description;
 	/** Activity model */
-	private ActivityModel model;
+	private Model model;
 	/** Activity instance identifier at source */
 	private String instanceSrcId;
 	/** Activity instance's parent */
@@ -97,14 +97,14 @@ public class ActivityInstance implements Serializable {
 	 * Gets the {@link #model} property.
 	 * @return the {@link #model} property.
 	 */
-	public ActivityModel getModel() {
+	public Model getModel() {
 		return model;
 	}
 	/**
 	 * Sets the {@link #model} property.
 	 * @param model the {@link #model} property to set.
 	 */
-	public void setModel(ActivityModel model) {
+	public void setModel(Model model) {
 		this.model = model;
 	}
 	/**

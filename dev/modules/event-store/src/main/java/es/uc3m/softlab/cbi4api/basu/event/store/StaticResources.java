@@ -39,9 +39,9 @@ public class StaticResources {
 	/** Component name for model data access object */
 	public static final String COMPONENT_NAME_MODEL_DAO = "/cbi4api-basu/event-store/dao/ModelDAO";
 	/** Component name for process model data access object */
-	public static final String COMPONENT_NAME_PROCESS_MODEL_DAO = "/cbi4api-basu/event-store/dao/ProcessModelDAO";
+	public static final String COMPONENT_NAME_PROCESS_MODEL_DAO = "/cbi4api-basu/event-store/dao/ModelDAO";
 	/** Component name for activity model data access object */
-	public static final String COMPONENT_NAME_ACTIVITY_MODEL_DAO = "/cbi4api-basu/event-store/dao/ActivityModelDAO";
+	public static final String COMPONENT_NAME_ACTIVITY_MODEL_DAO = "/cbi4api-basu/event-store/dao/ModelDAO";
 	/** Component name for process instance data access object */
 	public static final String COMPONENT_NAME_PROCESS_MAPPING_DAO = "/cbi4api-basu/event-store/dao/ProcessMappingDAO";
 	/** Component name for process instance data access object */
@@ -56,9 +56,9 @@ public class StaticResources {
 	/** Component name for model service facade */
 	public static final String COMPONENT_NAME_MODEL_FACADE = "/cbi4api-basu/event-store/facade/ModelFacade";
 	/** Component name for process model service facade */
-	public static final String COMPONENT_NAME_PROCESS_MODEL_FACADE = "/cbi4api-basu/event-store/facade/ProcessModelFacade";
+	public static final String COMPONENT_NAME_PROCESS_MODEL_FACADE = "/cbi4api-basu/event-store/facade/ModelFacade";
 	/** Component name for activity model service facade */
-	public static final String COMPONENT_NAME_ACTIVITY_MODEL_FACADE = "/cbi4api-basu/event-store/facade/ActivityModelFacade";
+	public static final String COMPONENT_NAME_ACTIVITY_MODEL_FACADE = "/cbi4api-basu/event-store/facade/ModelFacade";
 	/** Component name for process instance service facade */
 	public static final String COMPONENT_NAME_PROCESS_INSTANCE_FACADE = "/cbi4api-basu/event-store/facade/ProcessInstanceFacade";
 	/** Component name for activity instance service facade */
@@ -111,23 +111,24 @@ public class StaticResources {
 	public static final int WARN_GET_MODEL_WITHOUT_SOURCE = 12002;
 	/** Facade warn code for getting a model with no information on the model identifier of the original source */ 
 	public static final int WARN_GET_MODEL_WITHOUT_MODEL_SRC_ID = 12003;	
+	/** Facade warn code for getting a model with no information on the model type of the original source */ 
+	public static final int WARN_GET_MODEL_UNKNOWN_TYPE = 12004;
 	/** Facade warn code for saving a model which is a null object */ 
-	public static final int WARN_SAVE_NULL_MODEL = 12004;
+	public static final int WARN_SAVE_NULL_MODEL = 12005;
 	/** Facade warn code for saving a model with no information on the name field */ 
-	public static final int WARN_SAVE_MODEL_WITHOUT_NAME = 12005;
+	public static final int WARN_SAVE_MODEL_WITHOUT_NAME = 12006;
 	/** Facade warn code for saving a model with no information on the model source identifier field */ 
-	public static final int WARN_SAVE_MODEL_WITHOUT_MODEL_SRC_ID = 12006;
+	public static final int WARN_SAVE_MODEL_WITHOUT_MODEL_SRC_ID = 12007;
 	/** Facade warn code for saving a model with no information on the source field */ 
-	public static final int WARN_SAVE_MODEL_WITHOUT_SOURCE = 12007;
-
+	public static final int WARN_SAVE_MODEL_WITHOUT_SOURCE = 12008;
 	/** Facade warn code for saving a model which already exists at the database with the given name */ 
-	public static final int WARN_SAVE_MODEL_WITH_NAME_ALREADY_EXISTS = 12008;
+	public static final int WARN_SAVE_MODEL_WITH_NAME_ALREADY_EXISTS = 12009;
 	/** Facade warn code for updating a model which does not exist */ 
-	public static final int WARN_UPDATE_MODEL_NOT_EXIST = 12009;
+	public static final int WARN_UPDATE_MODEL_NOT_EXIST = 12010;
 	/** Facade warn code for deleting a model which does not exist */
-	public static final int WARN_DELETE_MODEL_NOT_EXIST = 12010;
+	public static final int WARN_DELETE_MODEL_NOT_EXIST = 12011;
 	/** Facade warn code for loading instance on a model which does not exist */
-	public static final int WARN_LOAD_PROCESS_INSTANCES_MODEL_NOT_EXIST=12011;
+	public static final int WARN_LOAD_PROCESS_INSTANCES_MODEL_NOT_EXIST=12012;
 	
 	/** Facade warn code for getting the previous process event from a null process instance */
 	public static final int WARN_GET_PREVIOUS_PROCESS_EVENT_NULL_PROCESS = 13001;

@@ -8,13 +8,12 @@ package es.uc3m.softlab.cbi4api.basu.event.store.dao;
 import es.uc3m.softlab.cbi4api.basu.event.store.StaticResources;
 import es.uc3m.softlab.cbi4api.basu.event.store.Stats;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.ActivityInstance;
-import es.uc3m.softlab.cbi4api.basu.event.store.domain.ActivityModel;
+import es.uc3m.softlab.cbi4api.basu.event.store.domain.Model;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.Event;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.EventCorrelation;
-import es.uc3m.softlab.cbi4api.basu.event.store.domain.Model;
+import es.uc3m.softlab.cbi4api.basu.event.store.domain.ModelType;
 import es.uc3m.softlab.cbi4api.basu.event.store.entity.HActivityInstance;
 import es.uc3m.softlab.cbi4api.basu.event.store.entity.HModel;
-import es.uc3m.softlab.cbi4api.basu.event.store.entity.HSequenceGenerator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -77,7 +76,7 @@ public class ActivityInstanceDAOImpl implements ActivityInstanceDAO {
 			ActivityInstance instance = BusinessObjectAssembler.getInstance().toBusinessObject(hinstance);
 			HModel hprocessModel = entityManager.find(HModel.class, hinstance.getModel());
 			Model model = BusinessObjectAssembler.getInstance().toBusinessObject(hprocessModel);
-			instance.setModel((ActivityModel)model); 
+			instance.setModel((Model)model); 
 			instances.add(instance);
 		}
 		return instances;
@@ -98,7 +97,7 @@ public class ActivityInstanceDAOImpl implements ActivityInstanceDAO {
 		if (hinstance != null) {			
 			ActivityInstance instance = BusinessObjectAssembler.getInstance().toBusinessObject(hinstance);
 			Model model = modelDAO.findById(hinstance.getModel());
-			instance.setModel((ActivityModel)model);	
+			instance.setModel((Model)model);	
 			logger.debug("Activity instance " + instance + " retrieved successfully.");
 			return instance;
 		} else {	
@@ -110,7 +109,7 @@ public class ActivityInstanceDAOImpl implements ActivityInstanceDAO {
 	 * Find the {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ActivityInstance} entity 
 	 * object associated to the 
 	 * ({@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ActivityInstance#getInstanceSrcId()} and
-	 *  {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ActivityModel#getSource()} retrieve from 
+	 *  {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Model#getSource()} retrieve from 
 	 *  {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ActivityInstance#getModel()}) 
 	 * as unique keys.
 	 * 
@@ -121,7 +120,7 @@ public class ActivityInstanceDAOImpl implements ActivityInstanceDAO {
 	 */
 	public ActivityInstance findBySourceData(String activityId, Model model) throws IllegalArgumentException {
 		logger.debug("Retrieving activity instance with source data as pairs of (" + activityId + ", " + model.getSource() + ")...");
-		Model _model = modelDAO.findBySourceData(model.getModelSrcId(), model.getSource());
+		Model _model = modelDAO.findBySourceData(model.getModelSrcId(), model.getSource(), ModelType.ACTIVITY);
 		if (_model == null)
 			return null;
 		Query query = entityManager.createQuery("select a from " + HActivityInstance.class.getName() + " a where a.instanceSrcId = :sourceId and a.model = :modelId");
@@ -149,9 +148,9 @@ public class ActivityInstanceDAOImpl implements ActivityInstanceDAO {
 	 * Find the {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ActivityInstance} entity 
 	 * object associated to the correlation information provided by a determined list of
 	 * ({@link es.uc3m.softlab.cbi4api.basu.event.store.domain.EventCorrelation} objects, 
-	 * a determined {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ActivityModel}
+	 * a determined {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Model}
 	 * and a determined ({@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Source} given by
-	 * the {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ActivityModel#getSource()}) property. 
+	 * the {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Model#getSource()}) property. 
 	 * 
 	 * @param correlation list of event correlation objects associated to the activity instance that is trying to be found.
 	 * @param model activity model associated to the activity instance that is trying to be found.
@@ -159,7 +158,7 @@ public class ActivityInstanceDAOImpl implements ActivityInstanceDAO {
 	 * @throws IllegalArgumentException if an illegal argument error occurred.
 	 */
     @SuppressWarnings("unchecked")
-    public ActivityInstance findBySourceData(Set<EventCorrelation> correlation, ActivityModel model) throws IllegalArgumentException {
+    public ActivityInstance findBySourceData(Set<EventCorrelation> correlation, Model model) throws IllegalArgumentException {
     	logger.debug("Retrieving activity instance associted to a determined correlation data from the model " + model + " associated to the source " + model.getSource() + " ...");
 		if (correlation == null || correlation.size() == 0) {
 			throw new IllegalArgumentException("Cannot retrieve activity instance because no correlation data has been provided.");
@@ -258,36 +257,18 @@ public class ActivityInstanceDAOImpl implements ActivityInstanceDAO {
 				return;
 			}
 		}
-		logger.debug("Process instance " + instance.getId() + " does not exists. Saving process instance...");
+		logger.debug("Activity instance " + instance.getId() + " does not exists. Saving process instance...");
 		/* saves the model */	
 		modelDAO.save(instance.getModel());
 
 		/* saves the instance */
 		HActivityInstance hactivityInstance = BusinessObjectAssembler.getInstance().toEntity(instance);
-
 		long ini = System.nanoTime();
-		HSequenceGenerator hsequenceGenerator = entityManager.find(HSequenceGenerator.class, HSequenceGenerator.Type.ACTIVITY_INSTANCE);
-		long end = System.nanoTime();
-		stats.writeStat(Stats.Operation.READ_BY_ID, hsequenceGenerator, ini, end);
-		if (hsequenceGenerator == null) {
-			logger.debug("There are not activity instances defined at the datastore.");	
-			hsequenceGenerator = new HSequenceGenerator(HSequenceGenerator.Type.ACTIVITY_INSTANCE, 0L);
-			ini = System.nanoTime();
-			entityManager.persist(hsequenceGenerator);
-			end = System.nanoTime();
-			stats.writeStat(Stats.Operation.WRITE, hsequenceGenerator, ini, end);
-		}
-		// update sequence
-		hactivityInstance.setId(hsequenceGenerator.getNextSeq());
-		ini = System.nanoTime();
-		entityManager.merge(hsequenceGenerator);
-		end = System.nanoTime();
-		stats.writeStat(Stats.Operation.UPDATE, hsequenceGenerator, ini, end);
-		// insert activity
-		instance.setId(hactivityInstance.getId());
-		ini = System.nanoTime();
 		entityManager.persist(hactivityInstance);
-		end = System.nanoTime();
+		long end = System.nanoTime();
+		// updates the current instance back with the new assigned identifier
+		entityManager.refresh(hactivityInstance);
+		instance.setId(hactivityInstance.getId());
 		stats.writeStat(Stats.Operation.WRITE, hactivityInstance, ini, end);
 		logger.debug("Activity instance " + instance + " saved successfully.");
 	}	

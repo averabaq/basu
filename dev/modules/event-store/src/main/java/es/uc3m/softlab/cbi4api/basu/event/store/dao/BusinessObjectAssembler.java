@@ -7,9 +7,9 @@ package es.uc3m.softlab.cbi4api.basu.event.store.dao;
 
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.ActivityInstance;
-import es.uc3m.softlab.cbi4api.basu.event.store.domain.ActivityModel;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.Event;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.EventCorrelation;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.EventData;
@@ -18,11 +18,13 @@ import es.uc3m.softlab.cbi4api.basu.event.store.domain.EventPayload;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.Model;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.ModelType;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessInstance;
-import es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessModel;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.Source;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.State;
 import es.uc3m.softlab.cbi4api.basu.event.store.entity.HActivityInstance;
 import es.uc3m.softlab.cbi4api.basu.event.store.entity.HEvent;
+import es.uc3m.softlab.cbi4api.basu.event.store.entity.HEventCorrelation;
+import es.uc3m.softlab.cbi4api.basu.event.store.entity.HEventData;
+import es.uc3m.softlab.cbi4api.basu.event.store.entity.HEventPayload;
 import es.uc3m.softlab.cbi4api.basu.event.store.entity.HModel;
 import es.uc3m.softlab.cbi4api.basu.event.store.entity.HProcessInstance;
 import es.uc3m.softlab.cbi4api.basu.event.store.entity.HSource;
@@ -106,7 +108,7 @@ public class BusinessObjectAssembler {
     	event.getEventDetails().setPreviousState(State.valueOf(hevent.getPreviousState()));
     	event.setDataElement(new HashSet<EventData>());
     	event.setCorrelations(new HashSet<EventCorrelation>());
-    	event.setPayload(new HashSet<EventPayload>());
+    	event.setPayload(new HashSet<EventPayload>());	
     	return event;
     }
     /**
@@ -191,14 +193,7 @@ public class BusinessObjectAssembler {
      */
     public Model toBusinessObject(HModel hmodel) {
     	ModelType type = ModelType.valueOf(hmodel.getType());
-    	Model model = null;
-    	if (type == ModelType.PROCESS) {
-    		model = new ProcessModel();
-    	} else if (type == ModelType.ACTIVITY) {
-    		model = new ActivityModel();
-    	} else {
-    		throw new IllegalArgumentException("Model type " + type + " not suported.");
-    	}    	
+    	Model model = new Model();  	
     	model.setId(hmodel.getId());
     	model.setName(hmodel.getName());
     	model.setDescription(hmodel.getDescription());
@@ -220,5 +215,82 @@ public class BusinessObjectAssembler {
     	hmodel.setModelSrcId(model.getModelSrcId());
     	hmodel.setSource(model.getSource().getId());
     	return hmodel;
+    }  
+    /**
+     * Convert event correlation entity object to business domain object 
+     * @param hcorrelation entity object to convert.
+     * @param event event business domain correlation owner.
+     * @return domain object.
+     */
+    public EventCorrelation toBusinessObject(HEventCorrelation hcorrelation, Event event) {    	
+    	EventCorrelation correlation = new EventCorrelation();  	
+    	correlation.setEvent(event);
+    	correlation.setKey(hcorrelation.getKey());
+    	correlation.setValue(hcorrelation.getValue());
+    	return correlation;
+    }
+    /**
+     * Convert event correlation business domain object to entity object
+     * @param correlation business domain object to convert.
+     * @return entity object.
+     */
+    public HEventCorrelation toEntity(EventCorrelation correlation) {
+    	HEventCorrelation hcorrelation = new HEventCorrelation();
+    	hcorrelation.setEventID((correlation.getEvent() == null)? 0 : correlation.getEvent().getEventID());
+    	hcorrelation.setKey(correlation.getKey());
+    	hcorrelation.setValue(correlation.getValue());
+    	return hcorrelation;
+    } 
+    
+    /**
+     * Convert event correlation entity object to business domain object 
+     * @param hcorrelation entity object to convert.
+     * @param event event business domain correlation owner.
+     * @return domain object.
+     */
+    public EventPayload toBusinessObject(HEventPayload hpayload, Event event) {    	
+    	EventPayload payload = new EventPayload();  	
+    	payload.setEvent(event);
+    	payload.setKey(hpayload.getKey());
+    	payload.setValue(hpayload.getValue());
+    	return payload;
+    }
+    /**
+     * Convert event payload business domain object to entity object
+     * @param payload business domain object to convert.
+     * @return entity object.
+     */
+    public HEventPayload toEntity(EventPayload payload) {
+    	HEventPayload hpayload = new HEventPayload();
+    	hpayload.setEventID((payload.getEvent() == null)? 0 : payload.getEvent().getEventID());
+    	hpayload.setKey(payload.getKey());
+    	hpayload.setValue(payload.getValue());
+    	return hpayload;
+    }  
+    
+    /**
+     * Convert event data entity object to business domain object.
+     * @param hdata entity object to convert.
+     * @param event event business domain correlation owner.
+     * @return domain object.
+     */
+    public EventData toBusinessObject(HEventData hdata, Event event) {    	
+    	EventData dataElement = new EventData();  	
+    	dataElement.setEvent(event);
+    	dataElement.setKey(hdata.getKey());
+    	dataElement.setValue(hdata.getValue());
+    	return dataElement;
+    }
+    /**
+     * Convert event data business domain object to entity object.
+     * @param dataElement business domain object to convert.
+     * @return entity object.
+     */
+    public HEventData toEntity(EventData dataElement) {
+    	HEventData hdata = new HEventData();
+    	hdata.setEventID((dataElement.getEvent() == null)? 0 : dataElement.getEvent().getEventID());
+    	hdata.setKey(dataElement.getKey());
+    	hdata.setValue(dataElement.getValue());
+    	return hdata;
     }  
 }

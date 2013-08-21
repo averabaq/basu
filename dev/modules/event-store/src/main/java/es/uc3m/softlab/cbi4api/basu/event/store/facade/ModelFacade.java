@@ -7,6 +7,7 @@ package es.uc3m.softlab.cbi4api.basu.event.store.facade;
 
 import es.uc3m.softlab.cbi4api.basu.event.store.StaticResources;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.Model;
+import es.uc3m.softlab.cbi4api.basu.event.store.domain.ModelType;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.Source;
 
 import java.util.List;
@@ -36,16 +37,17 @@ public interface ModelFacade {
 	/**
 	 * Gets the {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Model} entity 
 	 * object associated to the 
-	 * ({@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Model#getModelSrcId()} and
-	 *  {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Model#getSource()}) 
+	 * ({@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Model#getModelSrcId()},
+	 *  {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Model#getSource()} and
+	 *  {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Model#getType()})
 	 * as unique keys.
 	 * 
-	 * @param modelId model identifier given at the original source.
+	 * @param modelSrcId model source identifier given at the original source.
 	 * @param source model's source.
 	 * @return {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Model} entity object associated.
 	 * @throws ModelException if any model error occurred.
 	 */
-    public Model getModel(String modelId, Source source) throws ModelException;
+    public Model getModel(String modelSrcId, Source source, ModelType type) throws ModelException;
 	/**
 	 * Gets all {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Model} entity 
 	 * objects defined at the data base.

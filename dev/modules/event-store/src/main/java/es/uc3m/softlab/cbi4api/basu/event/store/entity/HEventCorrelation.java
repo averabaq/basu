@@ -70,7 +70,7 @@ public class HEventCorrelation implements Comparable<HEventCorrelation>, Seriali
 	 * @return the {@link #value} property.
 	 */
 	@Id
-	@Column(name="value", columnDefinition="text", nullable=false, updatable=false)
+	@Column(name="value", nullable=false, updatable=false)
 	public String getValue() {
 		return value;
 	}

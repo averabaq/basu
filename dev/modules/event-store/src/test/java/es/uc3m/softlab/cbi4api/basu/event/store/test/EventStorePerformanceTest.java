@@ -6,12 +6,13 @@
 package es.uc3m.softlab.cbi4api.basu.event.store.test;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.ActivityInstance;
-import es.uc3m.softlab.cbi4api.basu.event.store.domain.ActivityModel;
+import es.uc3m.softlab.cbi4api.basu.event.store.domain.Event;
+import es.uc3m.softlab.cbi4api.basu.event.store.domain.Model;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.ModelType;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessInstance;
-import es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessModel;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.Source;
 import es.uc3m.softlab.cbi4api.basu.event.store.facade.ActivityInstanceFacade;
 import es.uc3m.softlab.cbi4api.basu.event.store.facade.EventException;
@@ -23,7 +24,6 @@ import es.uc3m.softlab.cbi4api.basu.event.store.facade.ProcessInstanceFacade;
 import es.uc3m.softlab.cbi4api.basu.event.store.facade.SourceException;
 import es.uc3m.softlab.cbi4api.basu.event.store.facade.SourceFacade;
 
-import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,22 +33,21 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.transaction.TransactionConfiguration;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"classpath:applicationContext-test.xml"})
 @TransactionConfiguration(transactionManager = "transactionManager", defaultRollback = false)
 @Transactional(propagation=Propagation.REQUIRES_NEW)
 public class EventStorePerformanceTest extends AbstractShowcaseTest {
-	/** Log for tracing */
-    private static final Logger logger = Logger.getLogger(EventStoreTest.class);
     /** concurrency degree */
 	private static final int CONCURRENCY_DEGREE = 4;
     /** subprocess span level */
 	private static final int SUBPROCESS_SPAN_LEVEL = 7;	
 	/** number of events per instance */
-	private static final int EVENTS_PER_INSTANCE = 10;
+	private static final int EVENTS_PER_INSTANCE = 1;
 	/** Number of event records to store in this test */
-	private static final int TEST_CASE_EVENT_NUM = 1;
+	private static final int TEST_CASE_EVENT_NUM = 10;
 	/** Event session facade */
 	@Autowired private EventFacade eventFacade;
 	/** Source session facade */
@@ -74,40 +73,36 @@ public class EventStorePerformanceTest extends AbstractShowcaseTest {
 		for (int i = 0; i < CONCURRENCY_DEGREE; i++) {
 			Source source = new Source();
 			source.setId("ApacheODE(" + i + ")-192.168.1.1" + i);
-			source.setName("ApacheODE");
+			source.setName("ApacheODE[" + i + "]");
 			source.setDescription("BPEL engine");
 			source.setInetAddress("192.168.1.1" + i);
 			source.setPort(8080);
 			sources.add(source);
-			//sourceFacade.saveSource(source);			
+			sourceFacade.saveSource(source);			
 		}
 		long modelId = (long)(Math.random() * 1000);
-		//logger.fatal("Model " + modelId);
 		
-		/* Simulation of one global process per source */
-		ArrayList<ProcessModel> processModels = new ArrayList<ProcessModel>();
+		// Simulation of one global process per source 
+		ArrayList<Model> processModels = new ArrayList<Model>();
 		for (int i = 0; i < CONCURRENCY_DEGREE; i++) {
-			ProcessModel processModel = new ProcessModel();	
+			Model processModel = new Model();	
 			processModel.setModelSrcId(String.valueOf(++modelId));
 			processModel.setName("Process model [" + String.format("%03d", Long.valueOf(processModel.getModelSrcId())) + "]");		
 			processModel.setType(ModelType.PROCESS);
 			processModel.setSource(sources.get(i));
 			processModels.add(processModel);
-			//logger.fatal("Creating process model " + processModel.getModelSrcId());
 			//modelFacade.saveModel(processModel);
 		}
-		//logger.fatal("model for activity " + modelId);
-		/* Simulation of one global process per source */
-		ArrayList<ActivityModel> activityModels = new ArrayList<ActivityModel>();
+		// Simulation of one global process per source 
+		ArrayList<Model> activityModels = new ArrayList<Model>();
 		for (int i = 0; i < CONCURRENCY_DEGREE; i++) {
 			for (int j = 0; j < SUBPROCESS_SPAN_LEVEL; j++) {
-				ActivityModel activityModel = new ActivityModel();
+				Model activityModel = new Model();
 				activityModel.setModelSrcId(String.valueOf(++modelId));
 				activityModel.setName("Activity model [" + String.format("%03d", Long.valueOf(activityModel.getModelSrcId())) + "]");				
 				activityModel.setType(ModelType.ACTIVITY);
 				activityModel.setSource(sources.get(i));
 				activityModels.add(activityModel);
-				//logger.fatal("Creating activity model " + activityModel.getModelSrcId());
 				//modelFacade.saveModel(activityModel);
 			}
 		}
@@ -119,22 +114,18 @@ public class EventStorePerformanceTest extends AbstractShowcaseTest {
 				ProcessInstance processInstance = new ProcessInstance();
 				processInstance.setInstanceSrcId(String.valueOf(pInstanceId++));
 				processInstance.setModel(processModels.get(j));
-				//logger.fatal("Assignin process model: " + processInstance.getModel().getModelSrcId());
 				processInstance.setCorrelatorId((long)(Math.random() * 10000));
-				//logger.fatal("Assignin process instance: " + String.format("%05d", Long.valueOf(processInstance.getInstanceSrcId())));
 				processInstance.setName("Process instance [" + String.format("%05d", Long.valueOf(processInstance.getInstanceSrcId())) + "]");
 				for (int k = 0; k < SUBPROCESS_SPAN_LEVEL; k++) {
 					ActivityInstance activityInstance = new ActivityInstance();
 					activityInstance.setInstanceSrcId(String.valueOf(aInstanceId++));
 					activityInstance.setModel(activityModels.get((j * SUBPROCESS_SPAN_LEVEL) + k));	
-					//logger.fatal("Assignin activity instance: " + String.format("%05d", Long.valueOf(activityInstance.getInstanceSrcId())));
 					activityInstance.setName("Activity instance [" + String.format("%05d", Long.valueOf(activityInstance.getInstanceSrcId())) + "]");
-					/*for (int l = 0; l < EVENTS_PER_INSTANCE; l++) {			
+					for (int l = 0; l < EVENTS_PER_INSTANCE; l++) {			
 						(new EventGenerator(eventFacade, processInstance, activityInstance)).run();		
-					}*/
+					}
 				}
 			}
-
 		}
 	}
 	/**
@@ -142,36 +133,21 @@ public class EventStorePerformanceTest extends AbstractShowcaseTest {
 	 * @throws EventException if any event access error occurred.
 	 */
 	@Test
-	@Rollback(false)
-	public void testFindEvents() throws EventException {	
-		logger.fatal("=======================================================");
-		/*try {
+	public void testFindEvents() throws EventException {			
 		List<Source> sources = sourceFacade.getAll();
-		for (Source source : sources) {
-			logger.fatal(source);
-		}			
-		List<Event> events = eventFacade.getAll();
-		for (Event event : events) {
-			logger.fatal(event);
-		}
+		Assert.notEmpty(sources);
 		List<ProcessInstance> processInstances = processInstanceFacade.getAll();
-		for (ProcessInstance instance : processInstances) {
-			logger.fatal(instance);
-		}
+		Assert.notEmpty(processInstances);
 		List<ActivityInstance> activityInstances = activityInstanceFacade.getAll();
-		for (ActivityInstance instance : activityInstances) {
-			logger.fatal(instance);
-		}				
+		Assert.notEmpty(activityInstances);
 		List<Model> models = modelFacade.getAll();
-		for (Model model : models) {
-			logger.fatal(model);
-		}		
-		} catch(Exception ex) {
-			logger.error(ex.fillInStackTrace());
-			ex.printStackTrace();
-		} finally {
-			logger.fatal("=======================================================");
-		}*/
-		
+		Assert.notEmpty(models);
+		List<Event> events = eventFacade.getAllFromProcessInstId(processInstances.get(processInstances.size()-1).getId());
+		Assert.notEmpty(events);
+		for (Event event : events) {
+			Assert.notEmpty(event.getCorrelations()); 
+			Assert.notEmpty(event.getPayload()); 
+			Assert.notEmpty(event.getDataElement()); 				
+		}			
 	}
 }

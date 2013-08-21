@@ -8,10 +8,9 @@ package es.uc3m.softlab.cbi4api.basu.event.store.dao;
 import es.uc3m.softlab.cbi4api.basu.event.store.StaticResources;
 import es.uc3m.softlab.cbi4api.basu.event.store.Stats;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.Model;
+import es.uc3m.softlab.cbi4api.basu.event.store.domain.ModelType;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.Source;
 import es.uc3m.softlab.cbi4api.basu.event.store.entity.HModel;
-import es.uc3m.softlab.cbi4api.basu.event.store.entity.HProcessInstance;
-import es.uc3m.softlab.cbi4api.basu.event.store.entity.HSequenceGenerator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -108,16 +107,18 @@ public class ModelDAOImpl implements ModelDAO {
 	 *  {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Model#getSource()}) 
 	 * as unique keys.
 	 * 
-	 * @param modelId model identifier given at the original source.
+	 * @param modelSrcId model source identifier given at the original source.
 	 * @param source model's source.
+	 * @param type model's type.
 	 * @return {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Model} entity object associated.
 	 * @throws IllegalArgumentException if an illegal argument error occurred.
 	 */
-	synchronized public Model findBySourceData(String modelId, Source source) throws IllegalArgumentException {
-    	logger.debug("Retrieving model with source data as pairs of (" + modelId + ", " + source + ")...");
-		Query query = entityManager.createQuery("select m from " + HModel.class.getName() + " m where m.modelSrcId = :modelSrcId and m.source = :sourceId");
-		query.setParameter("modelSrcId", modelId);
+	public Model findBySourceData(String modelSrcId, Source source, ModelType type) throws IllegalArgumentException {
+    	logger.debug("Retrieving model with source data as set of (" + modelSrcId + ", " + source + ", " + type + ")...");
+		Query query = entityManager.createQuery("select m from " + HModel.class.getName() + " m where m.modelSrcId = :modelSrcId and m.source = :sourceId and m.type=:type");
+		query.setParameter("modelSrcId", modelSrcId);
 		query.setParameter("sourceId", source.getId());
+		query.setParameter("type", type.name());
 		HModel hmodel = null;		
 		try {			
 			long ini = System.nanoTime();
@@ -126,7 +127,7 @@ public class ModelDAOImpl implements ModelDAO {
 			stats.writeStat(Stats.Operation.READ_BY_SOURCE_DATA, hmodel, ini, end);
 			logger.debug("Model " + hmodel + " retrieved successfully.");
 		} catch(NoResultException nrex) {
-			logger.debug("Model with source data as pairs of (" + modelId + ", " + source + ") does not exist.");
+			logger.debug("Model with source data as set of (" + modelSrcId + ", " + source + ", " + type + ") does not exist.");
 			return null;
 		} catch(NonUniqueResultException nurex) {
 			logger.debug(nurex.fillInStackTrace());
@@ -197,40 +198,25 @@ public class ModelDAOImpl implements ModelDAO {
 			}
 		}
 		if (model.getModelSrcId() != null) {
-			Model _model = findBySourceData(model.getModelSrcId(), model.getSource());
+			Model _model = findBySourceData(model.getModelSrcId(), model.getSource(), ModelType.ACTIVITY);
 			if (_model != null) {
-				logger.debug("Model " + model.getId() + " cannot be persisted because it already exists.");
+				// update the model object
+				model = _model;
+				logger.debug("Model " + model.getModelSrcId() + " cannot be persisted because it already exists.");
 				return;
 			}
 		}
 		logger.debug("Model " + model.getId() + " does not exists. Saving model...");
 		/* TODO: check source */
-		
-		long ini = System.nanoTime();
-		HSequenceGenerator hsequenceGenerator = entityManager.find(HSequenceGenerator.class, HSequenceGenerator.Type.MODEL);
-		long end = System.nanoTime();
-		stats.writeStat(Stats.Operation.READ_BY_ID, hsequenceGenerator, ini, end);
-		if (hsequenceGenerator == null) {
-			logger.debug("There are not models defined at the datastore.");	
-			hsequenceGenerator = new HSequenceGenerator(HSequenceGenerator.Type.MODEL, 0L);
-			ini = System.nanoTime();
-			entityManager.persist(hsequenceGenerator);
-			end = System.nanoTime();
-			stats.writeStat(Stats.Operation.WRITE, hsequenceGenerator, ini, end);
-		}			
+			
 		HModel hmodel = BusinessObjectAssembler.getInstance().toEntity(model);
-		// update sequence
-		hmodel.setId(hsequenceGenerator.getNextSeq());
-		ini = System.nanoTime();
-		entityManager.merge(hsequenceGenerator);
-		end = System.nanoTime();
-		stats.writeStat(Stats.Operation.UPDATE, hsequenceGenerator, ini, end);
-		//updates the model back with the new identifier
-		model.setId(hmodel.getId());
-		ini = System.nanoTime();
+		long ini = System.nanoTime();
 		entityManager.persist(hmodel);	
-		end = System.nanoTime();
+		long end = System.nanoTime();
 		stats.writeStat(Stats.Operation.WRITE, hmodel, ini, end);
+		//updates the model back with the new identifier
+		entityManager.refresh(hmodel);
+		model.setId(hmodel.getId());
 		logger.debug("Model " + model + " saved successfully.");
-	}	
+	}		
 }

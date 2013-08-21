@@ -10,6 +10,8 @@ import es.uc3m.softlab.cbi4api.basu.event.store.StaticResources;
 import java.io.Serializable;
 
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.PersistenceUnit;
 import javax.persistence.Table;
@@ -58,7 +60,7 @@ public class HModel implements Serializable {
 	 * @return the {@link #id} property.
 	 */
 	@Id
-	//@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@GeneratedValue(strategy=GenerationType.AUTO)
 	public long getId() {
 		return id;
 	}
@@ -66,8 +68,6 @@ public class HModel implements Serializable {
 	 * Sets the {@link #id} property.
 	 * @param id the {@link #id} property to set
 	 */
-	@Id
-	//@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="model_sequence")
 	public void setId(long id) {
 		this.id = id;
 	}
@@ -135,7 +135,7 @@ public class HModel implements Serializable {
 	 * Gets the {@link #description} property.
 	 * @return the {@link #description} property.
 	 */
-	@Column(name="description", columnDefinition="text")
+	@Column(name="description")
 	public String getDescription() {
 		return description;
 	}

@@ -5,10 +5,10 @@
  */
 package es.uc3m.softlab.cbi4api.basu.event.store.dao;
 
+import java.util.List;
+
 import es.uc3m.softlab.cbi4api.basu.event.store.StaticResources;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.Event;
-
-import java.util.List;
 
 import javax.persistence.TransactionRequiredException;
 
@@ -27,13 +27,12 @@ public interface EventDAO {
 	/**
 	 * Find all {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Event} entity 
 	 * objects.
-	 * 
 	 * @return all {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Event} entity 
 	 * objects.
 	 * @throws IllegalArgumentException if an illegal argument error occurred.
-	 */    
+	 */
     public List<Event> findAll() throws IllegalArgumentException;
-    /**
+	/**
 	 * Find all {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Event} entity 
 	 * objects of a determined process instance 
 	 * ({@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Event#getProcessInstanceID()}).
@@ -44,7 +43,7 @@ public interface EventDAO {
 	 * objects of a determined process instance identifier.
 	 * @throws IllegalArgumentException if an illegal argument error occurred.
 	 */
-    public List<Event> findAllByProcessInstId(String processInstId) throws IllegalArgumentException;
+    public List<Event> findAllByProcessInstId(long processInstId) throws IllegalArgumentException;
 	/**
 	 * Find the {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Event} entity 
 	 * object associated to the  
@@ -95,7 +94,7 @@ public interface EventDAO {
 	 * @param event {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Event} to load the event payload on.
 	 * @throws IllegalArgumentException if an illegal argument error occurred.
 	 */	
-	public void loadPayload(Event event) throws IllegalArgumentException;	
+	public void loadPayload(Event event) throws IllegalArgumentException;
 	/**
 	 * Load the {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Event#getCorrelations()} associated
 	 * from the data base. This is needed due to the fetch property is set to lazy, and the 
@@ -105,7 +104,7 @@ public interface EventDAO {
 	 * @param event {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Event} to load the event correlation data on.
 	 * @throws IllegalArgumentException if an illegal argument error occurred.
 	 */	
-	public void loadCorrelation(Event event) throws IllegalArgumentException;	
+	public void loadCorrelation(Event event) throws IllegalArgumentException;
 	/**
 	 * Load the {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Event#getData()} associated
 	 * from the data base. This is needed due to the fetch property is set to lazy, and the 

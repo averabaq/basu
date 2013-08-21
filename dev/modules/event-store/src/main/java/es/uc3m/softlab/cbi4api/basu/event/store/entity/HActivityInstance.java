@@ -10,11 +10,10 @@ import es.uc3m.softlab.cbi4api.basu.event.store.StaticResources;
 import java.io.Serializable;
 
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
 import javax.persistence.PersistenceUnit;
-import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Column;
 
@@ -37,7 +36,6 @@ import javax.persistence.Column;
 @Entity(name="event-store.ActivityInstance")
 @Table(name="activity_instance", schema="event_store")
 @PersistenceUnit(name=StaticResources.PERSISTENCE_NAME_EVENT_STORE, unitName=StaticResources.PERSISTENCE_UNIT_NAME_EVENT_STORE)
-@SequenceGenerator(name="activity_instance_sequence", sequenceName="activity_instance_id_seq")
 /*@NamedQueries({
 	@NamedQuery(name="activityFromProcessInstanceAndActivityName", 
 		        query="select e.activityInstance from event-store.HEvent e where e.processInstance = :process and e.activityInstance.name = :activityName")
@@ -56,7 +54,7 @@ public class HActivityInstance implements Serializable {
 	/** Activity instance identifier at source */
 	private String instanceSrcId;
 	/** Activity instance's parent */
-	private long parent;
+	private Long parent;
 
 	/**
 	 * Creates a new object with null property values. 	 
@@ -68,7 +66,7 @@ public class HActivityInstance implements Serializable {
 	 * @return the {@link #id} property.
 	 */
 	@Id
-	//@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@GeneratedValue(strategy=GenerationType.AUTO)
 	public Long getId() {
 		return id;
 	}
@@ -76,8 +74,6 @@ public class HActivityInstance implements Serializable {
 	 * Sets the {@link #id} property.
 	 * @param id the {@link #id} property to set
 	 */
-	@Id
-	//@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="activity_instance_sequence")
 	public void setId(Long id) {
 		this.id = id;
 	}
@@ -100,7 +96,7 @@ public class HActivityInstance implements Serializable {
 	 * Gets the {@link #description} property.
 	 * @return the {@link #description} property.
 	 */
-	@Column(name="description", columnDefinition="text", updatable=false)
+	@Column(name="description", updatable=false)
 	public String getDescription() {
 		return description;
 	}
@@ -146,14 +142,14 @@ public class HActivityInstance implements Serializable {
 	 * @return the {@link #parent} property.
 	 */
 	@Column(name="parent", nullable=true, updatable=false)
-	public long getParent() {
+	public Long getParent() {
 		return parent;
 	}
 	/**
 	 * Sets the {@link #parent} property.
 	 * @param parent the {@link #parent} property to set.
 	 */
-	public void setParent(long parent) {
+	public void setParent(Long parent) {
 		this.parent = parent;
 	}			
 	/**

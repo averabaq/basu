@@ -8,6 +8,7 @@ package es.uc3m.softlab.cbi4api.basu.event.store.facade;
 import es.uc3m.softlab.cbi4api.basu.event.store.StaticResources;
 import es.uc3m.softlab.cbi4api.basu.event.store.dao.ModelDAO;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.Model;
+import es.uc3m.softlab.cbi4api.basu.event.store.domain.ModelType;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.Source;
 
 import java.util.List;
@@ -59,25 +60,28 @@ public class ModelFacadeImpl implements ModelFacade {
 	/**
 	 * Gets the {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Model} entity 
 	 * object associated to the 
-	 * ({@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Model#getModelSrcId()} and
-	 *  {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Model#getSource()}) 
+	 * ({@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Model#getModelSrcId()},
+	 *  {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Model#getSource()} and
+	 *  {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Model#getType()})
 	 * as unique keys.
 	 * 
-	 * @param modelId model identifier given at the original source.
+	 * @param modelSrcId model source identifier given at the original source.
 	 * @param source model's source.
 	 * @return {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Model} entity object associated.
 	 * @throws ModelException if any model error occurred.
 	 */
-    public Model getModel(String modelId, Source source) throws ModelException {
-		logger.debug("Retrieving model with source data as pairs of (" + modelId + ", " + source + ")...");
-		if (modelId == null) 
+    public Model getModel(String modelSrcId, Source source, ModelType type) throws ModelException {
+		logger.debug("Retrieving model with source data as set of (" + modelSrcId + ", " + source + ", " + type + ")...");
+		if (modelSrcId == null) 
 			throw new ModelException(StaticResources.WARN_GET_MODEL_WITHOUT_MODEL_SRC_ID,"Cannot retrieve model if the source model id is not properly provided.");
 		if (source == null) 
 			throw new ModelException(StaticResources.WARN_GET_MODEL_WITHOUT_SOURCE,"Cannot retrieve model if the source is not properly provided.");
+		if (type == null) 
+			throw new ModelException(StaticResources.WARN_GET_MODEL_UNKNOWN_TYPE,"Cannot retrieve model if the model type is not properly provided.");
 
-		Model model = modelDAO.findBySourceData(modelId, source);
+		Model model = modelDAO.findBySourceData(modelSrcId, source, type);
 		if (model == null) {
-			logger.debug("Cannot get model. Model with source data as pairs of (" + modelId + ", " + source + ") does not exist.");
+			logger.debug("Cannot get model. Model with source data as set of (" + modelSrcId + ", " + source + ", " + type + ") does not exist.");
 		}
 		logger.debug("Model " + model + " retrieved successfully.");
 		return model;
@@ -121,7 +125,7 @@ public class ModelFacadeImpl implements ModelFacade {
 			logger.warn("Cannot save model. Trying to save a model without a source.");
 			throw new ModelException(StaticResources.WARN_SAVE_MODEL_WITHOUT_SOURCE, "Cannot save model. Trying to save a model without a source.");
 		}
-		Model _model = modelDAO.findBySourceData(model.getModelSrcId(), model.getSource());
+		Model _model = modelDAO.findBySourceData(model.getModelSrcId(), model.getSource(), model.getType());
 		if (_model != null) {
 			logger.warn("Cannot save model. Model with source data as pairs of (" + model.getModelSrcId() + ", " + model.getSource() + ") already exists.");
 			throw new ModelException(StaticResources.WARN_SAVE_MODEL_WITH_NAME_ALREADY_EXISTS, "Cannot save model. Model with source data as pairs of (" + model.getModelSrcId() + ", " + model.getSource() + ") already exists.");

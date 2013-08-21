@@ -8,9 +8,8 @@ package es.uc3m.softlab.cbi4api.basu.event.store.facade;
 import es.uc3m.softlab.cbi4api.basu.event.store.StaticResources;
 import es.uc3m.softlab.cbi4api.basu.event.store.dao.ActivityInstanceDAO;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.ActivityInstance;
-import es.uc3m.softlab.cbi4api.basu.event.store.domain.ActivityModel;
-import es.uc3m.softlab.cbi4api.basu.event.store.domain.EventCorrelation;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.Model;
+import es.uc3m.softlab.cbi4api.basu.event.store.domain.EventCorrelation;
 
 import java.util.List;
 import java.util.Set;
@@ -63,7 +62,7 @@ public class ActivityInstanceFacadeImpl implements ActivityInstanceFacade {
 	 * Gets the {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ActivityInstance} entity 
 	 * object associated to the  
 	 * ({@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ActivityInstance#getInstanceSrcId()} and
-	 *  {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ActivityModel#getSource()} retrieve from 
+	 *  {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Model#getSource()} retrieve from 
 	 *  {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ActivityInstance#getModel()}) 
 	 * as unique keys.
 	 * 
@@ -89,16 +88,16 @@ public class ActivityInstanceFacadeImpl implements ActivityInstanceFacade {
 	 * Gets the {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ActivityInstance} entity 
 	 * object associated to the correlation information provided by a determined list of
 	 * ({@link es.uc3m.softlab.cbi4api.basu.event.store.domain.EventCorrelation} objects, 
-	 * a determined {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ActivityModel}
+	 * a determined {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Model}
 	 * and a determined ({@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Source} given by
-	 * the {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ActivityModel#getSource()}) property.
+	 * the {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Model#getSource()}) property.
 	 * 
 	 * @param correlation list of event correlation objects associated to the activity instance that is trying to be found.
 	 * @param model activity model associated to the activity instance that is trying to be found.
 	 * @return {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ActivityInstance} entity object associated.
 	 * @throws ActivityInstanceException if any activity instance error occurred.
 	 */
-    public ActivityInstance getActivityInstance(Set<EventCorrelation> correlation, ActivityModel model) throws ActivityInstanceException {
+    public ActivityInstance getActivityInstance(Set<EventCorrelation> correlation, Model model) throws ActivityInstanceException {
 		logger.debug("Retrieving activity instance associted to a determined correlation data from the model " + model + " and source associated...");
 		if (correlation == null || correlation.isEmpty()) 
 			throw new ActivityInstanceException(StaticResources.WARN_GET_ACTIVITY_INSTANCE_WITHOUT_CORRELATION_DATA,"Cannot retrieve activity instance if the correlation data is not properly provided.");		

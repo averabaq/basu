@@ -1,13 +1,13 @@
 /* 
- * $Id: ProcessModelController.java,v 1.4 2013-01-26 21:47:15 averab Exp $
+ * $Id: ModelController.java,v 1.4 2013-01-26 21:47:15 averab Exp $
  *
  * @copyright Universidad Carlos III de Madrid. proprietary/confidential. Use is subject to license terms.
  */
 package es.uc3m.softlab.cbi4api.basu.web.mvc.controller.event.store;
 
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessInstance;
-import es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessModel;
-import es.uc3m.softlab.cbi4api.basu.event.store.facade.ProcessModelFacade;
+import es.uc3m.softlab.cbi4api.basu.event.store.domain.Model;
+import es.uc3m.softlab.cbi4api.basu.event.store.facade.ModelFacade;
 import es.uc3m.softlab.cbi4api.basu.web.StaticResources;
 import es.uc3m.softlab.cbi4api.basu.web.mvc.controller.ControllerManager;
 import es.uc3m.softlab.cbi4api.basu.web.mvc.view.event.store.LazyProcessInstancesDataModel;
@@ -45,27 +45,27 @@ import org.springframework.stereotype.Controller;
  */
 @Scope(ViewScope.SCOPE_NAME)
 @Controller(value=StaticResources.MANAGED_BEAN_PROCESS_MODEL_CONTROLLER)
-public class ProcessModelController implements Serializable {
+public class ModelController implements Serializable {
 	/** Serial Version UID */
 	private static final long serialVersionUID = 532158492149587309L;
 	/** Logger for tracing. */
-	private static final Logger logger = Logger.getLogger(ProcessModelController.class);
+	private static final Logger logger = Logger.getLogger(ModelController.class);
 	/** Controller manager for common stuff management */
 	private ControllerManager manager = ControllerManager.getInstance();
 	/** Lazy data model for partial loading of process instances */
 	private LazyDataModel<ProcessInstance> lazyModel;
 	/** Process model selected */
-	private ProcessModel selectedModel;
+	private Model selectedModel;
 	/** Process models */
-	private List<ProcessModel> models;
+	private List<Model> models;
 	/** Process model facade session bean */
-	@Autowired private ProcessModelFacade processModelFacade;
+	@Autowired private ModelFacade processModelFacade;
 
 	/**
 	 * Creates a new object with a default values for the properties passed by
 	 * arguments.
 	 */
-	public ProcessModelController() {
+	public ModelController() {
 		lazyModel = new LazyProcessInstancesDataModel(); 
 	}
 	/**
@@ -73,7 +73,7 @@ public class ProcessModelController implements Serializable {
 	 */
 	@PostConstruct
 	public void init() {
-		selectedModel = new ProcessModel();
+		selectedModel = new Model();
 		refreshModelList();		
 	}
 	/**
@@ -94,28 +94,28 @@ public class ProcessModelController implements Serializable {
 	 * Gets the {@link #selectedModel} property.
 	 * @return the {@link #selectedModel} property.
 	 */
-	public ProcessModel getSelectedModel() {
+	public Model getSelectedModel() {
 		return selectedModel;
 	}
 	/**
 	 * Sets the {@link #selectedModel} property.
 	 * @param selectedModel the {@link #selectedModel} property to set.
 	 */
-	public void setSelectedModel(ProcessModel selectedModel) {
+	public void setSelectedModel(Model selectedModel) {
 		this.selectedModel = selectedModel;
 	}
 	/**
 	 * Gets the {@link #models} property.
 	 * @return the {@link #models} property.
 	 */
-	public List<ProcessModel> getModels() {
+	public List<Model> getModels() {
 		return models;
 	}
 	/**
 	 * Sets the {@link #models} property.
 	 * @param models the {@link #models} property to set.
 	 */
-	public void setModels(List<ProcessModel> models) {
+	public void setModels(List<Model> models) {
 		this.models = models;
 	}
 	/**
@@ -141,20 +141,5 @@ public class ProcessModelController implements Serializable {
 			logger.error(ex.fillInStackTrace());
 			manager.errorSys("modelsTableForm", ex.getLocalizedMessage(), StaticResources.STRING_NULL);
 		}
-	}
-	/**
-	 * Loads the process instance table information associated to the {@link #selectedModel}.
-	 */
-	public String loadInstances() {
-		try {	
-			logger.info("User is trying to load the process instances of process model " + selectedModel + "...");
-			processModelFacade.loadInstances(selectedModel);
-			((LazyProcessInstancesDataModel)lazyModel).setDataSource(selectedModel.getInstanceList());
-			logger.info("User loaded the process instances successfully");
-		} catch (Exception ex) {
-			logger.error(ex.fillInStackTrace());
-			manager.errorSys("modelsTableForm", ex.getLocalizedMessage(), StaticResources.STRING_NULL);
-		}
-		return null;
-	}		
+	}	
 }

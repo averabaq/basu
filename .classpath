@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="dev/modules/event-store/src/test/java"/>
+	<classpathentry kind="src" path="dev/applications/basu/src/main/java"/>
 	<classpathentry kind="src" path="dev/modules/ode-event-publisher/src/main/java"/>
 	<classpathentry kind="src" path="dev/modules/xes-event-publisher/src/main/java"/>
 	<classpathentry kind="src" path="dev/modules/xes-event-publisher/src/test/java"/>

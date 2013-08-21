@@ -29,11 +29,15 @@
 	    <!-- 
 	 	<module>modules/mxml-event-publisher</module>
 	 	 -->
-		<module>modules/xes-event-publisher</module>		 
-		<module>modules/ode-event-publisher</module>		
+		<module>modules/xes-event-publisher</module>	
+		<!-- 	 
+		<module>modules/ode-event-publisher</module>
+		 -->		
 		<module>modules/event-subscriber</module>
 		<module>modules/event-store</module>
+		<!-- 
 		<module>applications/basu-ode</module>
+		 -->
 		<module>applications/basu</module>
 	</modules>	
 	<scm>		

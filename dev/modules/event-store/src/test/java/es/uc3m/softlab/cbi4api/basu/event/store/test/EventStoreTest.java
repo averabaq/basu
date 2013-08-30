@@ -71,7 +71,7 @@ public class EventStoreTest extends AbstractShowcaseTest {
 	 */
 	@Test
 	@Rollback(false)
-	public void aTestSaveEvents() throws SourceException, ModelException, ProcessInstanceException, EventException {				
+	public void aTestSaveEvents() throws SourceException, ModelException, ProcessInstanceException, EventException {						
 		Source source = new Source();
 		source.setId("ApacheODE(1)-192.168.1.10");
 		source.setName("ApacheODE-10");
@@ -168,7 +168,7 @@ public class EventStoreTest extends AbstractShowcaseTest {
 	 * @throws EventException if any event access error occurred.
 	 */
 	@Test
-	public void bTestFindEvents() throws EventException {			
+	public void bTestFindEvents() throws EventException {	
 		List<Event> events = eventFacade.getAll();
 		Assert.notEmpty(events);
 		List<Source> sources = sourceFacade.getAll();
@@ -188,7 +188,7 @@ public class EventStoreTest extends AbstractShowcaseTest {
 	 * @throws ProcessInstanceException if any process instance error occurred. 
 	 * @throws ActivityInstanceException if any activity instance error occurred. 
 	 * @throws SourceException if any source error occurred. 
-	 */
+	 *
 	@Test
 	@Rollback(false)
 	public void cTestDeleteEvents() throws EventException, ModelException, ProcessInstanceException, ActivityInstanceException, SourceException {
@@ -226,5 +226,5 @@ public class EventStoreTest extends AbstractShowcaseTest {
 		}		
 		sources = sourceFacade.getAll();
 		Assert.state(sources.isEmpty());
-	}
+	}*/
 }

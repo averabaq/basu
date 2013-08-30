@@ -14,6 +14,7 @@ import es.uc3m.softlab.cbi4api.basu.event.store.domain.ModelType;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessInstance;
 import es.uc3m.softlab.cbi4api.basu.event.store.entity.HModel;
 import es.uc3m.softlab.cbi4api.basu.event.store.entity.HProcessInstance;
+import es.uc3m.softlab.cbi4api.basu.event.store.mapred.MapReduceCorrelation;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -122,10 +123,31 @@ public class ProcessInstanceDAOImpl implements ProcessInstanceDAO {
 		Model _model = modelDAO.findBySourceData(model.getModelSrcId(), model.getSource(), ModelType.PROCESS);
 		if (_model == null)
 			return null;
-		Query query = entityManager.createQuery("select p from " + HProcessInstance.class.getName() + " p where p.instanceSrcId = :sourceId and p.model = :modelId");
-		query.setParameter("sourceId", processId);
-		query.setParameter("modelId", _model.getId());		
-		HProcessInstance hinstance = null;
+    	//
+    	// JPQL parameters must be explicitly set as string values due to a bug  
+    	// found on DataNucleus implementation (3.2.0-release) for HBase when 
+    	// caching previous query parameters. 
+    	//
+    	StringBuffer sql = new StringBuffer("select p from [ENTITY] p ");
+    	sql.append("where p.instanceSrcId = :sourceId ");
+    	sql.append("and p.model = :modelId ");
+    	// set parameters
+    	String _sql = sql.toString();
+    	_sql = _sql.replace("[ENTITY]", HProcessInstance.class.getName());
+    	_sql = _sql.replace(":sourceId", "'" + processId + "'");
+    	_sql = _sql.replace(":modelId", "" + _model.getId() + "");
+    	// creates query without setting parameters
+    	Query query = entityManager.createQuery(_sql);
+    	
+    	//
+    	// the snippet code below does not work as the DataNucleus implementation (3.2.0-release) 
+    	// for HBase has a bug on cached parameters.
+    	//
+		// Query query = entityManager.createQuery("select p from " + HProcessInstance.class.getName() + " p where p.instanceSrcId = :sourceId and p.model = :modelId");
+		// query.setParameter("sourceId", processId);
+		// query.setParameter("modelId", _model.getId());			
+		
+    	HProcessInstance hinstance = null;
 		try {
 			long ini = System.nanoTime();
 			hinstance = (HProcessInstance)query.getSingleResult();
@@ -145,14 +167,14 @@ public class ProcessInstanceDAOImpl implements ProcessInstanceDAO {
 	}   
 	/**
 	 * Find the {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessInstance} entity 
-	 * object associated to the 
-	 * ({@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessInstance#getInstanceSrcId()} and
-	 *  {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Model#getSource()} retrieve from 
-	 *  {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessInstance#getModel()}) 
-	 * as unique keys.
+	 * object associated to the correlation information provided by a determined list of
+	 * ({@link es.uc3m.softlab.cbi4api.basu.event.store.domain.EventCorrelation} objects, 
+	 * a determined {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Model}
+	 * and a determined ({@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Source} given by
+	 * the {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Model#getSource()}) property. 
 	 * 
-	 * @param processId process instance identifier given at the original source.
-	 * @param model process instance model.
+	 * @param correlation list of event correlation objects associated to the process instance that is trying to be found.
+	 * @param model process model associated to the process instance that is trying to be found.
 	 * @return {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessInstance} entity object associated.
 	 * @throws IllegalArgumentException if an illegal argument error occurred.
 	 */
@@ -165,27 +187,28 @@ public class ProcessInstanceDAOImpl implements ProcessInstanceDAO {
 		Model _model = modelDAO.findById(model.getId());
 		if (_model == null) 
 			throw new IllegalArgumentException("The model with id " + model.getId() + " does not exist in the repository.");
-			
-		Query query = entityManager.createQuery("select p from " + HProcessInstance.class.getName() + " p where p.instanceSrcId = :sourceId and p.model = :modelId");
-		query.setParameter("sourceId", _model.getSource().getId());
+		
+		try {
+			MapReduceCorrelation.perform(model.getId(), correlation);
+		} catch (Exception ex) {
+			// TODO Auto-generated catch block
+			logger.error(ex.fillInStackTrace());
+			throw new IllegalArgumentException(ex);
+		}
+		/*
+		// nested-join algorithm implementation	
+		Query query = entityManager.createQuery("select p.id from " + HProcessInstance.class.getName() + " p where p.model = :modelId");
 		query.setParameter("modelId", _model.getId());		
 		HProcessInstance hinstance = null;
-		try {
-			long ini = System.nanoTime();
-			hinstance = (HProcessInstance)query.getSingleResult();
-			long end = System.nanoTime();
-			stats.writeStat(Stats.Operation.READ_BY_SOURCE_DATA, hinstance, ini, end);		
-			logger.debug("Process instance " + hinstance + " retrieved successfully.");
-		} catch(NoResultException nrex) {
-			logger.debug("Process instance with source data as pairs of (" + model + ", " + model.getSource() + ") does not exist.");
-			return null;
-		} catch(NonUniqueResultException nurex) {
-			logger.error(nurex.fillInStackTrace());
-			logger.fatal("This message should never appear. Inconsistence in the database has been found. There exists two or more different local process instances for a unique pair of source and source process instances.");			
-			throw new IllegalArgumentException("Inconsistence in the database has been found. There exists two or more different local process instances for a unique pair of source and source process instances.");
-		}
-		ProcessInstance instance = BusinessObjectAssembler.getInstance().toBusinessObject(hinstance);
-		return instance;
+		List<Long> instances = query.getResultList();
+		for (Long instance : instances) {
+			query = entityManager.createQuery("select e.id from " + HEvent.class.getName() + " e where e.processInstance = :processInstanceId and e.activeInstance is null");
+			query.setParameter("processInstanceId", instance);	
+			
+		}*/
+
+		//ProcessInstance instance = BusinessObjectAssembler.getInstance().toBusinessObject(hinstance);
+		return null;
 	}   
     
 	/**
@@ -218,6 +241,11 @@ public class ProcessInstanceDAOImpl implements ProcessInstanceDAO {
 		}
 		correlationClause.deleteCharAt(correlationClause.lastIndexOf(","));
 		correlationClause.append(")");
+    	//
+		// TODO: modify JPQL statement to set explicit parameters
+    	// the snippet code below does not work as the DataNucleus implementation (3.2.0-release) 
+    	// for HBase has a bug on cached parameters.
+    	//
 		Query query = entityManager.createQuery("select object(evt) from event-store.Event evt where evt.id in (select distinct e.id from Event e, EventCorrelation ec where e.id = ec.event and " + correlationClause.toString() + " and e.processInstance.model.name = :modelName and e.processInstance.model.source = :source group by e.id having count(e.id) = :correlationSize) order by evt.id desc");
 		query.setParameter("modelName", model.getName());
 		query.setParameter("source", model.getSource());
@@ -335,6 +363,11 @@ public class ProcessInstanceDAOImpl implements ProcessInstanceDAO {
 			return;
 		}
 		logger.debug("Loading events from the process instance " + instance + " ...");				
+    	//
+		// TODO: modify JPQL statement to set explicit parameters
+    	// the snippet code below does not work as the DataNucleus implementation (3.2.0-release) 
+    	// for HBase has a bug on cached parameters.
+    	//
 		Query query = entityManager.createQuery("select elements(i.events) from event-store.ProcessInstance as i where i.id = :id");
 		query.setParameter("id", instance.getId());
 		instance.setEvents(query.getResultList());		

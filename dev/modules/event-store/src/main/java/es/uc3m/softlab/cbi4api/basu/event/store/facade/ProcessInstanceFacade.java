@@ -53,16 +53,16 @@ public interface ProcessInstanceFacade {
 	 * Gets the {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessInstance} entity 
 	 * object associated to the correlation information provided by a determined list of
 	 * ({@link es.uc3m.softlab.cbi4api.basu.event.store.domain.EventCorrelation} objects, 
-	 * a determined {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Model}
-	 * and a determined ({@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Source} given by
+	 * a particular {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Model}
+	 * and a particular ({@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Source} given by
 	 * the {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Model#getSource()}) property.
 	 * 
-	 * @param correlation list of event correlation objects associated to the process instance that is trying to be found.
 	 * @param model process model associated to the process instance that is trying to be found.
+	 * @param correlation list of event correlation objects associated to the process instance that is trying to be found.
 	 * @return {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessInstance} entity object associated.
 	 * @throws ProcessInstanceException if any process instance error occurred.
 	 */
-    public ProcessInstance getProcessInstance(Set<EventCorrelation> correlation, Model model) throws ProcessInstanceException;    
+    public ProcessInstance getProcessInstance(Model model, Set<EventCorrelation> correlation) throws ProcessInstanceException;    
 	/**
 	 * Gets all {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessInstance} entity 
 	 * objects defined at the data base.

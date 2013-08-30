@@ -94,12 +94,12 @@ public class ProcessInstanceFacadeImpl implements ProcessInstanceFacade {
 	 * and a determined ({@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Source} given by
 	 * the {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Model#getSource()}) property.
 	 * 
-	 * @param correlation list of event correlation objects associated to the process instance that is trying to be found.
 	 * @param model process model associated to the process instance that is trying to be found.
+	 * @param correlation list of event correlation objects associated to the process instance that is trying to be found.
 	 * @return {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessInstance} entity object associated.
 	 * @throws ProcessInstanceException if any process instance error occurred.
 	 */
-    public ProcessInstance getProcessInstance(Set<EventCorrelation> correlation, Model model) throws ProcessInstanceException {
+    public ProcessInstance getProcessInstance(Model model, Set<EventCorrelation> correlation) throws ProcessInstanceException {
 		logger.debug("Retrieving process instance associted to a determined correlation data from the model " + model + " and source associated...");
 		if (correlation == null || correlation.isEmpty()) 
 			throw new ProcessInstanceException(StaticResources.WARN_GET_PROCESS_INSTANCE_WITHOUT_CORRELATION_DATA,"Cannot retrieve process instance if the correlation data is not properly provided.");		
@@ -108,7 +108,7 @@ public class ProcessInstanceFacadeImpl implements ProcessInstanceFacade {
 		if (model.getSource() == null) 
 			throw new ProcessInstanceException(StaticResources.WARN_GET_PROCESS_INSTANCE_WITHOUT_SOURCE,"Cannot retrieve process instance if the source is not properly provided.");
 		/* retrieve the process instance associated with the correlation information provided */
-		ProcessInstance instance = processInstanceDAO.findBySourceData(correlation, model);
+		ProcessInstance instance = processInstanceDAO.findByCorrelationData(model, correlation);
 		if (instance == null) {
 			logger.debug("Cannot get process instance. Process instance associted to a determined correlation data from the model " + model + " and associated source " + model.getSource() + " does not exist.");
 		}
@@ -239,43 +239,4 @@ public class ProcessInstanceFacadeImpl implements ProcessInstanceFacade {
 		logger.info("Correlation instance id for process model " + model + " retrieved successfully.");
 		return 1L;
 	}		
-	/**
-	 * Correlates all {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessInstance}
-	 * entity objects defined by attending to the information stored and represented by
-	 * the {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ModelMapping} objects.
-	 * 
-	 * <b>NOTE:</b> <i>This method is provided just for testing purposes on the event data test 
-	 * generation. It does not guarantee in any way that the process instances are properly
-	 * correlated since it assumes that instances arrive sequentially without any overlap
-	 * during execution time between them. In future works and further refinements, this 
-	 * method should be replaced by a suitable mechanism with capabilities to manage and 
-	 * ensuring the right order on correlation.</i>  
-	 * 
-	 * @throws ProcessInstanceException if any illegal data access or inconsistent process 
-	 * instance data error occurred during the correlation process.
-	 *
-	@SuppressWarnings("unchecked")
-	public void correlateAllProcessInstances() throws ProcessInstanceException {
-		logger.debug("Correlating all process instances defined...");
-		List<ProcessMapping> mappings = processMappingDAO.findAll();
-		// it correlates every process instance attending to the mapping information 
-		for (ProcessMapping mapping : mappings) {
-			// gets the mapping sequence 
-			Query query = entityManager.createNamedQuery("getProcessMappingSequence");
-			query.setParameter("mapping", mapping);
-			List<ModelMapping> modelMappings = query.getResultList();
-			for (ModelMapping modelMapping : modelMappings) {
-				query = entityManager.createNamedQuery("instancesOfModelOrderedByExecutionTimeline");
-				query.setParameter("model", modelMapping.getModel());
-				List<Long> ids = query.getResultList();
-				ListIterator<Long> iterator = ids.listIterator();													
-				while (iterator.hasNext()) {
-					Long id = iterator.next();
-					ProcessInstance instance = entityManager.find(ProcessInstance.class, id); 
-					instance.setCorrelatorId(Long.valueOf(iterator.nextIndex()));
-					processInstanceDAO.merge(instance);
-				}
-			}
-		}		
-	}	*/
 }

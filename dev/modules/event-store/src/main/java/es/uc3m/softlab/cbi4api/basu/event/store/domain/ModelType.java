@@ -15,11 +15,11 @@ public enum ModelType {
 	/**
 	 * Process model type.
 	 */
-	PROCESS("PROCESS"),
+	PROCESS("process"),
     /**
      * Activity model type.
      */
-    ACTIVITY("ACTIVITY");
+    ACTIVITY("activity");
 	/** enum constant value */
 	private final String value;
 	

@@ -6,10 +6,13 @@
 package es.uc3m.softlab.cbi4api.basu.event.store.test;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.ActivityInstance;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.Event;
+import es.uc3m.softlab.cbi4api.basu.event.store.domain.EventCorrelation;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.Model;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.ModelType;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessInstance;
@@ -107,6 +110,29 @@ public class EventStorePerformanceTest extends AbstractShowcaseTest {
 			}
 		}
 
+		/* Used for testing map-reduce jobs */
+		HashSet<EventCorrelation> dummyList = new HashSet<EventCorrelation>(); 
+		EventCorrelation cor = new EventCorrelation();
+		cor.setEvent(null);
+		cor.setKey("orderNo");
+		cor.setValue("0401");	
+		dummyList.add(cor);		
+		cor = new EventCorrelation();
+		cor.setEvent(null);
+		cor.setKey("CustomerNo");
+		cor.setValue("0641");				
+		dummyList.add(cor);	
+		cor = new EventCorrelation();
+		cor.setEvent(null);
+		cor.setKey("ItemNo");
+		cor.setValue("0125");				
+		dummyList.add(cor);	
+		
+		processModels.get(0).setId(686L);
+		processInstanceFacade.getProcessInstance(processModels.get(0), dummyList);
+
+		System.exit(0);
+		
 		long pInstanceId = (long)(Math.random() * 10000);
 		long aInstanceId = (long)(Math.random() * 10000);
 		for (int i = 0; i < TEST_CASE_EVENT_NUM; i++) {				
@@ -121,9 +147,15 @@ public class EventStorePerformanceTest extends AbstractShowcaseTest {
 					activityInstance.setInstanceSrcId(String.valueOf(aInstanceId++));
 					activityInstance.setModel(activityModels.get((j * SUBPROCESS_SPAN_LEVEL) + k));	
 					activityInstance.setName("Activity instance [" + String.format("%05d", Long.valueOf(activityInstance.getInstanceSrcId())) + "]");
-					for (int l = 0; l < EVENTS_PER_INSTANCE; l++) {			
-						(new EventGenerator(eventFacade, processInstance, activityInstance)).run();		
-					}
+					(new EventGenerator(eventFacade, processInstance, null)).run();
+					/*
+					for (int l = 0; l < EVENTS_PER_INSTANCE; l++) {		
+						if (((long)(Math.random() * 10)) == 1) {
+							(new EventGenerator(eventFacade, processInstance, activityInstance)).run();
+						} else {
+							(new EventGenerator(eventFacade, processInstance, null)).run();
+						}
+					}*/
 				}
 			}
 		}
@@ -133,7 +165,7 @@ public class EventStorePerformanceTest extends AbstractShowcaseTest {
 	 * @throws EventException if any event access error occurred.
 	 */
 	@Test
-	public void testFindEvents() throws EventException {			
+	public void testFindEvents() throws EventException {	
 		List<Source> sources = sourceFacade.getAll();
 		Assert.notEmpty(sources);
 		List<ProcessInstance> processInstances = processInstanceFacade.getAll();
@@ -148,6 +180,6 @@ public class EventStorePerformanceTest extends AbstractShowcaseTest {
 			Assert.notEmpty(event.getCorrelations()); 
 			Assert.notEmpty(event.getPayload()); 
 			Assert.notEmpty(event.getDataElement()); 				
-		}			
+		}		
 	}
 }

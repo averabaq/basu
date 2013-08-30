@@ -145,7 +145,13 @@
 			<artifactId>geronimo-jpa_2.0_spec</artifactId>
 			<version>1.1</version>
 			<scope>compile</scope>
-		</dependency>		   		
+		</dependency>
+		<dependency>
+			<groupId>org.apache.geronimo.specs</groupId>
+			<artifactId>geronimo-jta_1.1_spec</artifactId>
+			<version>1.1.1</version>
+			<scope>compile</scope>
+		</dependency> 		   		
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context</artifactId>
@@ -225,7 +231,7 @@
 			<version>${org.datanucleus.version}</version>
 			<scope>compile</scope>
 		</dependency>		
-		-->	
+		-->
 		<dependency>
 			<groupId>org.apache.hbql</groupId>
 			<artifactId>hbql</artifactId>
@@ -611,16 +617,17 @@
 					<filter>src/main/filters/filter-dev.properties</filter>			
 				</filters>
 				<testResources>
-					<!-- enable this to run the tests against an hbase instance					  
+					<!-- enable this to run the tests against an hbase instance	-->		  
 					<testResource>
 						<directory>src/test/hbase-resources</directory>
 						<filtering>true</filtering>
 					</testResource>
-					 -->
+					<!-- 					 
 					<testResource>
 						<directory>src/test/hsqldb-resources</directory>
 						<filtering>true</filtering>
-					</testResource>					
+					</testResource>	
+					 -->				 					
 				</testResources>
 			</build>
 		</profile>

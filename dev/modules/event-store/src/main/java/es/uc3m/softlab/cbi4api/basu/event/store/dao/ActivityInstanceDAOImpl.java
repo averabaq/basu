@@ -123,9 +123,30 @@ public class ActivityInstanceDAOImpl implements ActivityInstanceDAO {
 		Model _model = modelDAO.findBySourceData(model.getModelSrcId(), model.getSource(), ModelType.ACTIVITY);
 		if (_model == null)
 			return null;
-		Query query = entityManager.createQuery("select a from " + HActivityInstance.class.getName() + " a where a.instanceSrcId = :sourceId and a.model = :modelId");
-		query.setParameter("sourceId", activityId);
-		query.setParameter("modelId", _model.getId());
+    	//
+    	// JPQL parameters must be explicitly set as string values due to a bug  
+    	// found on DataNucleus implementation (3.2.0-release) for HBase when 
+    	// caching previous query parameters. 
+    	//
+    	StringBuffer sql = new StringBuffer("select a from [ENTITY] a ");
+    	sql.append("where a.instanceSrcId = :sourceId ");
+    	sql.append("and a.model = :modelId ");
+    	// set parameters
+    	String _sql = sql.toString();
+    	_sql = _sql.replace("[ENTITY]", HActivityInstance.class.getName());
+    	_sql = _sql.replace(":sourceId", "'" + activityId + "'");
+    	_sql = _sql.replace(":modelId", "" + _model.getId() + "");
+    	// creates query without setting parameters
+    	Query query = entityManager.createQuery(_sql);
+    	
+    	//
+    	// the snippet code below does not work as the DataNucleus implementation (3.2.0-release) 
+    	// for HBase has a bug on cached parameters.
+    	//
+		// Query query = entityManager.createQuery("select a from " + HActivityInstance.class.getName() + " a where a.instanceSrcId = :sourceId and a.model = :modelId");
+		// query.setParameter("sourceId", activityId);
+		// query.setParameter("modelId", _model.getId());    	
+		
 		HActivityInstance hinstance = null;
 		try {
 			long ini = System.nanoTime();
@@ -174,6 +195,11 @@ public class ActivityInstanceDAOImpl implements ActivityInstanceDAO {
 		}
 		correlationClause.deleteCharAt(correlationClause.lastIndexOf(","));
 		correlationClause.append(")");
+    	//
+		// TODO: modify JPQL statement to set explicit parameters
+    	// the snippet code below does not work as the DataNucleus implementation (3.2.0-release) 
+    	// for HBase has a bug on cached parameters.
+    	//
 		Query query = entityManager.createQuery("select object(evt) from event-store.Event evt where evt.id in (select distinct e.id from Event e, EventCorrelation ec where e.id = ec.event and " + correlationClause.toString() + " and e.activityInstance.model.name = :modelName and e.activityInstance.model.source = :source group by e.id having count(e.id) = :correlationSize) order by evt.id desc");
 		query.setParameter("modelName", model.getName());
 		query.setParameter("source", model.getSource());
@@ -291,7 +317,12 @@ public class ActivityInstanceDAOImpl implements ActivityInstanceDAO {
 			logger.warn("Activity instance does not have any identifier. Cannot load events from a non existing (null) activity instance.");
 			return;
 		}
-		logger.debug("Loading events from the activity instance " + instance + " ...");				
+		logger.debug("Loading events from the activity instance " + instance + " ...");		
+    	//
+		// TODO: modify JPQL statement to set explicit parameters
+    	// the snippet code below does not work as the DataNucleus implementation (3.2.0-release) 
+    	// for HBase has a bug on cached parameters.
+    	//
 		Query query = entityManager.createQuery("select elements(a.events) from event-store.ActivityInstance as a where a.id = :id");
 		query.setParameter("id", instance.getId());
 		instance.setEvents(query.getResultList());		

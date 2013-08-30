@@ -80,9 +80,11 @@ public class EventDAOImpl implements EventDAO {
 			// load the process instance
 			ProcessInstance processInstance = processInstanceDAO.findById(hevent.getProcessInstance());
 			event.setProcessInstance(processInstance);
-			// load the activity instance 	
-			ActivityInstance activityInstance = activityInstanceDAO.findById(hevent.getActivityInstance());
-			event.setActivityInstance(activityInstance);
+			// load the activity instance if present 	
+			if (hevent.getActivityInstance() != null) {
+				ActivityInstance activityInstance = activityInstanceDAO.findById(hevent.getActivityInstance());
+				event.setActivityInstance(activityInstance);
+			}
 			// load remaining sets of data
 			loadPayload(event); 
 			loadCorrelation(event); 
@@ -106,20 +108,42 @@ public class EventDAOImpl implements EventDAO {
     @SuppressWarnings("unchecked")
     public List<Event> findAllByProcessInstId(long processInstId) throws IllegalArgumentException {
 		logger.debug("Finding all events of process instance with id " + processInstId + "...");
-		Query query = entityManager.createQuery("select e from " + HEvent.class.getName() + " e where e.processInstance = :processInstId order by eventID asc");
-		query.setParameter("processInstId", processInstId);
+    	//
+    	// JPQL parameters must be explicitly set as string values due to a bug  
+    	// found on DataNucleus implementation (3.2.0-release) for HBase when 
+    	// caching previous query parameters. 
+    	//
+    	StringBuffer sql = new StringBuffer("select e from [ENTITY] e ");
+    	sql.append("where e.processInstance = :processInstId ");
+    	sql.append("order by eventID asc ");
+    	// set parameters
+    	String _sql = sql.toString();
+    	_sql = _sql.replace("[ENTITY]", HEvent.class.getName());
+    	_sql = _sql.replace(":processInstId", "" + processInstId + "");
+    	// creates query without setting parameters
+    	Query query = entityManager.createQuery(_sql);
+    	
+    	//
+    	// the snippet code below does not work as the DataNucleus implementation (3.2.0-release) 
+    	// for HBase has a bug on cached parameters.
+    	//
+		// Query query = entityManager.createQuery("select e from " + HEvent.class.getName() + " e where e.processInstance = :processInstId order by eventID asc");
+		// query.setParameter("processInstId", processInstId); 
+    	
 		List<HEvent> list = query.getResultList();
 		logger.debug("All events of process instance with id " + processInstId + " found successfully.");
-		/* convert to business object */
+		// convert to business object 
 		List<Event> events = new ArrayList<Event>();
 		for (HEvent hevent : list) {
 			Event event = BusinessObjectAssembler.getInstance().toBusinessObject(hevent);
 			// load the process instance
 			ProcessInstance processInstance = processInstanceDAO.findById(hevent.getProcessInstance());
 			event.setProcessInstance(processInstance);
-			// load the activity instance 	
-			ActivityInstance activityInstance = activityInstanceDAO.findById(hevent.getActivityInstance());
-			event.setActivityInstance(activityInstance);
+			// load the activity instance if present 	
+			if (hevent.getActivityInstance() != null) {
+				ActivityInstance activityInstance = activityInstanceDAO.findById(hevent.getActivityInstance());
+				event.setActivityInstance(activityInstance);
+			}
 			// load remaining sets of data
 			loadPayload(event); 
 			loadCorrelation(event); 
@@ -227,9 +251,28 @@ public class EventDAOImpl implements EventDAO {
 			logger.warn("Event correlators of event [" + event.getEventID() + "] could not be deleted. The event does not exists.");
 			return;
 		}	
+    	//
+    	// JPQL parameters must be explicitly set as string values due to a bug  
+    	// found on DataNucleus implementation (3.2.0-release) for HBase when 
+    	// caching previous query parameters. 
+    	//
+    	StringBuffer sql = new StringBuffer("select c from [ENTITY] c ");
+    	sql.append("where c.eventID = :eventID ");
+    	// set parameters
+    	String _sql = sql.toString();
+    	_sql = _sql.replace("[ENTITY]", HEventCorrelation.class.getName());
+    	_sql = _sql.replace(":eventID", "" + event.getEventID() + "");
+    	// creates query without setting parameters
+    	Query query = entityManager.createQuery(_sql);
+    	
+    	//
+    	// the snippet code below does not work as the DataNucleus implementation (3.2.0-release) 
+    	// for HBase has a bug on cached parameters.
+    	//
+		// Query query = entityManager.createQuery("select c from " + HEventCorrelation.class.getName() + " as c where c.eventID = :eventID");
+		// query.setParameter("eventID", event.getEventID());
+		
 		// remove event associated data
-		Query query = entityManager.createQuery("select c from " + HEventCorrelation.class.getName() + " as c where c.eventID = :eventID");
-		query.setParameter("eventID", event.getEventID());
 		List<HEventCorrelation> hcorrelations = new ArrayList<HEventCorrelation>(query.getResultList());
 		for (HEventCorrelation hcorrelation : hcorrelations) {
 			// remove event	correlation	
@@ -260,9 +303,28 @@ public class EventDAOImpl implements EventDAO {
 			logger.warn("Event payload of event [" + event.getEventID() + "] could not be deleted. The event does not exists.");
 			return;
 		}	
+    	//
+    	// JPQL parameters must be explicitly set as string values due to a bug  
+    	// found on DataNucleus implementation (3.2.0-release) for HBase when 
+    	// caching previous query parameters. 
+    	//
+    	StringBuffer sql = new StringBuffer("select p from [ENTITY] p ");
+    	sql.append("where p.eventID = :eventID ");
+    	// set parameters
+    	String _sql = sql.toString();
+    	_sql = _sql.replace("[ENTITY]", HEventPayload.class.getName());
+    	_sql = _sql.replace(":eventID", "" + event.getEventID() + "");
+    	// creates query without setting parameters
+    	Query query = entityManager.createQuery(_sql);
+    	
+    	//
+    	// the snippet code below does not work as the DataNucleus implementation (3.2.0-release) 
+    	// for HBase has a bug on cached parameters.
+    	//
+		// Query query = entityManager.createQuery("select p from " + HEventPayload.class.getName() + " as p where p.eventID = :eventID");
+		// query.setParameter("eventID", event.getEventID());
+    	
 		// remove event associated data
-		Query query = entityManager.createQuery("select p from " + HEventPayload.class.getName() + " as p where p.eventID = :eventID");
-		query.setParameter("eventID", event.getEventID());
 		List<HEventPayload> hpayload = new ArrayList<HEventPayload>(query.getResultList());
 		for (HEventPayload _hpayload : hpayload) {
 			// remove event	payload	
@@ -293,9 +355,28 @@ public class EventDAOImpl implements EventDAO {
 			logger.warn("Event data elements of event [" + event.getEventID() + "] could not be deleted. The event does not exists.");
 			return;
 		}	
+    	//
+    	// JPQL parameters must be explicitly set as string values due to a bug  
+    	// found on DataNucleus implementation (3.2.0-release) for HBase when 
+    	// caching previous query parameters. 
+    	//
+    	StringBuffer sql = new StringBuffer("select d from [ENTITY] d ");
+    	sql.append("where d.eventID = :eventID ");
+    	// set parameters
+    	String _sql = sql.toString();
+    	_sql = _sql.replace("[ENTITY]", HEventData.class.getName());
+    	_sql = _sql.replace(":eventID", "" + event.getEventID() + "");
+    	// creates query without setting parameters
+    	Query query = entityManager.createQuery(_sql);
+    	
+    	//
+    	// the snippet code below does not work as the DataNucleus implementation (3.2.0-release) 
+    	// for HBase has a bug on cached parameters.
+    	//
+		// Query query = entityManager.createQuery("select d from " + HEventData.class.getName() + " as d where d.eventID = :eventID");
+		// query.setParameter("eventID", event.getEventID());
+    	
 		// remove event associated data
-		Query query = entityManager.createQuery("select d from " + HEventData.class.getName() + " as d where d.eventID = :eventID");
-		query.setParameter("eventID", event.getEventID());
 		List<HEventData> hdata = new ArrayList<HEventData>(query.getResultList());
 		for (HEventData _hdata : hdata) {
 			// remove event	data elements	
@@ -356,8 +437,26 @@ public class EventDAOImpl implements EventDAO {
 			return;
 		}
 		logger.debug("Loading event data elements from event " + event + " ...");				
-		Query query = entityManager.createQuery("select p from " + HEventPayload.class.getName() + " as p where p.eventID = :eventID");
-		query.setParameter("eventID", event.getEventID());
+    	//
+    	// JPQL parameters must be explicitly set as string values due to a bug  
+    	// found on DataNucleus implementation (3.2.0-release) for HBase when 
+    	// caching previous query parameters. 
+    	//
+    	StringBuffer sql = new StringBuffer("select p from [ENTITY] p ");
+    	sql.append("where p.eventID = :eventID ");
+    	// set parameters
+    	String _sql = sql.toString();
+    	_sql = _sql.replace("[ENTITY]", HEventPayload.class.getName());
+    	_sql = _sql.replace(":eventID", "" + event.getEventID() + "");
+    	// creates query without setting parameters
+    	Query query = entityManager.createQuery(_sql);
+    	
+    	//
+    	// the snippet code below does not work as the DataNucleus implementation (3.2.0-release) 
+    	// for HBase has a bug on cached parameters.
+    	//
+		// Query query = entityManager.createQuery("select p from " + HEventPayload.class.getName() + " as p where p.eventID = :eventID");
+		// query.setParameter("eventID", event.getEventID());
 		Set<HEventPayload> hpayload = new HashSet<HEventPayload>(query.getResultList());
 		for (HEventPayload _hpayload : hpayload) {
 			EventPayload payload = BusinessObjectAssembler.getInstance().toBusinessObject(_hpayload, event);
@@ -381,8 +480,26 @@ public class EventDAOImpl implements EventDAO {
 			return;
 		}
 		logger.debug("Loading event correlation data from event " + event + " ...");				
-		Query query = entityManager.createQuery("select c from " + HEventCorrelation.class.getName() + " as c where c.eventID = :eventID");
-		query.setParameter("eventID", event.getEventID());
+    	//
+    	// JPQL parameters must be explicitly set as string values due to a bug  
+    	// found on DataNucleus implementation (3.2.0-release) for HBase when 
+    	// caching previous query parameters. 
+    	//
+    	StringBuffer sql = new StringBuffer("select c from [ENTITY] c ");
+    	sql.append("where c.eventID = :eventID ");
+    	// set parameters
+    	String _sql = sql.toString();
+    	_sql = _sql.replace("[ENTITY]", HEventCorrelation.class.getName());
+    	_sql = _sql.replace(":eventID", "" + event.getEventID() + "");
+    	// creates query without setting parameters
+    	Query query = entityManager.createQuery(_sql);
+    	
+    	//
+    	// the snippet code below does not work as the DataNucleus implementation (3.2.0-release) 
+    	// for HBase has a bug on cached parameters.
+    	//
+		// Query query = entityManager.createQuery("select c from " + HEventCorrelation.class.getName() + " as c where c.eventID = :eventID");
+		// query.setParameter("eventID", event.getEventID());
 		Set<HEventCorrelation> hcorrelations = new HashSet<HEventCorrelation>(query.getResultList());
 		for (HEventCorrelation _hcorrelation : hcorrelations) {
 			EventCorrelation correlation = BusinessObjectAssembler.getInstance().toBusinessObject(_hcorrelation, event);
@@ -406,8 +523,26 @@ public class EventDAOImpl implements EventDAO {
 			return;
 		}
 		logger.debug("Loading event data elements from event " + event + " ...");				
-		Query query = entityManager.createQuery("select d from " + HEventData.class.getName() + " as d where d.eventID = :eventID");
-		query.setParameter("eventID", event.getEventID());
+    	//
+    	// JPQL parameters must be explicitly set as string values due to a bug  
+    	// found on DataNucleus implementation (3.2.0-release) for HBase when 
+    	// caching previous query parameters. 
+    	//
+    	StringBuffer sql = new StringBuffer("select d from [ENTITY] d ");
+    	sql.append("where d.eventID = :eventID ");
+    	// set parameters
+    	String _sql = sql.toString();
+    	_sql = _sql.replace("[ENTITY]", HEventData.class.getName());
+    	_sql = _sql.replace(":eventID", "" + event.getEventID() + "");
+    	// creates query without setting parameters
+    	Query query = entityManager.createQuery(_sql);
+    	
+    	//
+    	// the snippet code below does not work as the DataNucleus implementation (3.2.0-release) 
+    	// for HBase has a bug on cached parameters.
+    	//
+		// Query query = entityManager.createQuery("select d from " + HEventData.class.getName() + " as d where d.eventID = :eventID");
+		// query.setParameter("eventID", event.getEventID());
 		Set<HEventData> hdata = new HashSet<HEventData>(query.getResultList());
 		for (HEventData _hdata : hdata) {
 			EventData dataElement = BusinessObjectAssembler.getInstance().toBusinessObject(_hdata, event);

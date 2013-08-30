@@ -74,10 +74,37 @@ public class EventGenerator extends Thread {
 			event.getPayload().add(payload);
 		}
 
-		for (int j = 0; j < (1+((int)(Math.random() * 10))); j++) {				
+		String[] corKey = new String[] {"orderNo", "CustomerNo", "ItemNo", "transCode", "opCode", "invoiceNo", "supplierId", "deptNo"};
+		
+		/*
+		EventCorrelation correlation = new EventCorrelation();
+		correlation.setKey(corKey[0]);
+		correlation.setValue("0401");
+		correlation.setEvent(event);
+		event.getCorrelations().add(correlation);
+		
+		correlation = new EventCorrelation();
+		correlation.setKey(corKey[1]);
+		correlation.setValue("0748");
+		correlation.setEvent(event);
+		event.getCorrelations().add(correlation);
+		
+		correlation = new EventCorrelation();
+		correlation.setKey(corKey[2]);
+		correlation.setValue("0125");
+		correlation.setEvent(event);
+		event.getCorrelations().add(correlation);
+		
+		correlation = new EventCorrelation();
+		correlation.setKey(corKey[4]);
+		correlation.setValue("0286");
+		correlation.setEvent(event);
+		event.getCorrelations().add(correlation);
+		*/
+		for (int j = 0; j < (1+((int)(Math.random() * 8))); j++) {				
 			EventCorrelation correlation = new EventCorrelation();
-			correlation.setKey(UUID.randomUUID().toString());
-			correlation.setValue(UUID.randomUUID().toString());
+			correlation.setKey(corKey[j]);
+			correlation.setValue(String.format("%04d", (j+((int)(Math.random() * 1000)))));
 			correlation.setEvent(event);
 			event.getCorrelations().add(correlation);
 		}

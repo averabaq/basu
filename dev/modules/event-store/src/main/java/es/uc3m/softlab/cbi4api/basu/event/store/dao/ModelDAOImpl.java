@@ -114,11 +114,34 @@ public class ModelDAOImpl implements ModelDAO {
 	 * @throws IllegalArgumentException if an illegal argument error occurred.
 	 */
 	public Model findBySourceData(String modelSrcId, Source source, ModelType type) throws IllegalArgumentException {
-    	logger.debug("Retrieving model with source data as set of (" + modelSrcId + ", " + source + ", " + type + ")...");
-		Query query = entityManager.createQuery("select m from " + HModel.class.getName() + " m where m.modelSrcId = :modelSrcId and m.source = :sourceId and m.type=:type");
-		query.setParameter("modelSrcId", modelSrcId);
-		query.setParameter("sourceId", source.getId());
-		query.setParameter("type", type.name());
+    	logger.debug("Retrieving model with source data as set of (" + modelSrcId + ", " + source + ", " + type + ")...");    	
+    	//
+    	// JPQL parameters must be explicitly set as string values due to a bug  
+    	// found on DataNucleus implementation (3.2.0-release) for HBase when 
+    	// caching previous query parameters. 
+    	//
+    	StringBuffer sql = new StringBuffer("select m from [ENTITY] m ");
+    	sql.append("where m.modelSrcId = :modelSrcId ");
+    	sql.append("and m.source = :sourceId ");
+    	sql.append("and m.type = :type");
+    	// set parameters
+    	String _sql = sql.toString();
+    	_sql = _sql.replace("[ENTITY]", HModel.class.getName());
+    	_sql = _sql.replace(":modelSrcId", "'" + modelSrcId + "'");
+    	_sql = _sql.replace(":sourceId", "'" + source.getId() + "'");
+    	_sql = _sql.replace(":type", "'" + type.name() + "'");
+    	// creates query without setting parameters
+    	Query query = entityManager.createQuery(_sql);
+    	
+    	//
+    	// the snippet code below does not work as the DataNucleus implementation (3.2.0-release) 
+    	// for HBase has a bug on cached parameters.
+    	//
+    	// Query query = entityManager.createQuery("select m from " + HModel.class.getName() + " m where m.modelSrcId = :modelSrcId and m.source = :sourceId and m.type = :type");
+		// query.setParameter("modelSrcId", modelSrcId);
+		// query.setParameter("sourceId", source.getId());
+		// query.setParameter("type", type.name());
+		
 		HModel hmodel = null;		
 		try {			
 			long ini = System.nanoTime();
@@ -198,10 +221,10 @@ public class ModelDAOImpl implements ModelDAO {
 			}
 		}
 		if (model.getModelSrcId() != null) {
-			Model _model = findBySourceData(model.getModelSrcId(), model.getSource(), ModelType.ACTIVITY);
+			Model _model = findBySourceData(model.getModelSrcId(), model.getSource(), model.getType());
 			if (_model != null) {
-				// update the model object
-				model = _model;
+				// update the model object identifier
+				model.setId(_model.getId());
 				logger.debug("Model " + model.getModelSrcId() + " cannot be persisted because it already exists.");
 				return;
 			}
@@ -217,6 +240,7 @@ public class ModelDAOImpl implements ModelDAO {
 		//updates the model back with the new identifier
 		entityManager.refresh(hmodel);
 		model.setId(hmodel.getId());
+		entityManager.flush();
 		logger.debug("Model " + model + " saved successfully.");
 	}		
 }

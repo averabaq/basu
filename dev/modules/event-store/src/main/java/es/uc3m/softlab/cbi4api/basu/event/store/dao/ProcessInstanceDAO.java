@@ -9,7 +9,6 @@ import es.uc3m.softlab.cbi4api.basu.event.store.StaticResources;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.EventCorrelation;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.Model;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessInstance;
-import es.uc3m.softlab.cbi4api.basu.event.store.domain.Model;
 
 import java.util.List;
 import java.util.Set;
@@ -75,7 +74,7 @@ public interface ProcessInstanceDAO {
 	 * @return {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessInstance} entity object associated.
 	 * @throws IllegalArgumentException if an illegal argument error occurred.
 	 */
-    public ProcessInstance findBySourceData(Set<EventCorrelation> correlation, Model model) throws IllegalArgumentException;    
+    public ProcessInstance findByCorrelationData(Model model, Set<EventCorrelation> correlation) throws IllegalArgumentException;    
 	/**
 	 * Merges and synchronizes the {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessInstance}
 	 * entity object state with the data base.

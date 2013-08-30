@@ -7,7 +7,6 @@ package es.uc3m.softlab.cbi4api.basu.event.store.dao;
 
 import java.util.Date;
 import java.util.HashSet;
-import java.util.List;
 
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.ActivityInstance;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.Event;

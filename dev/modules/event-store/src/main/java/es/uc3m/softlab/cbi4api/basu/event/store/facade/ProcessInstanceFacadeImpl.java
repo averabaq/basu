@@ -108,7 +108,7 @@ public class ProcessInstanceFacadeImpl implements ProcessInstanceFacade {
 		if (model.getSource() == null) 
 			throw new ProcessInstanceException(StaticResources.WARN_GET_PROCESS_INSTANCE_WITHOUT_SOURCE,"Cannot retrieve process instance if the source is not properly provided.");
 		/* retrieve the process instance associated with the correlation information provided */
-		ProcessInstance instance = processInstanceDAO.findByCorrelationData(model, correlation);
+		ProcessInstance instance = processInstanceDAO.findByCorrelationData(correlation, model);
 		if (instance == null) {
 			logger.debug("Cannot get process instance. Process instance associted to a determined correlation data from the model " + model + " and associated source " + model.getSource() + " does not exist.");
 		}
@@ -216,27 +216,5 @@ public class ProcessInstanceFacadeImpl implements ProcessInstanceFacade {
 		}
 		processInstanceDAO.delete(_instance);		
 		logger.info("Process instance " + _instance + " removed successfully.");
-	}	
-	/**
-	 * Gets the next correlation identifier for {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessInstance}
-	 * associated to the {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Model} entity object 
-	 * passed by arguments.
-	 * 
-	 * @param model {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Model} entity object to get the next
-	 * correlation identifier from.
-	 * @param correlations list of {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.EventCorrelation} entity objects
-	 * associated the all process instances aimed to correlate.
-	 * @throws ProcessInstanceException if any illegal data access or inconsistent process instance data error occurred.
-	 */
-	public long getCorrelationId(Model model, Set<EventCorrelation> correlations) throws ProcessInstanceException {
-		logger.debug("Getting correlation instance id for process model " + model + "...");	
-		/*Model _model = modelDAO.findById(instance.getId());
-		if (_instance == null) {
-			logger.warn("Cannot remove process instance. Process instance with identifier: " + instance.getId() + " does not exist.");
-			throw new ProcessInstanceException(StaticResources.WARN_DELETE_PROCESS_INSTANCE_NOT_EXIST, "Cannot remove process instance. Process instance with identifier: " + instance.getId() + " does not exist.");
-		}
-		processInstanceDAO.delete(_instance);		*/
-		logger.info("Correlation instance id for process model " + model + " retrieved successfully.");
-		return 1L;
-	}		
+	}
 }

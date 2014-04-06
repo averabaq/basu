@@ -11,7 +11,7 @@
 	<groupId>es.uc3m.softlab.cbi4api.basu</groupId>
 	<artifactId>basu-prj</artifactId>
 	<packaging>pom</packaging>
-	<version>1.0.0-SNAPSHOT</version>
+	<version>1.0.2-SNAPSHOT</version>
 	<inceptionYear>2013</inceptionYear>	
 	<name>CBI4API (BASU) - Main Project</name>
 	<description>
@@ -35,10 +35,10 @@
 		 -->		
 		<module>modules/event-subscriber</module>
 		<module>modules/event-store</module>
-		<!-- 
-		<module>applications/basu-ode</module>
-		 -->
-		<module>applications/basu</module>
+		<module>modules/event-dw</module>
+		<module>modules/bpeql</module>
+		<module>applications/basu-war</module>
+        <module>applications/basu-dist</module>
 	</modules>	
 	<scm>		
 		<url>http://git.verasoft.es/cbi4api/basu.git</url>
@@ -62,18 +62,11 @@
 			</notifier>
 		</notifiers>
 	</ciManagement>
-	<repositories>
-		<repository>
-			<id>nexus</id>
-			<url>http://nexus.verasoft.es/nexus/content/repositories/public</url>
-			<layout>default</layout>
-		</repository>
-	</repositories>
 	<pluginRepositories>
 		<pluginRepository>
 			<id>central</id>
 			<name>Maven Plugin Repository</name>
-			<url>http://repo1.maven.org/maven2</url>
+			<url>https://repo1.maven.org/maven2</url>
 			<layout>default</layout>
 			<snapshots>
 				<enabled>false</enabled>
@@ -87,12 +80,7 @@
 		<defaultGoal>package</defaultGoal>
 		<pluginManagement>
 			<plugins>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-release-plugin</artifactId>
-					<version>2.4</version>
-				</plugin>
-				<plugin>
+ 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-site-plugin</artifactId>
 					<version>3.3</version>
@@ -119,6 +107,11 @@
 			</plugins>
 		</pluginManagement>
 		<plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>2.4.2</version>
+            </plugin>
             <plugin>
             	<groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>

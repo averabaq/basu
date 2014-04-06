@@ -61,21 +61,21 @@ public interface ProcessInstanceDAO {
 	 * @throws IllegalArgumentException if an illegal argument error occurred.
 	 */
     public ProcessInstance findBySourceData(String processId, Model model) throws IllegalArgumentException;
-	/**
-	 * Find the {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessInstance} entity 
-	 * object associated to the correlation information provided by a determined list of
-	 * ({@link es.uc3m.softlab.cbi4api.basu.event.store.domain.EventCorrelation} objects, 
-	 * a determined {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Model}
-	 * and a determined ({@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Source} given by
-	 * the {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Model#getSource()}) property. 
-	 * 
-	 * @param correlation list of event correlation objects associated to the process instance that is trying to be found.
-	 * @param model process model associated to the process instance that is trying to be found.
-	 * @return {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessInstance} entity object associated.
-	 * @throws IllegalArgumentException if an illegal argument error occurred.
-	 */
-    public ProcessInstance findByCorrelationData(Model model, Set<EventCorrelation> correlation) throws IllegalArgumentException;    
-	/**
+    /**
+     * Find the {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessInstance} entity
+     * object associated to the correlation information provided by a determined list of
+     * ({@link es.uc3m.softlab.cbi4api.basu.event.store.domain.EventCorrelation} objects,
+     * a determined {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Model}
+     * and a determined ({@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Source} given by
+     * the {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Model#getSource()}) property.
+     *
+     * @param correlation list of event correlation objects associated to the process instance that is trying to be found.
+     * @param model process model associated to the process instance that is trying to be found.
+     * @return {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessInstance} entity object associated.
+     * @throws IllegalArgumentException if an illegal argument error occurred.
+     */
+    public ProcessInstance findByCorrelationData(Set<EventCorrelation> correlation, Model model) throws IllegalArgumentException;
+    /**
 	 * Merges and synchronizes the {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessInstance}
 	 * entity object state with the data base.
 	 * 

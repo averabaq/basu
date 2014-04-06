@@ -35,12 +35,8 @@ import javax.persistence.Column;
  * @author averab
  */
 @Entity(name="event-store.ProcessInstance")
-@Table(name="process_instance", schema="event_store")
+@Table(name="lv_process_instance", schema="event_store")
 @PersistenceUnit(name=StaticResources.PERSISTENCE_NAME_EVENT_STORE, unitName=StaticResources.PERSISTENCE_UNIT_NAME_EVENT_STORE)
-/*@NamedQueries({
-    @NamedQuery(name="getLastCorrelatorIdOfModel", 
-		        query="select max(p.correlatorId) from event-store.HProcessInstance p where p.model = :model")		        
-})*/
 public class HProcessInstance implements Comparable<HProcessInstance>, Serializable {
 	/** Serial Version UID */
 	private static final long serialVersionUID = 793843691244028471L;
@@ -52,8 +48,6 @@ public class HProcessInstance implements Comparable<HProcessInstance>, Serializa
 	private String description;
 	/** Process instance's model */
 	private long model;
-	/** Process instance correlation identifier */
-	private long correlatorId;
 	/** Process instance identifier at source */
 	private String instanceSrcId;
 
@@ -122,21 +116,6 @@ public class HProcessInstance implements Comparable<HProcessInstance>, Serializa
 	 */
 	public void setModel(long model) {
 		this.model = model;
-	}
-	/**
-	 * Gets the {@link #correlatorId} property.
-	 * @return the {@link #correlatorId} property.
-	 */
-	@Column(name="correlator_id", nullable=true)
-	public long getCorrelatorId() {
-		return correlatorId;
-	}
-	/**
-	 * Sets the {@link #correlatorId} property.
-	 * @param correlatorId the {@link #correlatorId} property to set.
-	 */
-	public void setCorrelatorId(long correlatorId) {
-		this.correlatorId = correlatorId;
 	}
 	/**
 	 * Gets the {@link #instanceSrcId} property.

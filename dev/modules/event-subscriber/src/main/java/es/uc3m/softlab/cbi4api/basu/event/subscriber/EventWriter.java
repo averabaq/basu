@@ -20,24 +20,16 @@ import es.uc3m.softlab.cbi4api.basu.event.store.facade.EventException;
  */
 public interface EventWriter {
  	/** Spring component name */
-    public static final String COMPONENT_NAME = StaticResources.COMPONENT_NAME_EVENT_WRITER;        
+    public static final String COMPONENT_NAME = StaticResources.COMPONENT_NAME_EVENT_WRITER;
 
     /**
      * Stores the event in the data source and sets the processed event back to be forwarded to the
      * output the channel in xml format.  
      * @param exchange exchange data object to route. 
-     * @param event event {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Event}
-	 * entity object to forward in xml format to the output channel.
+     * @param bpafEvent BPAF event {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Event} to store
+     * @param basuEvent BASU event {@link es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.basu.event.Event}
+     *  object to forward in xml format to the GBAS output channel.
      * @throws EventException if any illegal data access or inconsistent event data error occurred.
      */
-    public void loadEvent(Exchange exchange, Event event) throws EventException;
-	/**
-	 * Saves and synchronizes the {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Event}
-	 * entity object state with the data base.
-	 * 
-	 * @param event {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Event}
-	 * entity object to save.
-	 * @throws EventException if any illegal data access or inconsistent event data error occurred.
-	 */
-	public void storeEvent(Event event) throws EventException;
+    public void loadEvent(Exchange exchange, Event bpafEvent, es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.basu.event.Event basuEvent) throws EventException;
 }

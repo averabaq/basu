@@ -30,24 +30,40 @@ import javax.persistence.Column;
  * @author averab
  */
 @Entity(name="event-store.EventPayload")
-@Table(name="event_payload", schema="event_store")
-@IdClass(HEventPayload.class)
+@Table(name="lv_event_payload", schema="event_store")
+@IdClass(HEventPayloadIdKey.class)
 @PersistenceUnit(name=StaticResources.PERSISTENCE_NAME_EVENT_STORE, unitName=StaticResources.PERSISTENCE_UNIT_NAME_EVENT_STORE)
 public class HEventPayload implements Comparable<HEventPayload>, Serializable {
 	/** Serial Version UID */
 	private static final long serialVersionUID = 205884628381791L;
+	/** Payload event ID. */
+	private long eventID;
 	/** Payload key */
 	private String key;
 	/** Payload value. */
 	private String value;
-	/** Payload event ID. */
-	private long eventID;
 
 	/**
 	 * Creates a new object with null property values. 	 
 	 */
 	public HEventPayload() {		
 	}
+	/**
+	 * Gets the {@link #eventID} property.
+	 * @return the {@link #eventID} property.
+	 */
+	@Id
+	@Column(name="event_id", nullable=false)
+	public long getEventID() {
+		return eventID;
+	}
+	/**
+	 * Sets the {@link #eventID} property.
+	 * @param eventID the {@link #eventID} property to set.
+	 */
+	public void setEventID(long eventID) {
+		this.eventID = eventID;
+	}	
 	/**
 	 * Gets the {@link #key} property.
 	 * @return the {@link #key} property.
@@ -68,7 +84,6 @@ public class HEventPayload implements Comparable<HEventPayload>, Serializable {
 	 * Gets the {@link #value} property.
 	 * @return the {@link #value} property.
 	 */
-	@Id
 	@Column(name="value", nullable=false, updatable=false)
 	public String getValue() {
 		return value;
@@ -81,22 +96,6 @@ public class HEventPayload implements Comparable<HEventPayload>, Serializable {
 		this.value = value;
 	}
 	/**
-	 * Gets the {@link #eventID} property.
-	 * @return the {@link #eventID} property.
-	 */
-	@Id
-	@Column(name="event_id", nullable=false)
-	public long getEventID() {
-		return eventID;
-	}
-	/**
-	 * Sets the {@link #eventID} property.
-	 * @param event the {@link #eventID} property to set.
-	 */
-	public void setEventID(long eventID) {
-		this.eventID = eventID;
-	}
-	/**
 	 * Compares this object with the specified object for order. Returns a negative integer, zero, or a positive 
 	 * integer as this object is less than, equal to, or greater than the specified object. 
 	 * The implementor must ensure sgn(x.compareTo(y)) == -sgn(y.compareTo(x)) for all x and y. (This implies that 
@@ -105,7 +104,7 @@ public class HEventPayload implements Comparable<HEventPayload>, Serializable {
 	 * implies x.compareTo(z)>0. Finally, the implementor must ensure that x.compareTo(y)==0 implies that 
 	 * sgn(x.compareTo(z)) == sgn(y.compareTo(z)), for all z. 
 	 * 
-	 * @param event the object to be compared. 
+	 * @param payload the object to be compared.
 	 * @return a negative integer, zero, or a positive integer as this object is less than, equal to, or greater 
 	 * than the specified object. 
 	 */
@@ -113,9 +112,11 @@ public class HEventPayload implements Comparable<HEventPayload>, Serializable {
 	public int compareTo(HEventPayload payload) {
 		if (payload == null)
 			return -1;	
+		if (eventID != payload.getEventID())
+			return Long.valueOf(eventID).compareTo(payload.getEventID());
 		if (key == null)
 			return 1;
-		return key.compareTo(payload.getKey()) ;
+		return key.compareTo(payload.getKey());
 	}			
 	/**
 	 * Returns a string representation of the object.
@@ -145,7 +146,6 @@ public class HEventPayload implements Comparable<HEventPayload>, Serializable {
 		int result = 1;
 		result = prime * result + (int) (eventID ^ (eventID >>> 32));
 		result = prime * result + ((key == null) ? 0 : key.hashCode());
-		result = prime * result + ((value == null) ? 0 : value.hashCode());
 		return result;
 	}
 	/**
@@ -169,11 +169,6 @@ public class HEventPayload implements Comparable<HEventPayload>, Serializable {
 			if (other.key != null)
 				return false;
 		} else if (!key.equals(other.key))
-			return false;
-		if (value == null) {
-			if (other.value != null)
-				return false;
-		} else if (!value.equals(other.value))
 			return false;
 		return true;
 	}

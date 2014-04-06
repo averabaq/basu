@@ -8,7 +8,6 @@ package es.uc3m.softlab.cbi4api.basu.event.store.test;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.ActivityInstance;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.Event;
@@ -48,9 +47,9 @@ public class EventStorePerformanceTest extends AbstractShowcaseTest {
     /** subprocess span level */
 	private static final int SUBPROCESS_SPAN_LEVEL = 7;	
 	/** number of events per instance */
-	private static final int EVENTS_PER_INSTANCE = 1;
+	private static final int EVENTS_PER_INSTANCE = 10;
 	/** Number of event records to store in this test */
-	private static final int TEST_CASE_EVENT_NUM = 10;
+	private static final int TEST_CASE_EVENT_NUM = 100000;
 	/** Event session facade */
 	@Autowired private EventFacade eventFacade;
 	/** Source session facade */
@@ -69,7 +68,7 @@ public class EventStorePerformanceTest extends AbstractShowcaseTest {
 	 * @throws ProcessInstanceException if any process instance access error occurred.
 	 * @throws EventException if any event access error occurred.
 	 */
-	@Test
+	//@Test
 	@Rollback(false)
 	public void testPerformance() throws SourceException, ModelException, ProcessInstanceException, EventException {
 		ArrayList<Source> sources = new ArrayList<Source>();
@@ -115,20 +114,20 @@ public class EventStorePerformanceTest extends AbstractShowcaseTest {
 		EventCorrelation cor = new EventCorrelation();
 		cor.setEvent(null);
 		cor.setKey("orderNo");
-		cor.setValue("0401");	
+		cor.setValue("0201");	
 		dummyList.add(cor);		
 		cor = new EventCorrelation();
 		cor.setEvent(null);
 		cor.setKey("CustomerNo");
-		cor.setValue("0641");				
+		cor.setValue("0394");				
 		dummyList.add(cor);	
 		cor = new EventCorrelation();
 		cor.setEvent(null);
 		cor.setKey("ItemNo");
-		cor.setValue("0125");				
+		cor.setValue("0195");				
 		dummyList.add(cor);	
 		
-		processModels.get(0).setId(686L);
+		processModels.get(0).setId(5L);
 		processInstanceFacade.getProcessInstance(processModels.get(0), dummyList);
 
 		System.exit(0);
@@ -140,22 +139,21 @@ public class EventStorePerformanceTest extends AbstractShowcaseTest {
 				ProcessInstance processInstance = new ProcessInstance();
 				processInstance.setInstanceSrcId(String.valueOf(pInstanceId++));
 				processInstance.setModel(processModels.get(j));
-				processInstance.setCorrelatorId((long)(Math.random() * 10000));
 				processInstance.setName("Process instance [" + String.format("%05d", Long.valueOf(processInstance.getInstanceSrcId())) + "]");
 				for (int k = 0; k < SUBPROCESS_SPAN_LEVEL; k++) {
 					ActivityInstance activityInstance = new ActivityInstance();
 					activityInstance.setInstanceSrcId(String.valueOf(aInstanceId++));
 					activityInstance.setModel(activityModels.get((j * SUBPROCESS_SPAN_LEVEL) + k));	
 					activityInstance.setName("Activity instance [" + String.format("%05d", Long.valueOf(activityInstance.getInstanceSrcId())) + "]");
-					(new EventGenerator(eventFacade, processInstance, null)).run();
-					/*
+					//(new EventGenerator(eventFacade, processInstance, null)).run();
+					
 					for (int l = 0; l < EVENTS_PER_INSTANCE; l++) {		
 						if (((long)(Math.random() * 10)) == 1) {
 							(new EventGenerator(eventFacade, processInstance, activityInstance)).run();
 						} else {
 							(new EventGenerator(eventFacade, processInstance, null)).run();
 						}
-					}*/
+					}
 				}
 			}
 		}
@@ -164,7 +162,7 @@ public class EventStorePerformanceTest extends AbstractShowcaseTest {
 	 * Test events retrieval methods.
 	 * @throws EventException if any event access error occurred.
 	 */
-	@Test
+	//@Test
 	public void testFindEvents() throws EventException {	
 		List<Source> sources = sourceFacade.getAll();
 		Assert.notEmpty(sources);

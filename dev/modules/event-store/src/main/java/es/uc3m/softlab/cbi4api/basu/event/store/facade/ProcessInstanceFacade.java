@@ -99,18 +99,6 @@ public interface ProcessInstanceFacade {
 	 */
 	public void deleteProcessInstance(ProcessInstance instance) throws ProcessInstanceException;
 	/**
-	 * Gets the next correlation identifier for {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessInstance}
-	 * associated to the {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Model} entity object 
-	 * passed by arguments.
-	 * 
-	 * @param model {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Model} entity object to get the next
-	 * correlation identifier from.
-	 * @param correlation list of {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.EventCorrelation} entity objects
-	 * associated the all process instances aimed to correlate.
-	 * @throws ProcessInstanceException if any illegal data access or inconsistent process instance data error occurred.
-	 */
-	public long getCorrelationId(Model model, Set<EventCorrelation> correlation) throws ProcessInstanceException;	
-	/**
 	 * Loads the {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessInstance#events} associated
 	 * from the data base. This is needed due to the fetch property is set to lazy, and their associated 
 	 * objects are loaded out of synchronism when the {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ProcessInstance} 

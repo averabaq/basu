@@ -45,7 +45,7 @@
 	</scm>
 	<ciManagement>
 		<system>teamcity</system>
-		<url>http://teamcity.verasoft.es/teamcity</url>
+		<url>http://teamcity.verasoft.es</url>
 		<notifiers>
 			<notifier>
 				<type>mail</type>
@@ -59,13 +59,6 @@
 			</notifier>
 		</notifiers>
 	</ciManagement>
-	<repositories>
-		<repository>
-			<id>nexus</id>
-			<url>http://nexus.verasoft.es/nexus/content/repositories/public</url>
-			<layout>default</layout>
-		</repository>
-	</repositories>
 	<dependencies>		    	
 		<dependency>
 			<groupId>org.apache.activemq</groupId>
@@ -228,8 +221,8 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.0</version>
 				<configuration>
-					<source>1.6</source>
-					<target>1.6</target>
+					<source>1.7</source>
+					<target>1.7</target>
 					<encoding>UTF-8</encoding> 					
 				</configuration>
 			</plugin>
@@ -267,7 +260,7 @@
 						</manifestEntries>
 					</archive>
 				</configuration>	
-			</plugin>					
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-docck-plugin</artifactId>

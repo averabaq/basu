@@ -46,9 +46,9 @@ public class EventReaderImpl implements EventReader {
 	 */
 	@Override
 	public Event extractEvent(Exchange exchange) throws EventReaderException {		
-		logger.debug("Extracing incoming event message with ID " + exchange.getIn().getMessageId());
+		logger.debug("Extracting incoming event message with ID " + exchange.getIn().getMessageId());
 		byte[] xml = (byte[])exchange.getIn().getBody();						
-		logger.debug(xml);
+		logger.debug(new String(xml));
 		
 		Event event = null;
 		ByteArrayInputStream bios = new ByteArrayInputStream(xml);		
@@ -70,12 +70,10 @@ public class EventReaderImpl implements EventReader {
 			logger.error(saxex.fillInStackTrace());
 			throw new EventReaderException(saxex);
 		} finally {
-			if (bios != null) {			
-				try {
-					bios.close();
-				} catch (IOException ioex) {
-					logger.error(ioex.fillInStackTrace());
-				}
+			try {
+				bios.close();
+			} catch (IOException ioex) {
+				logger.error(ioex.fillInStackTrace());
 			}
 		}
 		return event;

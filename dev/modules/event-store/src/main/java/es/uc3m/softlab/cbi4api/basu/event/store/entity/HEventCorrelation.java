@@ -31,24 +31,40 @@ import javax.persistence.Table;
  * @version 1.0.0 
  */
 @Entity(name="event-store.EventCorrelation")
-@Table(name="event_correlation", schema="event_store")
-@IdClass(HEventCorrelation.class)
+@Table(name="lv_event_correlation", schema="event_store")
+@IdClass(HEventCorrelationIdKey.class)
 @PersistenceUnit(name=StaticResources.PERSISTENCE_NAME_EVENT_STORE, unitName=StaticResources.PERSISTENCE_UNIT_NAME_EVENT_STORE)
 public class HEventCorrelation implements Comparable<HEventCorrelation>, Serializable {
 	/** Serial Version UID */
 	private static final long serialVersionUID = 1847387461208318702L;
+	/** Correlation event ID. */
+	private long eventID;
 	/** Correlation key */
 	private String key;
 	/** Correlation value. */
 	private String value;
-	/** Correlation event ID. */
-	private long eventID;
 
 	/**
 	 * Creates a new object with null property values. 	 
 	 */
 	public HEventCorrelation() {		
 	}
+	/**
+	 * Gets the {@link #eventID} property.
+	 * @return the {@link #eventID} property.
+	 */
+	@Id
+	@Column(name="event_id", nullable=false)
+	public long getEventID() {
+		return eventID;
+	}
+	/**
+	 * Sets the {@link #eventID} property.
+	 * @param event the {@link #eventID} property to set.
+	 */
+	public void setEventID(long eventID) {
+		this.eventID = eventID;
+	}	
 	/**
 	 * Gets the {@link #key} property.
 	 * @return the {@link #key} property.
@@ -69,7 +85,6 @@ public class HEventCorrelation implements Comparable<HEventCorrelation>, Seriali
 	 * Gets the {@link #value} property.
 	 * @return the {@link #value} property.
 	 */
-	@Id
 	@Column(name="value", nullable=false, updatable=false)
 	public String getValue() {
 		return value;
@@ -80,22 +95,6 @@ public class HEventCorrelation implements Comparable<HEventCorrelation>, Seriali
 	 */
 	public void setValue(String value) {
 		this.value = value;
-	}
-	/**
-	 * Gets the {@link #eventID} property.
-	 * @return the {@link #eventID} property.
-	 */
-	@Id
-	@Column(name="event_id", nullable=false)
-	public long getEventID() {
-		return eventID;
-	}
-	/**
-	 * Sets the {@link #eventID} property.
-	 * @param event the {@link #eventID} property to set.
-	 */
-	public void setEventID(long eventID) {
-		this.eventID = eventID;
 	}
 	/**
 	 * Compares this object with the specified object for order. Returns a negative integer, zero, or a positive 
@@ -111,12 +110,14 @@ public class HEventCorrelation implements Comparable<HEventCorrelation>, Seriali
 	 * than the specified object. 
 	 */
 	@Override
-	public int compareTo(HEventCorrelation data) {
-		if (data == null)
+	public int compareTo(HEventCorrelation correlation) {
+		if (correlation == null)
 			return -1;	
+		if (eventID != correlation.getEventID())
+			return Long.valueOf(eventID).compareTo(correlation.getEventID());
 		if (key == null)
 			return 1;
-		return key.compareTo(data.getKey()) ;
+		return key.compareTo(correlation.getKey());
 	}			
 	/**
 	 * Returns a string representation of the object.
@@ -146,7 +147,6 @@ public class HEventCorrelation implements Comparable<HEventCorrelation>, Seriali
 		int result = 1;
 		result = prime * result + (int) (eventID ^ (eventID >>> 32));
 		result = prime * result + ((key == null) ? 0 : key.hashCode());
-		result = prime * result + ((value == null) ? 0 : value.hashCode());
 		return result;
 	}
 	/**
@@ -161,7 +161,7 @@ public class HEventCorrelation implements Comparable<HEventCorrelation>, Seriali
 			return true;
 		if (obj == null)
 			return false;
-		if (getClass() != obj.getClass())
+		if (!(obj instanceof HEventCorrelation))
 			return false;
 		HEventCorrelation other = (HEventCorrelation) obj;
 		if (eventID != other.eventID)
@@ -170,11 +170,6 @@ public class HEventCorrelation implements Comparable<HEventCorrelation>, Seriali
 			if (other.key != null)
 				return false;
 		} else if (!key.equals(other.key))
-			return false;
-		if (value == null) {
-			if (other.value != null)
-				return false;
-		} else if (!value.equals(other.value))
 			return false;
 		return true;
 	}

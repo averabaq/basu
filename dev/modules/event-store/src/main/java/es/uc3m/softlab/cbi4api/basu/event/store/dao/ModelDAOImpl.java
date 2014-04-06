@@ -6,7 +6,7 @@
 package es.uc3m.softlab.cbi4api.basu.event.store.dao;
 
 import es.uc3m.softlab.cbi4api.basu.event.store.StaticResources;
-import es.uc3m.softlab.cbi4api.basu.event.store.Stats;
+import es.uc3m.softlab.cbi4api.basu.event.store.kpi.Stats;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.Model;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.ModelType;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.Source;
@@ -86,8 +86,7 @@ public class ModelDAOImpl implements ModelDAO {
 	 * @throws IllegalArgumentException if an illegal argument error occurred.
 	 */
 	public Model findById(long id) throws IllegalArgumentException {
-		logger.debug("Retrieving model with identifier " + id + "...");
-		
+		logger.debug("Retrieving model with identifier " + id + "...");		
 		HModel hmodel = entityManager.find(HModel.class, id);	
 		if (hmodel != null) {			
 			Model model = BusinessObjectAssembler.getInstance().toBusinessObject(hmodel);
@@ -147,7 +146,7 @@ public class ModelDAOImpl implements ModelDAO {
 			long ini = System.nanoTime();
 			hmodel = (HModel)query.getSingleResult();
 			long end = System.nanoTime();
-			stats.writeStat(Stats.Operation.READ_BY_SOURCE_DATA, hmodel, ini, end);
+			stats.writeStat(Stats.Operation.READ_BY_SOURCE_DATA, HModel.class, hmodel, ini, end);
 			logger.debug("Model " + hmodel + " retrieved successfully.");
 		} catch(NoResultException nrex) {
 			logger.debug("Model with source data as set of (" + modelSrcId + ", " + source + ", " + type + ") does not exist.");
@@ -206,8 +205,7 @@ public class ModelDAOImpl implements ModelDAO {
 	 * @throws TransactionRequiredException if a transaction error occurred.
 	 */	
 	public void save(Model model) throws IllegalArgumentException, TransactionRequiredException {
-		logger.debug("Saving model " + model + "...");	
-		
+		logger.debug("Saving model " + model + "...");			
 		if (model == null) {
 			logger.warn("Cannot save model. Model is null.");
 			throw new IllegalArgumentException("Cannot save model. Model is null.");
@@ -230,13 +228,12 @@ public class ModelDAOImpl implements ModelDAO {
 			}
 		}
 		logger.debug("Model " + model.getId() + " does not exists. Saving model...");
-		/* TODO: check source */
-			
+
 		HModel hmodel = BusinessObjectAssembler.getInstance().toEntity(model);
 		long ini = System.nanoTime();
 		entityManager.persist(hmodel);	
 		long end = System.nanoTime();
-		stats.writeStat(Stats.Operation.WRITE, hmodel, ini, end);
+		stats.writeStat(Stats.Operation.WRITE, HModel.class, hmodel, ini, end);
 		//updates the model back with the new identifier
 		entityManager.refresh(hmodel);
 		model.setId(hmodel.getId());

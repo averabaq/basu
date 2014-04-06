@@ -11,6 +11,9 @@ import es.uc3m.softlab.cbi4api.basu.event.subscriber.EventConverter;
 import es.uc3m.softlab.cbi4api.basu.event.subscriber.EventReader;
 import es.uc3m.softlab.cbi4api.basu.event.subscriber.EventWriter;
 import es.uc3m.softlab.cbi4api.basu.event.subscriber.StaticResources;
+import es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.basu.event.Correlation;
+import es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.basu.event.CorrelationData;
+import es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.basu.event.CorrelationElement;
 import es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.basu.event.Event;
 import es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.basu.event.Event.EventDetails;
 import es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.basu.event.State;
@@ -90,15 +93,15 @@ public class EventSubscriberTest extends AbstractShowcaseTest  {
     		JAXBContext context = JAXBContext.newInstance(Event.class);
     		Marshaller marshaller = context.createMarshaller();
     		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-    		logger.debug("Marshalling event " + event + "...");
+    		//logger.debug("Marshalling event " + event + "...");
     		marshaller.marshal(event, writer);
     		final byte[] xml = baos.toByteArray();    			
     		DefaultExchange exchange = new DefaultExchange(sourceEndpoint);
     		exchange.getIn().setBody(xml, byte[].class);  	
     		sourceEndpoint.assertIsSatisfied();
-    		logger.debug("Performing ETL process...");	
+    		//logger.debug("Performing ETL process...");	
     		etl.process(exchange);
-    		logger.debug("ETL process performed.");		    		
+    		//logger.debug("ETL process performed.");		    		
 		}		
     }
 	
@@ -115,7 +118,7 @@ public class EventSubscriberTest extends AbstractShowcaseTest  {
     		JAXBContext context = JAXBContext.newInstance(Event.class);
     		Marshaller marshaller = context.createMarshaller();
     		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-    		logger.debug("Marshalling event " + event + "...");
+    		//logger.debug("Marshalling event " + event + "...");
     		marshaller.marshal(event, writer);
     		final byte[] xml = baos.toByteArray();
     		DefaultExchange exchange = new DefaultExchange(sourceEndpoint);
@@ -157,7 +160,7 @@ public class EventSubscriberTest extends AbstractShowcaseTest  {
 				_event = transformer.transform(event);
 				assert(_event != null && !String.valueOf(_event.getEventID()).equals(event.getEventID()));   
 	    		DefaultExchange exchange = new DefaultExchange(targetEndpoint);	
-				loader.loadEvent(exchange, _event);
+				loader.loadEvent(exchange, _event, event);
 	    		targetEndpoint.assertIsSatisfied();  
 			} catch(EventException evex) {
 				// a non-state-transition must be considered as an acceptable scenario
@@ -185,7 +188,7 @@ public class EventSubscriberTest extends AbstractShowcaseTest  {
 		JAXBContext context = JAXBContext.newInstance(Event.class);
 		Marshaller marshaller = context.createMarshaller();
 		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-		logger.debug("Marshalling event " + event + "...");
+		//logger.debug("Marshalling event " + event + "...");
 		marshaller.marshal(event, writer);
 		final byte[] xml = baos.toByteArray();
 		basuProducer.sendBody(xml);	
@@ -195,7 +198,7 @@ public class EventSubscriberTest extends AbstractShowcaseTest  {
 		assert (exchange != null && exchange.getIn() != null);
 		byte[] _xml = (byte[])exchange.getIn().getBody();
 		assert (_xml != null);
-		logger.debug(new String(_xml));
+		//logger.debug(new String(_xml));
 	}	
 		
 	private Event generateMockEvent() {
@@ -204,8 +207,7 @@ public class EventSubscriberTest extends AbstractShowcaseTest  {
 		event.setActivityInstanceID(UUID.randomUUID().toString());
 		event.setActivityName(UUID.randomUUID().toString());
 		event.setEventID(String.valueOf((long)(Math.random() * 10000)));
-		event.setProcessDefinitionID("SRC_PRC_BP_MODEL_ID");
-		event.setProcessInstanceID(UUID.randomUUID().toString());
+		event.setProcessDefinitionID("SRC_PRC_BP_MODEL_ID");		
 		event.setProcessName(UUID.randomUUID().toString());
 		event.setServerID("BASU-SOURCE");
 		event.setEventDetails(new EventDetails());
@@ -216,6 +218,15 @@ public class EventSubscriberTest extends AbstractShowcaseTest  {
 		Calendar tstamp = Calendar.getInstance();
 		tstamp.setTime(new Date());
 		event.setTimestamp(tstamp);
+		event.setCorrelation(new Correlation());
+		event.getCorrelation().setProcessInstanceID(UUID.randomUUID().toString());
+		event.getCorrelation().setCorrelationData(new CorrelationData());
+		for (int i=0; i < (1 + ((int)Math.random() * 10)); i++) {
+			CorrelationElement elem = new CorrelationElement();
+			elem.setKey(UUID.randomUUID().toString());
+			elem.setValue(UUID.randomUUID().toString());
+			event.getCorrelation().getCorrelationData().getCorrelationElement().add(elem);
+		}
 		return event;
 	}
 	

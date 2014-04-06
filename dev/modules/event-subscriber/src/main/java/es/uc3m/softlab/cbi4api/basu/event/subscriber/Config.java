@@ -35,7 +35,7 @@ public class Config {
     public String getString(String key) {
     	String value = null;
     	try {
-    		ResourceBundle propFile = ResourceBundle.getBundle(StaticResources.CONFIG_RESOURCE_BUNDLE);     
+    		ResourceBundle propFile = ResourceBundle.getBundle(StaticResources.MODULE_CONFIG_RESOURCE_BUNDLE);
     		value = propFile.getString(key);    		
     	}
     	catch (MissingResourceException mre) {
@@ -50,11 +50,27 @@ public class Config {
      * @return broker url.
      */
     public String getBrokerUrl() {		
-		String url = getString("cbi4api.basu.event.subscriber.activemq.broker.url");
+		String url = getString(StaticResources.BROKER_URL_RESOURCE_BUNDLE_KEY);
 		if (url == null) 
-			logger.error("The property 'cbi4api.basu.event.subscriber.activemq.broker.url' containing the identification of the broker url could not be found. Please, provide this information.");
+			logger.error(String.format("The property '%s' containing the identification of the broker url could not be found. Please, provide this information.", StaticResources.BROKER_URL_RESOURCE_BUNDLE_KEY));
 		return url;
-    }      
+    }
+    /**
+     * Gets the current BASU node identifier.
+     * @return BASU node identifier.
+     */
+    public String getNodeId() {
+        String value = null;
+        try {
+            ResourceBundle propFile = ResourceBundle.getBundle(StaticResources.APP_CONFIG_RESOURCE_BUNDLE);
+            value = propFile.getString(StaticResources.BASU_NODE_ID_RESOURCE_BUNDLE_KEY);
+        }
+        catch (MissingResourceException mre) {
+            logger.warn(String.format("Not found '%s' property. Is it defined?", StaticResources.BASU_NODE_ID_RESOURCE_BUNDLE_KEY));
+            logger.error(mre.getMessage());
+        }
+        return value;
+    }
     /**
      * Gets the local application configuration from business logic layer. It may differ from
      * the presentation layer. 
@@ -63,7 +79,7 @@ public class Config {
      */
     public Locale getLocale() {
 		Locale locale;
-		String strLocale = getString("cbi4api.basu.event.subscriber.application.locale");
+		String strLocale = getString(StaticResources.LOCALE_RESOURCE_BUNDLE_KEY);
 		if (strLocale == null) 
 			strLocale = StaticResources.DEFAULT_LOCALE;				
 		String locales[] = strLocale.split("_");

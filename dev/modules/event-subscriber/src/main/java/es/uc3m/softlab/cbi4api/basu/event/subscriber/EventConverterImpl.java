@@ -77,9 +77,9 @@ public class EventConverterImpl implements EventConverter {
     	/* checks the source definition */    	
 		Source source = sourceFacade.getSource(event.getServerID());			
 		if (source == null) {
-			logger.fatal("Cannot get source from database for the server with id " + event.getServerID() + ". Please, check if it is defined.");
+			logger.error(String.format("Cannot get source " + event.getServerID() + ". Rejecting event [%s]", event.getEventID()));
 			throw new SourceException(es.uc3m.softlab.cbi4api.basu.event.store.StaticResources.WARN_GET_SOURCE_NOT_EXIST,
-					"Cannot get source from database for the server with id " + event.getServerID() + ". Please, check if it is defined.");
+                    String.format("Cannot get source " + event.getServerID() + ". Rejecting event [%s]", event.getEventID()));
 		}						
 		/* correlates the event by obtaining an existing process instance or creating a new one if necessary */
 		ProcessInstance processInstance = eventCorrelator.correlateProcess(event, source);		
@@ -110,18 +110,18 @@ public class EventConverterImpl implements EventConverter {
 		evt.setPayload(transformPayload(evt, event.getPayload()));
 		/* adds the additional data */
 		evt.setDataElement(transformData(evt, event.getDataElement()));
-		/* if the event supply correlation data in detriment of the source process instance */
-		if (event.getCorrelation() != null) {
+		/* if the event correlation data is supplied */
+		if (event.getCorrelation().isSetCorrelationData()) {
 			/* adds the event correlation data */
-			evt.setCorrelations(transformCorrelation(evt, event.getCorrelation().getCorrelationElement()));			
+			evt.setCorrelations(transformCorrelation(evt, event.getCorrelation().getCorrelationData().getCorrelationElement()));			
 		}		
 		return evt;		
     }  
 	/**
-	 * Transform a list of {@link es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.bpaf.extension.Payload} 
+	 * Transform a list of {@link es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.basu.event.Payload}
 	 * objects into a list of {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.EventPayload} objects.
 	 * @param event {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Event} to attach the payload.
-	 * @param payloads list of {@link es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.bpaf.extension.Payload} objects.
+	 * @param payloads list of {@link es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.basu.event.Payload} objects.
 	 * @return list of {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.EventPayload} objects.
 	 */
 	private Set<EventPayload> transformPayload(Event event, List<Payload> payloads) {
@@ -138,10 +138,10 @@ public class EventConverterImpl implements EventConverter {
 		return _payloads;
 	}    
 	/**
-	 * Transform a list of {@link es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.bpaf.extension.CorrelationElement} 
+	 * Transform a list of {@link es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.basu.event.CorrelationElement}
 	 * objects into a list of {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.EventCorrelation} objects.
 	 * @param event {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Event} to attach the correlation data.
-	 * @param correlations list of {@link es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.bpaf.extension.CorrelationElement} objects.
+	 * @param correlations list of {@link es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.basu.event.CorrelationElement} objects.
 	 * @return list of {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.EventCorrelation} objects.
 	 */
 	private Set<EventCorrelation> transformCorrelation(Event event, List<CorrelationElement> correlations) {
@@ -158,10 +158,10 @@ public class EventConverterImpl implements EventConverter {
 		return eventCorrelations;
 	}
 	/**
-	 * Transform a list of {@link es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.bpaf.extension.Payload} 
+	 * Transform a list of {@link es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.basu.event.Payload}
 	 * objects into a list of {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.EventPayload} objects.
 	 * @param event {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Event} to attach the event data.
-	 * @param dataElements list of {@link es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.bpaf.extension.Payload} objects.
+	 * @param dataElements list of {@link es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.basu.event.Payload} objects.
 	 * @return list of {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.EventPayload} objects.
 	 */
 	private Set<EventData> transformData(Event event, List<DataElement> dataElements) {
@@ -172,7 +172,7 @@ public class EventConverterImpl implements EventConverter {
 			EventData data = new EventData();
 			data.setKey(dataElement.getKey());
 			data.setValue(dataElement.getValue());
-			data.setEvent(event);			
+			data.setEvent(event);
 			eventData.add(data);
 		}
 		return eventData;

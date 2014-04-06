@@ -146,7 +146,7 @@ public class EventFacadeImpl implements EventFacade {
 		}		
 		/* 
 		 * The data elements, correlation and payload information is not managed by this 
-		 * method because it is supposed to do not be updatable. 
+		 * method because it is supposed not to be updatable.
 		 */
 		eventDAO.merge(event);		
 		logger.info("Event " + event + " updated successfully.");
@@ -170,7 +170,7 @@ public class EventFacadeImpl implements EventFacade {
 		logger.info("Event " + _event + " removed successfully.");
 	}	
 	/**
-	 * Loads the {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Event#data} associated
+	 * Loads the {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Event#dataElement} associated
 	 * from the data base. This is needed due to the fetch property is set to lazy, and their associated 
 	 * objects are loaded out of synchronism when the {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Event} 
 	 * is initially loaded within a JTA transaction.

@@ -12,9 +12,9 @@ package es.uc3m.softlab.cbi4api.basu.event.store;
  * @author averab
  */
 public class StaticResources {
-	/** Sigav persistence name */
+	/** BASU persistence name */
 	public static final String PERSISTENCE_NAME_EVENT_STORE="cbi4api-basu-event-store";	
-	/** Sigav persistence unit name */
+	/** BASU persistence unit name */
 	public static final String PERSISTENCE_UNIT_NAME_EVENT_STORE="cbi4api-basu-event-store";
 	/** Internationalization resource bundle */
 	public static final String CONFIG_RESOURCE_BUNDLE="event-store";	
@@ -25,10 +25,10 @@ public class StaticResources {
 
     /** Bundle key for current locale */
     public static final String BUNDLE_CONFIG_LOCALE_KEY="cbi4api.basu.event.store.application.locale";
-    /** Bundle key for stats file */
-    public static final String BUNDLE_CONFIG_STATS_FILE_KEY="cbi4api.basu.event.store.stats.file";
     /** Bundle key for stats active flag */
     public static final String BUNDLE_CONFIG_STATS_ACTIVE_KEY="cbi4api.basu.event.store.stats.active";
+    /** Bundle key for stats batch size flag */
+    public static final String BUNDLE_CONFIG_BATCH_STATS_SIZE_KEY="cbi4api.basu.event.store.stats.batch.size";
     
 	/** Component name for the event store configuration */
 	public static final String COMPONENT_NAME_CONFIG = "eventStoreConfig";
@@ -42,8 +42,6 @@ public class StaticResources {
 	public static final String COMPONENT_NAME_PROCESS_MODEL_DAO = "/cbi4api-basu/event-store/dao/ModelDAO";
 	/** Component name for activity model data access object */
 	public static final String COMPONENT_NAME_ACTIVITY_MODEL_DAO = "/cbi4api-basu/event-store/dao/ModelDAO";
-	/** Component name for process instance data access object */
-	public static final String COMPONENT_NAME_PROCESS_MAPPING_DAO = "/cbi4api-basu/event-store/dao/ProcessMappingDAO";
 	/** Component name for process instance data access object */
 	public static final String COMPONENT_NAME_PROCESS_INSTANCE_DAO = "/cbi4api-basu/event-store/dao/ProcessInstanceDAO";
 	/** Component name for activity instance data access object */
@@ -63,9 +61,7 @@ public class StaticResources {
 	public static final String COMPONENT_NAME_PROCESS_INSTANCE_FACADE = "/cbi4api-basu/event-store/facade/ProcessInstanceFacade";
 	/** Component name for activity instance service facade */
 	public static final String COMPONENT_NAME_ACTIVITY_INSTANCE_FACADE = "/cbi4api-basu/event-store/facade/ActivityInstanceFacade";
-	/** Component name for process mapping service facade */
-	public static final String COMPONENT_NAME_PROCESS_MAPPING_FACADE = "/cbi4api-basu/event-store/facade/ProcessMappingFacade";
-	
+
 	/** Facade warn login code for generic spring components exceptions */ 
 	public static final int ERROR_GENERIC_SPRING_COMPONENTS = 1;
 	/** Facade warn login code for generic JPA unexpected exceptions */ 
@@ -190,21 +186,6 @@ public class StaticResources {
 	/** Facade warn code for deleting a activity instance which does not exist */
 	public static final int WARN_DELETE_ACTIVITY_INSTANCE_NOT_EXIST = 15009;
 	/** Facade warn code for loading events on an activity instance which does not exist */
-	public static final int WARN_LOAD_EVENT_ACTIVITY_INSTANCE_NOT_EXIST = 15010;	
-	
-	/** Facade warn code for getting a process mapping which does not exist */ 
-	public static final int WARN_GET_PROCESS_MAPPING_NOT_EXIST = 16001;	
-	/** Facade warn code for saving a process mapping which is a null object */ 
-	public static final int WARN_SAVE_NULL_PROCESS_MAPPING = 16002;
-	/** Facade warn code for saving a process mapping with no information on the name field */ 
-	public static final int WARN_SAVE_PROCESS_MAPPING_WITHOUT_NAME = 16003;
-	/** Facade warn code for saving a process mapping with no information on the description field */ 
-	public static final int WARN_SAVE_PROCESS_MAPPING_WITHOUT_DESCRIPTION = 16004;
-	/** Facade warn code for updating a process mapping which does not exist */ 
-	public static final int WARN_UPDATE_PROCESS_MAPPING_NOT_EXIST = 16005;
-	/** Facade warn code for deleting a process mapping which does not exist */
-	public static final int WARN_DELETE_PROCESS_MAPPING_NOT_EXIST = 16006;
-	/** Facade warn code for loading model mappings on a process mapping which does not exist */
-	public static final int WARN_LOAD_MODEL_MAPPINGS_PROCESS_MAPPING_NOT_EXIST = 16007;
+	public static final int WARN_LOAD_EVENT_ACTIVITY_INSTANCE_NOT_EXIST = 15010;
 	
 }

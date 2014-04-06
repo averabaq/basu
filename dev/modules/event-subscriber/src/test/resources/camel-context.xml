@@ -25,7 +25,6 @@
 			<camel:from	ref="basu.bpaf.queue.endpoint" />
 		    <camel:convertBodyTo type="byte[]"/>
 		    <camel:process ref="/cbi4api-basu/event-subscriber/service/etl-event-processor" />
-			<camel:to uri="gbas.bpaf.queue.endpoint" />
 		</camel:route>		
 	</camel:camelContext>		
 	

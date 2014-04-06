@@ -49,6 +49,7 @@ public class ActivityInstanceFacadeImpl implements ActivityInstanceFacade {
 	 * @return {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ActivityInstance} entity 
 	 * object associated.
 	 */
+    @Override
     public ActivityInstance getActivityInstance(long id) {
 		logger.debug("Retrieving model with identifier " + id + "...");
 		ActivityInstance instance = activityInstanceDAO.findById(id);
@@ -67,10 +68,11 @@ public class ActivityInstanceFacadeImpl implements ActivityInstanceFacade {
 	 * as unique keys.
 	 * 
 	 * @param activityId activity instance identifier given at the original source.
-	 * @param source activity instance source.
+	 * @param model activity instance model.
 	 * @return {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ActivityInstance} entity object associated.
 	 * @throws ActivityInstanceException if any activity instance error occurred.
 	 */
+    @Override
     public ActivityInstance getActivityInstance(String activityId, Model model) throws ActivityInstanceException {
 		logger.debug("Retrieving activity instance with source data as pairs of (" + activityId + ", " + model.getSource() + ")...");
 		if (activityId == null) 
@@ -97,6 +99,7 @@ public class ActivityInstanceFacadeImpl implements ActivityInstanceFacade {
 	 * @return {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ActivityInstance} entity object associated.
 	 * @throws ActivityInstanceException if any activity instance error occurred.
 	 */
+    @Override
     public ActivityInstance getActivityInstance(Set<EventCorrelation> correlation, Model model) throws ActivityInstanceException {
 		logger.debug("Retrieving activity instance associted to a determined correlation data from the model " + model + " and source associated...");
 		if (correlation == null || correlation.isEmpty()) 
@@ -108,7 +111,7 @@ public class ActivityInstanceFacadeImpl implements ActivityInstanceFacade {
 		/* retrieve the activity instance associated with the correlation information provided */
 		ActivityInstance instance = activityInstanceDAO.findBySourceData(correlation, model);
 		if (instance == null) {
-			logger.debug("Cannot get activity instance. Activity instance associted to a determined correlation data from the model " + model + " and associated source " + model.getSource() + " does not exist.");
+			logger.debug("Cannot get activity instance. Activity instance associated to a determined correlation data from the model " + model + " and associated source " + model.getSource() + " does not exist.");
 		}
 		logger.debug("Activity instance " + instance + " retrieved successfully.");
 		return instance;
@@ -121,7 +124,8 @@ public class ActivityInstanceFacadeImpl implements ActivityInstanceFacade {
 	 * 
 	 * @param instance {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ActivityInstance} to load the events on.
 	 * @throws ActivityInstanceException if any illegal data access or inconsistent activity instance data error occurred.
-	 */	
+	 */
+    @Override
     public void loadEvents(ActivityInstance instance) throws ActivityInstanceException {
 		logger.debug("Loading events on process instance '" + instance + "'...");
 		ActivityInstance _instance = activityInstanceDAO.findById(instance.getId());
@@ -139,6 +143,7 @@ public class ActivityInstanceFacadeImpl implements ActivityInstanceFacade {
 	 * @return all {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ActivityInstance} entity 
 	 * objects defined at the data base.
 	 */
+    @Override
 	public List<ActivityInstance> getAll() {
 		logger.debug("Retrieving all activity instances...");
 		List<ActivityInstance> instances = activityInstanceDAO.findAll();
@@ -153,6 +158,7 @@ public class ActivityInstanceFacadeImpl implements ActivityInstanceFacade {
 	 * entity object to save.
 	 * @throws ActivityInstanceException if any activity instance error occurred.
 	 */
+    @Override
 	public void saveActivityInstance(ActivityInstance instance) throws ActivityInstanceException {
 		logger.debug("Saving the activity instance " + instance + "...");		
 		if (instance == null) {
@@ -171,6 +177,7 @@ public class ActivityInstanceFacadeImpl implements ActivityInstanceFacade {
 	 * entity object to update.
 	 * @throws ActivityInstanceException if any illegal data access or inconsistent activity instance data error occurred.
 	 */
+    @Override
 	public void updateActivityInstance(ActivityInstance instance) throws ActivityInstanceException {
 		logger.debug("Updating activity instance " + instance + "...");	
 		ActivityInstance _instance = activityInstanceDAO.findById(instance.getId());
@@ -189,6 +196,7 @@ public class ActivityInstanceFacadeImpl implements ActivityInstanceFacade {
 	 * entity object to delete.
 	 * @throws ActivityInstanceException if any illegal data access or inconsistent activity instance data error occurred.
 	 */
+    @Override
 	public void deleteActivityInstance(ActivityInstance instance) throws ActivityInstanceException {
 		logger.debug("Removing activity instance " + instance + "...");	
 		ActivityInstance _instance = activityInstanceDAO.findById(instance.getId());

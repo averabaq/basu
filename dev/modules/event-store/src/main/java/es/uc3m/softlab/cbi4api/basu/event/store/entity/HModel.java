@@ -32,7 +32,7 @@ import javax.persistence.Column;
  * @author averab
  */
 @Entity(name="event-store.HModel")
-@Table(name="model", schema="event_store") 
+@Table(name="lv_model", schema="event_store")
 @PersistenceUnit(name=StaticResources.PERSISTENCE_NAME_EVENT_STORE, unitName=StaticResources.PERSISTENCE_UNIT_NAME_EVENT_STORE)
 public class HModel implements Serializable {
 	/** Serial Version UID */

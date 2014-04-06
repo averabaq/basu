@@ -34,7 +34,7 @@ import javax.persistence.Column;
  * @author averab
  */
 @Entity(name="event-store.ActivityInstance")
-@Table(name="activity_instance", schema="event_store")
+@Table(name="lv_activity_instance", schema="event_store")
 @PersistenceUnit(name=StaticResources.PERSISTENCE_NAME_EVENT_STORE, unitName=StaticResources.PERSISTENCE_UNIT_NAME_EVENT_STORE)
 /*@NamedQueries({
 	@NamedQuery(name="activityFromProcessInstanceAndActivityName", 

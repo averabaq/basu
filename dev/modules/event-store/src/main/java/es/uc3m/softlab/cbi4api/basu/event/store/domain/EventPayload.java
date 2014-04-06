@@ -86,7 +86,7 @@ public class EventPayload implements Comparable<EventPayload>, Serializable {
 	 * implies x.compareTo(z)>0. Finally, the implementor must ensure that x.compareTo(y)==0 implies that 
 	 * sgn(x.compareTo(z)) == sgn(y.compareTo(z)), for all z. 
 	 * 
-	 * @param event the object to be compared. 
+	 * @param payload the object to be compared.
 	 * @return a negative integer, zero, or a positive integer as this object is less than, equal to, or greater 
 	 * than the specified object. 
 	 */

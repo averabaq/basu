@@ -6,14 +6,16 @@
 package es.uc3m.softlab.cbi4api.basu.event.store.dao;
 
 import es.uc3m.softlab.cbi4api.basu.event.store.StaticResources;
-import es.uc3m.softlab.cbi4api.basu.event.store.Stats;
+import es.uc3m.softlab.cbi4api.basu.event.store.kpi.Stats;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.ActivityInstance;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.Model;
-import es.uc3m.softlab.cbi4api.basu.event.store.domain.Event;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.EventCorrelation;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.ModelType;
 import es.uc3m.softlab.cbi4api.basu.event.store.entity.HActivityInstance;
+import es.uc3m.softlab.cbi4api.basu.event.store.entity.HEvent;
 import es.uc3m.softlab.cbi4api.basu.event.store.entity.HModel;
+import es.uc3m.softlab.cbi4api.basu.event.store.entity.HEventCorrelationIndex;
+import es.uc3m.softlab.cbi4api.basu.event.store.entity.HIndexBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -63,7 +65,8 @@ public class ActivityInstanceDAOImpl implements ActivityInstanceDAO {
 	 * @return all {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ActivityInstance} entity 
 	 * objects.
 	 * @throws IllegalArgumentException if an illegal argument error occurred.
-	 */    
+	 */
+    @Override
     @SuppressWarnings("unchecked")
     public List<ActivityInstance> findAll() throws IllegalArgumentException {
 		logger.debug("Finding all activity instances...");
@@ -91,6 +94,7 @@ public class ActivityInstanceDAOImpl implements ActivityInstanceDAO {
 	 * object associated.
 	 * @throws IllegalArgumentException if an illegal argument error occurred.
 	 */
+    @Override
 	public ActivityInstance findById(long id) throws IllegalArgumentException {
 		logger.debug("Retrieving activity instance with identifier " + id + "...");
 		HActivityInstance hinstance = entityManager.find(HActivityInstance.class, id);	
@@ -118,6 +122,7 @@ public class ActivityInstanceDAOImpl implements ActivityInstanceDAO {
 	 * @return {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ActivityInstance} entity object associated.
 	 * @throws IllegalArgumentException if an illegal argument error occurred.
 	 */
+    @Override
 	public ActivityInstance findBySourceData(String activityId, Model model) throws IllegalArgumentException {
 		logger.debug("Retrieving activity instance with source data as pairs of (" + activityId + ", " + model.getSource() + ")...");
 		Model _model = modelDAO.findBySourceData(model.getModelSrcId(), model.getSource(), ModelType.ACTIVITY);
@@ -152,15 +157,15 @@ public class ActivityInstanceDAOImpl implements ActivityInstanceDAO {
 			long ini = System.nanoTime();
 			hinstance = (HActivityInstance)query.getSingleResult();
 			long end = System.nanoTime();
-			stats.writeStat(Stats.Operation.READ_BY_SOURCE_DATA, hinstance, ini, end);
+			stats.writeStat(Stats.Operation.READ_BY_SOURCE_DATA, HActivityInstance.class, hinstance, ini, end);
 			logger.debug("Activity instance " + hinstance + " retrieved successfully.");
 		} catch(NoResultException nrex) {
 			logger.debug("Activity instance with source data as pairs of (" + activityId + ", " + model.getSource() + ") does not exist.");
 			return null;
 		} catch(NonUniqueResultException nurex) {
 			logger.error(nurex.fillInStackTrace());
-			logger.fatal("This message should never appear. Inconsistence in the database has been found. There exists two or more different local activity instances for a unique pair of source and source activity instances.");			
-			throw new IllegalArgumentException("Inconsistence in the database has been found. There exists two or more different local activity instances for a unique pair of source and source activity instances.");
+			logger.fatal("This message should never appear. Inconsistency found in database. There exists two or more different local activity instances for a unique pair of source and source activity instances.");
+			throw new IllegalArgumentException("Inconsistency found in database. There exists two or more different local activity instances for a unique pair of source and source activity instances.");
 		}
 		ActivityInstance instance = BusinessObjectAssembler.getInstance().toBusinessObject(hinstance);
 		return instance;
@@ -178,39 +183,27 @@ public class ActivityInstanceDAOImpl implements ActivityInstanceDAO {
 	 * @return {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ActivityInstance} entity object associated.
 	 * @throws IllegalArgumentException if an illegal argument error occurred.
 	 */
-    @SuppressWarnings("unchecked")
+    @Override
     public ActivityInstance findBySourceData(Set<EventCorrelation> correlation, Model model) throws IllegalArgumentException {
-    	logger.debug("Retrieving activity instance associted to a determined correlation data from the model " + model + " associated to the source " + model.getSource() + " ...");
-		if (correlation == null || correlation.size() == 0) {
+    	logger.debug("Retrieving activity instance associted to a determined correlation data from the model " + model + " associated to the source " + model.getSource() + "...");
+		if (correlation == null || correlation.isEmpty()) {
 			throw new IllegalArgumentException("Cannot retrieve activity instance because no correlation data has been provided.");
 		}
-    	StringBuilder correlationClause = new StringBuilder("ec.key in (");
-		for (EventCorrelation eventCorrelation : correlation) {
-			correlationClause.append("'" + eventCorrelation.getKey() + "',");			
-		}
-		correlationClause.deleteCharAt(correlationClause.lastIndexOf(","));
-		correlationClause.append(") and ec.value in (");
-		for (EventCorrelation eventCorrelation : correlation) {
-			correlationClause.append("'" + eventCorrelation.getValue() + "',");			
-		}
-		correlationClause.deleteCharAt(correlationClause.lastIndexOf(","));
-		correlationClause.append(")");
-    	//
-		// TODO: modify JPQL statement to set explicit parameters
-    	// the snippet code below does not work as the DataNucleus implementation (3.2.0-release) 
-    	// for HBase has a bug on cached parameters.
-    	//
-		Query query = entityManager.createQuery("select object(evt) from event-store.Event evt where evt.id in (select distinct e.id from Event e, EventCorrelation ec where e.id = ec.event and " + correlationClause.toString() + " and e.activityInstance.model.name = :modelName and e.activityInstance.model.source = :source group by e.id having count(e.id) = :correlationSize) order by evt.id desc");
-		query.setParameter("modelName", model.getName());
-		query.setParameter("source", model.getSource());
-		query.setParameter("correlationSize", Long.valueOf(correlation.size()));		
-		List<Event> events = query.getResultList();
-		if (events == null || events.size() == 0) {
-			logger.debug("No activity instance associted to a determined correlation data from the model " + model + " associated to the source " + model.getSource() + " could be found.");
+		byte[] key = HIndexBuilder.getInstance().getIndexKey(correlation, model);
+		// filter by correlation set
+        long ini = System.nanoTime();
+        HEventCorrelationIndex index = entityManager.find(HEventCorrelationIndex.class, key);;
+        long end = System.nanoTime();
+        stats.writeStat(Stats.Operation.SECONDARY_INDEX_CORRELATION, HEventCorrelationIndex.class, index, ini, end);
+		// if no index was found it means a new activity instance
+		if (index == null)
 			return null;
-		}
-		/* gets the activity instance from the most recent event to undertake the event correlation */
-		ActivityInstance instance = events.get(0).getActivityInstance();
+		// gets the event
+		HEvent event = entityManager.find(HEvent.class, index.getEventID());		
+		if (model.getId() != event.getActivityDefinitionID())
+			return null;
+		// gets the activity instance from the most recent event to undertake the event correlation 
+		ActivityInstance instance = findById(event.getActivityInstance());
 		logger.debug("Activity instance " + instance + " retrieved successfully.");
 		return instance;
 	}           
@@ -223,6 +216,7 @@ public class ActivityInstanceDAOImpl implements ActivityInstanceDAO {
 	 * @throws IllegalArgumentException if an illegal argument error occurred.
 	 * @throws TransactionRequiredException if a transaction error occurred.
 	 */
+    @Override
 	public void merge(ActivityInstance instance) throws IllegalArgumentException, TransactionRequiredException {
 		logger.debug("Merging activity instance " + instance + "...");
 		HActivityInstance hinstance = BusinessObjectAssembler.getInstance().toEntity(instance);
@@ -237,7 +231,8 @@ public class ActivityInstanceDAOImpl implements ActivityInstanceDAO {
 	 * entity object to delete.
 	 * @throws IllegalArgumentException if an illegal argument error occurred.
 	 * @throws TransactionRequiredException if a transaction error occurred.
-	 */	
+	 */
+    @Override
 	public void delete(ActivityInstance instance) throws IllegalArgumentException, TransactionRequiredException {
 		logger.debug("Deleting activity instance " + instance + "...");
 		HActivityInstance hinstance = entityManager.find(HActivityInstance.class, instance.getId());
@@ -257,7 +252,8 @@ public class ActivityInstanceDAOImpl implements ActivityInstanceDAO {
 	 * entity object to save.
 	 * @throws IllegalArgumentException if an illegal argument error occurred.
 	 * @throws TransactionRequiredException if a transaction error occurred.
-	 */	
+	 */
+    @Override
 	public void save(ActivityInstance instance) throws IllegalArgumentException, TransactionRequiredException {
 		logger.debug("Saving activity instance " + instance + "...");	
 		
@@ -270,7 +266,7 @@ public class ActivityInstanceDAOImpl implements ActivityInstanceDAO {
 			/* checks for the activity instance existence */
 			HActivityInstance _hactivityInstance = entityManager.find(HActivityInstance.class, instance.getId());			
 			long end = System.nanoTime();
-			stats.writeStat(Stats.Operation.READ_BY_ID, _hactivityInstance, ini, end);			
+			stats.writeStat(Stats.Operation.READ_BY_ID, HActivityInstance.class, _hactivityInstance, ini, end);			
 			if (_hactivityInstance != null) {
 				logger.debug("Activity instance " + instance.getId() + " cannot be persisted because it already exists.");
 				return;
@@ -295,7 +291,7 @@ public class ActivityInstanceDAOImpl implements ActivityInstanceDAO {
 		// updates the current instance back with the new assigned identifier
 		entityManager.refresh(hactivityInstance);
 		instance.setId(hactivityInstance.getId());
-		stats.writeStat(Stats.Operation.WRITE, hactivityInstance, ini, end);
+		stats.writeStat(Stats.Operation.WRITE, HActivityInstance.class, hactivityInstance, ini, end);
 		logger.debug("Activity instance " + instance + " saved successfully.");
 	}	
 	/**
@@ -306,7 +302,8 @@ public class ActivityInstanceDAOImpl implements ActivityInstanceDAO {
 	 * 
 	 * @param instance {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.ActivityInstance} to load the events on.
 	 * @throws IllegalArgumentException if an illegal argument error occurred.
-	 */	
+	 */
+    @Override
 	@SuppressWarnings("unchecked")
 	public void loadEvents(ActivityInstance instance) throws IllegalArgumentException {
 		if (instance == null) {

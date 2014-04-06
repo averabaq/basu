@@ -5,10 +5,20 @@
     <!-- cbi4api.basu Event Store Persistence Unit -->
 	<persistence-unit name="${cbi4api.basu.event.store.persistence.unit.name}" transaction-type="RESOURCE_LOCAL">
 		<provider>${cbi4api.basu.event.store.persistence.jpa.provider}</provider>
-		<properties>
+
+        <class>es.uc3m.softlab.cbi4api.basu.event.store.entity.HSource</class>
+        <class>es.uc3m.softlab.cbi4api.basu.event.store.entity.HModel</class>
+        <class>es.uc3m.softlab.cbi4api.basu.event.store.entity.HProcessInstance</class>
+        <class>es.uc3m.softlab.cbi4api.basu.event.store.entity.HActivityInstance</class>
+        <class>es.uc3m.softlab.cbi4api.basu.event.store.entity.HEvent</class>
+        <class>es.uc3m.softlab.cbi4api.basu.event.store.entity.HEventCorrelation</class>
+        <class>es.uc3m.softlab.cbi4api.basu.event.store.entity.HEventData</class>
+        <class>es.uc3m.softlab.cbi4api.basu.event.store.entity.HEventPayload</class>
+        <class>es.uc3m.softlab.cbi4api.basu.event.store.entity.HEventCorrelationIndex</class>
+
+        <properties>
 			<property name="javax.persistence.jdbc.url" value="hbase:"/>
 			<property name="datanucleus.jpa.addClassTransformer" value="false" />
-			<property name="datanucleus.managedRuntime" value="false" />
 			<property name="datanucleus.ConnectionURL" value="hbase" />
 			<property name="datanucleus.ConnectionUserName" value="" />
 			<property name="datanucleus.ConnectionPassword" value="" />

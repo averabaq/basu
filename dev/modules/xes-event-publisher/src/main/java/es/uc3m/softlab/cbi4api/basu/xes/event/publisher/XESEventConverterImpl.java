@@ -5,15 +5,11 @@
  */
 package es.uc3m.softlab.cbi4api.basu.xes.event.publisher;
 
-import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -22,7 +18,6 @@ import java.util.UUID;
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
@@ -30,6 +25,7 @@ import javax.xml.validation.SchemaFactory;
 import es.uc3m.softlab.cbi4api.basu.xes.event.publisher.XESMap.BPAFStateXesMap;
 import es.uc3m.softlab.cbi4api.basu.xes.event.publisher.xsd.TimeStampAdapter;
 import es.uc3m.softlab.cbi4api.basu.xes.event.publisher.xsd.basu.event.Correlation;
+import es.uc3m.softlab.cbi4api.basu.xes.event.publisher.xsd.basu.event.CorrelationData;
 import es.uc3m.softlab.cbi4api.basu.xes.event.publisher.xsd.basu.event.CorrelationElement;
 import es.uc3m.softlab.cbi4api.basu.xes.event.publisher.xsd.basu.event.DataElement;
 import es.uc3m.softlab.cbi4api.basu.xes.event.publisher.xsd.basu.event.Event;
@@ -93,6 +89,7 @@ public class XESEventConverterImpl implements XESEventConverter {
 		for (TraceType trace : xes.getTrace()) {
 			// process instance level
 			Event event = new Event();	
+			event.setCorrelation(new Correlation());
 			event.setEventID(UUID.randomUUID().toString());
 			event.setServerID(config.getSourceId());		
 			for (Object object : trace.getStringOrDateOrInt()) {				
@@ -103,15 +100,17 @@ public class XESEventConverterImpl implements XESEventConverter {
 			
 			// save process data for being set in subprocesses (activities)
 			String processName = event.getProcessName();
-			String processInstanceID = event.getProcessInstanceID();
+			String processInstanceID = event.getCorrelation().getProcessInstanceID();
 			String processDefinitionID = event.getProcessDefinitionID();			
 			// activity instance level
 			for (EventType eventType : trace.getEvent()) {	
-				event = new Event();
+				event = new Event();	
+				event.setCorrelation(new Correlation());
 				event.setEventID(UUID.randomUUID().toString());
 				event.setServerID(config.getSourceId());
-				event.setProcessName(processName);
-				event.setProcessInstanceID(processInstanceID);
+				event.setCorrelation(new Correlation());
+				event.getCorrelation().setProcessInstanceID(processInstanceID);
+				event.setProcessName(processName);				
 				event.setProcessDefinitionID(processDefinitionID);				
 				for (Object object : eventType.getStringOrDateOrInt()) {
 					processXES(XESMapType.EVENT, xesMap, object, event);			
@@ -230,7 +229,7 @@ public class XESEventConverterImpl implements XESEventConverter {
     			case EVENT_ID: event.setEventID((String)value); break;
     			case SERVER_ID: event.setServerID((String)value); break;
     			case PROCESS_DEFINITION_ID: event.setProcessDefinitionID((String)value); break;
-    			case PROCESS_INSTANCE_ID: event.setProcessInstanceID((String)value); break;
+    			case PROCESS_INSTANCE_ID: event.getCorrelation().setProcessInstanceID((String)value); break;
     			case PROCESS_NAME: event.setProcessName((String)value); break;
     			case ACTIVITY_DEFINITION_ID: event.setActivityDefinitionID((String)value); break;
     			case ACTIVITY_INSTANCE_ID: event.setActivityInstanceID((String)value); break;
@@ -247,13 +246,16 @@ public class XESEventConverterImpl implements XESEventConverter {
      * @param value attribute value
      */
     private void setEventCorrelation(Event event, String key, Object value) {
-		if (event.getCorrelation() == null) {
+		if (!event.isSetCorrelation()) {
 			event.setCorrelation(new Correlation());    				
+		}
+    	if (!event.getCorrelation().isSetCorrelationData()) {
+			event.getCorrelation().setCorrelationData(new CorrelationData());    				
 		}
 		CorrelationElement correlation = new CorrelationElement();
 		correlation.setKey(key);
 		correlation.setValue(String.valueOf(value));
-		event.getCorrelation().getCorrelationElement().add(correlation);   	
+		event.getCorrelation().getCorrelationData().getCorrelationElement().add(correlation);   	
     } 
     /**
      * Sets the event payload attributes to a particular event

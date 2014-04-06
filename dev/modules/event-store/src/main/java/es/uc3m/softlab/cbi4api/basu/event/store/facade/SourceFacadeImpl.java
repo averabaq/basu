@@ -51,8 +51,9 @@ public class SourceFacadeImpl implements SourceFacade {
 		Source source = sourceDAO.findById(id);
 		if (source == null) {
 			logger.warn("Cannot get source. Source with identifier: " + id + " does not exist.");
-		}
-		logger.debug("Source " + source + " retrieved successfully.");
+		} else {
+            logger.debug("Source " + source + " retrieved successfully.");
+        }
 		return source;
 	}
 	/**

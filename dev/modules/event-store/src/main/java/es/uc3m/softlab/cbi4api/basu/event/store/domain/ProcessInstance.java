@@ -20,7 +20,6 @@ import java.io.Serializable;
  * <li><b>name</b>: Process instance's name.</li>
  * <li><b>description</b>: Process instance's description.</li>
  * <li><b>model</b>: Process instance's model.</li>
- * <li><b>correlator_id</b>: Process instance correlation identifier.</li>
  * <li><b>instance_src_id</b>: Process instance identifier at source.</li>
  * <li><b>source</b>: Process instance's source.</li> 
  * </ul>
@@ -38,8 +37,6 @@ public class ProcessInstance implements Comparable<ProcessInstance>, Serializabl
 	private String description;
 	/** Process instance's model */
 	private Model model;
-	/** Process instance correlation identifier */
-	private Long correlatorId;
 	/** Process instance identifier at source */
 	private String instanceSrcId;
 	/** Process instance's events. */
@@ -105,20 +102,6 @@ public class ProcessInstance implements Comparable<ProcessInstance>, Serializabl
 	 */
 	public void setModel(Model model) {
 		this.model = model;
-	}
-	/**
-	 * Gets the {@link #correlatorId} property.
-	 * @return the {@link #correlatorId} property.
-	 */
-	public Long getCorrelatorId() {
-		return correlatorId;
-	}
-	/**
-	 * Sets the {@link #correlatorId} property.
-	 * @param correlatorId the {@link #correlatorId} property to set.
-	 */
-	public void setCorrelatorId(Long correlatorId) {
-		this.correlatorId = correlatorId;
 	}
 	/**
 	 * Gets the {@link #instanceSrcId} property.
@@ -371,10 +354,10 @@ public class ProcessInstance implements Comparable<ProcessInstance>, Serializabl
 	 */
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + (int) (id ^ (id >>> 32));
-		return result;
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((id == null) ? 0 : id.hashCode());
+        return result;
 	}
 	/**
 	 * Indicates whether some other object is "equal to" this one.

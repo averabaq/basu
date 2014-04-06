@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<basuLoaderConfig name="open311">
+    <sources>
+        <source id="Chicago" name="City of Chicago">
+            <description>Open311 Services for the city of Chicago</description>
+            <inetAddress>localhost</inetAddress>
+            <port>8080</port>
+        </source>
+    </sources>
+    <processModels>
+        <processModel id="4ffa4c69601827691b000018" name="Abandoned Vehicle">
+            <source>Chicago</source>
+            <description>Abandoned vehicles are taken to auto pound 3S or 3N where they are -- if not redeemed by the owners -- sold for scrap</description>
+        </processModel>
+        <processModel id="4ffa9cad6018277d4000007b" name="Alley Light Out">
+            <source>Chicago</source>
+            <description>One or more alley lights out, on a wooden pole in the alley itself, are reported under this service request type. Important information needed when reporting alley lights out includes: the exact address that the light/lights are behind, how many lights are out, and if the light(s) are completely out or if they blink on and off intermittently. Alley light repairs are done during the day when the lights are not on, so this information is essential to expedite the repair work</description>
+        </processModel>
+        <processModel id="4fd3bd72e750846c530000cd" name="Building Violation">
+            <source>Chicago</source>
+            <description>The Department of Buildings supports the safety and quality of life for the residents and visitors of the City of Chicago through enforcement of the Chicago Building Code</description>
+        </processModel>
+        <processModel id="4fd3b167e750846744000005" name="Graffiti Removal">
+            <source>Chicago</source>
+            <description>Graffiti Blasters employs 13 blast trucks that use baking soda under high water pressure to erase painted graffiti from brick, stone and other mineral surfaces. They also use 14 paint trucks to cover graffiti on the remaining surfaces</description>
+        </processModel>
+        <processModel id="4ffa971e6018277d4000000b" name="Pavement Cave-In Survey">
+            <source>Chicago</source>
+            <description>This code is used to request an inspection of cave-ins within the public way only.  Outside the limits of property line</description>
+        </processModel>
+        <processModel id="4fd3b656e750846c53000004" name="Pothole in Street">
+            <source>Chicago</source>
+            <description>Report Potholes in public streets</description>
+        </processModel>
+        <processModel id="4fd6e4ece750840569000019" name="Restaurant Complaint">
+            <source>Chicago</source>
+            <description>This service request is used to report problems related to food safety at restaurants.  Do not use this type to report problems relating to pricing, weights, expiration dates or other business issues.  These complaints are to be made under the Department of Business Affairs and Consumer Protection "Consumer Retail Complaint" type code</description>
+        </processModel>
+        <processModel id="4fd3b9bce750846c5300004a" name="Rodent Baiting / Rat Complaint">
+            <source>Chicago</source>
+            <description>Chicago's Bureau of Rodent Control investigates every reported rat sighting.  Alley conditions are investigated and damaged carts are replaced.  Rodenticide is placed in rat burrows to eradicate the nest</description>
+        </processModel>
+        <processModel id="4fd3b750e750846c5300001d" name="Sanitation Code Violation">
+            <source>Chicago</source>
+            <description>Chicago's sanitation code is a series of municipal ordinances that require cleanliness and the safe disposal of all trash and debris. Since mid-1994, a major crackdown on overflowing dumpsters has been underway in Chicago</description>
+        </processModel>
+        <processModel id="4ffa995a6018277d4000003c" name="Street Cut Complaints">
+            <source>Chicago</source>
+            <description>Used to identify areas where cuts were made in the street and were not repaired properly and are in need of asphalt improvement</description>
+        </processModel>
+        <processModel id="4ffa9f2d6018277d400000c8" name="Street Light Out">
+            <source>Chicago</source>
+            <description>Report a street light out in your neighborhood.  Street lights are always located on metal poles. To report alley lights, which are always located on wooden poles, use Alley Light Out</description>
+        </processModel>
+        <processModel id="4ffa9db16018277d400000a2" name="Traffic Signal Out">
+            <source>Chicago</source>
+            <description>This is a code that is used to report traffic signal outages</description>
+        </processModel>
+        <processModel id="4fd3bbf8e750846c53000069" name="Tree Debris">
+            <source>Chicago</source>
+            <description>Use this service type to request a pickup of a pile of branches or bushes. The branches/bushes must be neatly stacked in the alley or City parkway near the curb. Blocking a street, sidewalk of alleyway may result in a sanitation code ticket being issued</description>
+        </processModel>
+    </processModels>
+</basuLoaderConfig>
+
+

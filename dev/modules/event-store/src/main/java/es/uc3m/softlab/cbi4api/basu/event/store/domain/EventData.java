@@ -10,6 +10,7 @@ import java.io.Serializable;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 /**
  * <p>Event data entity class. This class is bound to the <strong>event_data</strong> table at the data base 
@@ -35,6 +36,7 @@ public class EventData implements Comparable<EventData>, Serializable {
     /** Event data element value */
     protected String value;
     /** Event owner of this data element */
+    @XmlTransient
     protected Event event;
 
 	/**
@@ -93,7 +95,7 @@ public class EventData implements Comparable<EventData>, Serializable {
 	 * implies x.compareTo(z)>0. Finally, the implementor must ensure that x.compareTo(y)==0 implies that 
 	 * sgn(x.compareTo(z)) == sgn(y.compareTo(z)), for all z. 
 	 * 
-	 * @param event the object to be compared. 
+	 * @param data the object to be compared.
 	 * @return a negative integer, zero, or a positive integer as this object is less than, equal to, or greater 
 	 * than the specified object. 
 	 */

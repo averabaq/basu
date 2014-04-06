@@ -393,7 +393,7 @@ public class Event implements Comparable<Event>, Serializable {
     }
 	/**
 	 * Sets the {@link #dataElement} property.
-	 * @param data the {@link #dataElement} property to set.
+	 * @param dataElement the {@link #dataElement} property to set.
 	 */
 	public void setDataElement(Set<EventData> dataElement) {
 		this.dataElement = dataElement;

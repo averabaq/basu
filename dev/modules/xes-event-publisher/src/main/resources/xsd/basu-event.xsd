@@ -31,10 +31,8 @@
 						<xs:attribute name="PreviousState" type="basu:State"/>
 					</xs:complexType>
 				</xs:element>
-				<xs:choice minOccurs="1" maxOccurs="1">					
-					<xs:element name="ProcessInstanceID" type="xs:NMTOKEN" />
-					<xs:element name="Correlation" type="basu:Correlation" />
-				</xs:choice>
+                <xs:element name="ActivityParent" type="basu:ActivityParent" minOccurs="0" maxOccurs="1"/>
+				<xs:element name="Correlation" type="basu:Correlation" minOccurs="1" maxOccurs="1"/>				
 				<xs:element name="DataElement" minOccurs="0" maxOccurs="unbounded" type="basu:DataElement"/>
 				<xs:element name="Payload" minOccurs="0" maxOccurs="unbounded" type="basu:Payload"/>
 			</xs:sequence>			
@@ -44,12 +42,25 @@
 			<xs:attribute name="ProcessName" type="xs:string"/>
 			<xs:attribute name="ActivityDefinitionID" type="xs:NMTOKEN"/>
 			<xs:attribute name="ActivityInstanceID" type="xs:NMTOKEN"/>
-			<xs:attribute name="ActivityParentID" type="xs:NMTOKEN"/>
 			<xs:attribute name="ActivityName" type="xs:string"/>
 			<xs:attribute name="Timestamp" type="xs:dateTime" use="required"/>			
 		</xs:complexType>
-	</xs:element>	
-	
+	</xs:element>
+
+    <xs:complexType name="ActivityParent">
+        <xs:sequence>
+            <xs:element name="ActivityDefinitionID" type="xs:NMTOKEN" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="ActivityInstanceID" type="xs:NMTOKEN" minOccurs="1" maxOccurs="1" />
+        </xs:sequence>
+    </xs:complexType>
+
+ 	<xs:complexType name="Correlation"> 	
+ 		<xs:sequence> 			 			
+ 			<xs:element name="ProcessInstanceID" type="xs:NMTOKEN" minOccurs="0"/>
+			<xs:element name="CorrelationData" type="basu:CorrelationData" minOccurs="0"/>
+ 		</xs:sequence>
+	</xs:complexType>	
+		
 	<xs:simpleType name="State" xmlns="http://www.wfmc.org/2009/BPAF2.0">
 		<xs:annotation>
 			<xs:documentation>Enumeration of Possible Process and Activity States</xs:documentation>
@@ -86,7 +97,7 @@
 		<xs:restriction base="xs:NMTOKEN"/>
 	</xs:simpleType>
  
- 	<xs:complexType name="Correlation"> 	
+ 	<xs:complexType name="CorrelationData"> 	
  		<xs:sequence> 			 			
  			<xs:element name="CorrelationElement" type="basu:CorrelationElement" minOccurs="1" maxOccurs="unbounded" /> 				
  		</xs:sequence>

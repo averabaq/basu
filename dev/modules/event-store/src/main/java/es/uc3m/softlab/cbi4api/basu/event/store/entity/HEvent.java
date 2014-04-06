@@ -45,7 +45,7 @@ import javax.persistence.Table;
  * @version 1.0.0 
  */
 @Entity(name="event-store.Event")
-@Table(name="event", schema="event_store")
+@Table(name="lv_event", schema="event_store")
 @PersistenceUnit(name=StaticResources.PERSISTENCE_NAME_EVENT_STORE, unitName=StaticResources.PERSISTENCE_UNIT_NAME_EVENT_STORE)
 /*@NamedQueries({
 	@NamedQuery(name="eventsFromProcessInstance", 
@@ -66,8 +66,12 @@ public class HEvent implements Comparable<HEvent>, Serializable {
 	private long eventID;
     /** HEvent process instance */
     private long processInstance;
+	/** HEvent process instance definition identifier */
+	private long processDefinitionID;
     /** HEvent activity instance */
     private Long activityInstance;
+    /** HEvent activity definition identifier */
+    private Long activityDefinitionID;    
     /** HEvent timestamp */
     private Long timestamp;
 	/** HEvent current state. */
@@ -132,6 +136,36 @@ public class HEvent implements Comparable<HEvent>, Serializable {
 	 */
 	public void setActivityInstance(Long activityInstance) {
 		this.activityInstance = activityInstance;
+	}
+	/**
+	 * Gets the {@link #processDefinitionID} property.
+	 * @return the processDefinitionID property.
+	 */
+	@Column(name="process_model", nullable=true, updatable=false)
+	public long getProcessDefinitionID() {
+		return processDefinitionID;
+	}
+	/**
+	 * Sets the {@link #processDefinitionID} property.
+	 * @param processDefinitionID the {@link #processDefinitionID} to set
+	 */
+	public void setProcessDefinitionID(long processDefinitionID) {
+		this.processDefinitionID = processDefinitionID;
+	}
+	/**
+	 * Gets the {@link #activityDefinitionID} property.
+	 * @return the activityDefinitionID property.
+	 */
+	@Column(name="activity_model", nullable=true, updatable=false)
+	public Long getActivityDefinitionID() {
+		return activityDefinitionID;
+	}
+	/**
+	 * Sets the {@link #activityDefinitionID} property.
+	 * @param activityDefinitionID the {@link #activityDefinitionID} to set
+	 */
+	public void setActivityDefinitionID(Long activityDefinitionID) {
+		this.activityDefinitionID = activityDefinitionID;
 	}
 	/**
 	 * Gets the {@link #timestamp} property.

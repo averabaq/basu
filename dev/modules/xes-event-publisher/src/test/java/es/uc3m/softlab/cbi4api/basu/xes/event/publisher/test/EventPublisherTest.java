@@ -9,6 +9,7 @@ import es.uc3m.softlab.cbi4api.basu.xes.event.publisher.ETLProcessor;
 import es.uc3m.softlab.cbi4api.basu.xes.event.publisher.XESEventConverter;
 import es.uc3m.softlab.cbi4api.basu.xes.event.publisher.XESEventReader;
 import es.uc3m.softlab.cbi4api.basu.xes.event.publisher.XESEventWriter;
+import es.uc3m.softlab.cbi4api.basu.xes.event.publisher.xsd.basu.event.Correlation;
 import es.uc3m.softlab.cbi4api.basu.xes.event.publisher.xsd.basu.event.Event;
 import es.uc3m.softlab.cbi4api.basu.xes.event.publisher.xsd.xes.LogType;
 
@@ -30,6 +31,7 @@ import org.apache.camel.PollingConsumer;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.impl.DefaultExchange;
 import org.apache.commons.io.IOUtils;
+import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -43,6 +45,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"classpath:applicationContext-test.xml"})
 public class EventPublisherTest extends AbstractShowcaseTest {
+    /** Logger for tracing */
+    private transient Logger logger = Logger.getLogger(EventPublisherTest.class);
 	/** Configuration object */
 	@Autowired private CamelContext context;
 	/** ETL (Extract, Transform & Load) processor */
@@ -103,12 +107,13 @@ public class EventPublisherTest extends AbstractShowcaseTest {
 		List<Event> events = new ArrayList<Event>();
 		for (int i = 0; i < 25 ; i++) {
 			Event event = new Event();
+			event.setCorrelation(new Correlation());
+			event.getCorrelation().setProcessInstanceID(UUID.randomUUID().toString());
 			event.setActivityDefinitionID(UUID.randomUUID().toString());
 			event.setActivityInstanceID(UUID.randomUUID().toString());
 			event.setActivityName(UUID.randomUUID().toString());
 			event.setEventID(String.valueOf((long)(Math.random() * 10000)));
-			event.setProcessDefinitionID(UUID.randomUUID().toString());
-			event.setProcessInstanceID(UUID.randomUUID().toString());
+			event.setProcessDefinitionID(UUID.randomUUID().toString());			
 			event.setProcessName(UUID.randomUUID().toString());
 			event.setServerID(UUID.randomUUID().toString());
 			Calendar tstamp = Calendar.getInstance();

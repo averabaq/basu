@@ -45,9 +45,8 @@ public class Config {
     	return value;     	
     }   
 	/**
-     * Gets the string value of the key property given.
-     * @param key key property.
-     * @return value of the key property.
+     * Returns whether the stats are active or not.
+     * @return true if the stats generation is active, false otherwise.
      */
     public boolean isStatsActive() {
     	boolean active = false;
@@ -62,7 +61,24 @@ public class Config {
     		return false;
     	}    	
     	return active;     	
-    } 
+    }
+    /**
+     * Gets the batch size property used for statistics purposes.
+     * @return batch size.
+     */
+    public int getStatsBatchSize() {
+        int batchSize = 1;
+        try {
+            ResourceBundle propFile = ResourceBundle.getBundle(StaticResources.CONFIG_RESOURCE_BUNDLE);
+            String value = propFile.getString(StaticResources.BUNDLE_CONFIG_BATCH_STATS_SIZE_KEY);
+            batchSize = Integer.valueOf(value);
+        }
+        catch (MissingResourceException mre) {
+            logger.warn("Not found " + StaticResources.BUNDLE_CONFIG_BATCH_STATS_SIZE_KEY + " property. Is it defined?");
+            logger.error(mre.getMessage());
+        }
+        return batchSize;
+    }
     /**
      * Gets the local application configuration from business logic layer. It may differ from
      * the presentation layer. 

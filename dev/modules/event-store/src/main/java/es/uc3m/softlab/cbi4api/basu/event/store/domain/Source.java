@@ -128,7 +128,7 @@ public class Source implements Serializable {
 			builder.append(description);
 		return builder.toString();
 	}
-	/**
+    /**
 	 * Returns a hash code value for the object.
 	 * @return a hash code value for this object.
 	 * @see java.lang.Object#hashCode()
@@ -155,7 +155,7 @@ public class Source implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		Source other = (Source) obj;
-		if (id != other.id)
+		if ((!id.equals(other.id)))
 			return false;
 		return true;
 	}

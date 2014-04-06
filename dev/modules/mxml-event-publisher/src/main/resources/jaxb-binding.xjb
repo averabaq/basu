@@ -1,0 +1,28 @@
+<jaxb:bindings 
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+    xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc" 
+	jaxb:extensionBindingPrefimxml="xjc"   	
+    version="2.1">        
+    <jaxb:globalBindings generateIsSetMethod="true" fixedAttributeAsConstantProperty="true">
+        <xjc:serializable uid="1"/>               	        
+        <xjc:javaType name="java.util.Calendar" xmlType="xs:dateTime" adapter="es.uc3m.softlab.cbi4api.basu.mxml.event.publisher.xsd.TimeStampAdapter" />
+    </jaxb:globalBindings> 
+    <jaxb:bindings schemaLocation="xsd/basu-event.xsd">    	
+    	<jaxb:schemaBindings>    		
+    		<jaxb:package name="es.uc3m.softlab.cbi4api.basu.mxml.event.publisher.xsd.basu.event" />
+    	</jaxb:schemaBindings>        
+    </jaxb:bindings>     
+    <jaxb:bindings schemaLocation="xsd/mxml.xsd">
+    	<jaxb:schemaBindings>    	
+    		<jaxb:package name="es.uc3m.softlab.cbi4api.basu.mxml.event.publisher.xsd.mxml" />    		
+    	</jaxb:schemaBindings>    	        
+   	</jaxb:bindings>
+    <!-- 
+    <jaxb:bindings schemaLocation="xsd/bpaf.xsd">    	
+    	<jaxb:schemaBindings>    		
+    		<jaxb:package name="es.uc3m.softlab.cbi4api.basu.event.publisher.xsd.bpaf" />
+    	</jaxb:schemaBindings>        
+   </jaxb:bindings>
+    -->
+</jaxb:bindings>

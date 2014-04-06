@@ -120,9 +120,12 @@ public class BusinessObjectAssembler {
     	hevent.setEventID(event.getEventID());
     	hevent.setTimestamp(event.getTimestamp().getTime());
     	hevent.setProcessInstance(event.getProcessInstance().getId());
+    	hevent.setProcessDefinitionID(event.getProcessInstance().getModel().getId());
     	hevent.setCurrentState(event.getEventDetails().getCurrentState().name());  	
-    	if (event.getActivityInstance() != null)    
+    	if (event.getActivityInstance() != null) { 
     		hevent.setActivityInstance(event.getActivityInstance().getId());
+    		hevent.setActivityDefinitionID(event.getActivityInstance().getModel().getId());
+    	}
     	if (event.getEventDetails().getPreviousState() != null)
     		hevent.setPreviousState(event.getEventDetails().getPreviousState().name());    	
     	return hevent;
@@ -138,7 +141,6 @@ public class BusinessObjectAssembler {
     	processInstance.setName(hprocessInstance.getName());
     	processInstance.setDescription(hprocessInstance.getDescription());
     	processInstance.setInstanceSrcId(hprocessInstance.getInstanceSrcId());
-    	processInstance.setCorrelatorId(hprocessInstance.getCorrelatorId());
     	return processInstance;
     }
     /**
@@ -153,7 +155,6 @@ public class BusinessObjectAssembler {
     	hprocessInstance.setDescription(processInstance.getDescription());
     	hprocessInstance.setModel(processInstance.getModel().getId());
     	hprocessInstance.setInstanceSrcId(processInstance.getInstanceSrcId());
-    	hprocessInstance.setCorrelatorId((processInstance.getCorrelatorId() == null)? 0 : processInstance.getCorrelatorId());
     	return hprocessInstance;
     }    
     /**
@@ -234,8 +235,10 @@ public class BusinessObjectAssembler {
      * @return entity object.
      */
     public HEventCorrelation toEntity(EventCorrelation correlation) {
+    	if (correlation.getEvent() == null)
+    		return null;
     	HEventCorrelation hcorrelation = new HEventCorrelation();
-    	hcorrelation.setEventID((correlation.getEvent() == null)? 0 : correlation.getEvent().getEventID());
+    	hcorrelation.setEventID(correlation.getEvent().getEventID());
     	hcorrelation.setKey(correlation.getKey());
     	hcorrelation.setValue(correlation.getValue());
     	return hcorrelation;
@@ -243,7 +246,7 @@ public class BusinessObjectAssembler {
     
     /**
      * Convert event correlation entity object to business domain object 
-     * @param hcorrelation entity object to convert.
+     * @param hpayload entity object to convert.
      * @param event event business domain correlation owner.
      * @return domain object.
      */

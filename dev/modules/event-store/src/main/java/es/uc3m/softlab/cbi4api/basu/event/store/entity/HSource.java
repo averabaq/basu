@@ -31,7 +31,7 @@ import javax.persistence.Table;
  * @author averab
  */
 @Entity(name="event-store.Source")
-@Table(name="source", schema="event_store")
+@Table(name="lv_source", schema="event_store")
 @PersistenceUnit(name=StaticResources.PERSISTENCE_NAME_EVENT_STORE, unitName=StaticResources.PERSISTENCE_UNIT_NAME_EVENT_STORE)
 public class HSource implements Serializable {
 	/** Serial Version UID */
@@ -172,7 +172,7 @@ public class HSource implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		HSource other = (HSource) obj;
-		if (id != other.id)
+        if (!id.equals(other.id))
 			return false;
 		return true;
 	}

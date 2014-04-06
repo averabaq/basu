@@ -12,17 +12,26 @@ package es.uc3m.softlab.cbi4api.basu.event.subscriber;
  * @author averab
  */
 public class StaticResources {
-	/** Internationalization resource bundle */
-	public static final String CONFIG_RESOURCE_BUNDLE="event-subscriber";		
+    /** Global application resource bundle */
+    public static final String APP_CONFIG_RESOURCE_BUNDLE="basu";
+	/** Module resource bundle */
+	public static final String MODULE_CONFIG_RESOURCE_BUNDLE="event-subscriber";
 	/** basu-event BPAF xml schema classpath location */
     public static final String BASU_EVENT_BPAF_XML_SCHEMA_CLASSPATH_FILE="/xsd/basu-event.xsd";
-	/** basu-process BPAF xml schema classpath location */
-    public static final String BASU_PROCESS_BPAF_XML_SCHEMA_CLASSPATH_FILE="/xsd/basu-process.xsd";
     /** Charset encoding */
     public static final String CHARSET_ENCODING = "UTF-8";
     /** Default application locale */
     public static final String DEFAULT_LOCALE="en_IE";
-    
+
+    /** Locale url bundle key */
+    public static final String LOCALE_RESOURCE_BUNDLE_KEY="cbi4api.basu.event.subscriber.application.locale";
+    /** Broker url bundle key */
+    public static final String BROKER_URL_RESOURCE_BUNDLE_KEY="cbi4api.basu.event.subscriber.activemq.broker.url";
+    /** BASU node identifier bundle key */
+    public static final String BASU_NODE_ID_RESOURCE_BUNDLE_KEY="cbi4api.basu.node.id";
+    /** GBAS global process definition identifier */
+    public static final String GBAS_GLOBAL_PROCESS_DEFINITION_ID="override";
+
 	/** Component name for the event subscriber configuration */
 	public static final String COMPONENT_NAME_CONFIG = "eventSubscriberConfig";
 	/** Component name for the event writer */

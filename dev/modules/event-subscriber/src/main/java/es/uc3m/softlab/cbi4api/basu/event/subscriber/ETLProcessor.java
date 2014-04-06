@@ -49,17 +49,16 @@ public class ETLProcessor implements Processor {
     @Override
 	public void process(Exchange exchange) throws Exception {	
 		try {					
-			es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.basu.event.Event bpafEvent;			
-			// extract event 
-			bpafEvent = extractor.extractEvent(exchange);
+			es.uc3m.softlab.cbi4api.basu.event.subscriber.xsd.basu.event.Event basuEvent;
+			// extract basu event
+            basuEvent = extractor.extractEvent(exchange);
 			// this block has to be synchronized as the events must be processed
-			// in strictly order as they arrive in order to guarantee the 
-			// correlation mechanism to work properly
+			// in strictly order as they arrive
 			synchronized(this) {
 				// transform event 
-				es.uc3m.softlab.cbi4api.basu.event.store.domain.Event event = transformer.transform(bpafEvent);			
-				// load the event into the data source and forwards event to the output channel
-				loader.loadEvent(exchange, event);	
+				es.uc3m.softlab.cbi4api.basu.event.store.domain.Event bpafEvent = transformer.transform(basuEvent);
+				// load the event into the data source and forwards the basu event to the output channel
+				loader.loadEvent(exchange, bpafEvent, basuEvent);
 			}
 		} catch(ProcessInstanceException piex) {			
 			logger.error(piex.fillInStackTrace());			

@@ -6,7 +6,7 @@
 package es.uc3m.softlab.cbi4api.basu.event.store.dao;
 
 import es.uc3m.softlab.cbi4api.basu.event.store.StaticResources;
-import es.uc3m.softlab.cbi4api.basu.event.store.Stats;
+import es.uc3m.softlab.cbi4api.basu.event.store.kpi.Stats;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.ActivityInstance;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.Event;
 import es.uc3m.softlab.cbi4api.basu.event.store.domain.EventCorrelation;
@@ -17,6 +17,8 @@ import es.uc3m.softlab.cbi4api.basu.event.store.entity.HEvent;
 import es.uc3m.softlab.cbi4api.basu.event.store.entity.HEventCorrelation;
 import es.uc3m.softlab.cbi4api.basu.event.store.entity.HEventData;
 import es.uc3m.softlab.cbi4api.basu.event.store.entity.HEventPayload;
+import es.uc3m.softlab.cbi4api.basu.event.store.entity.HEventCorrelationIndex;
+import es.uc3m.softlab.cbi4api.basu.event.store.entity.HIndexBuilder;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -67,6 +69,7 @@ public class EventDAOImpl implements EventDAO {
 	 * objects.
 	 * @throws IllegalArgumentException if an illegal argument error occurred.
 	 */
+    @Override
     @SuppressWarnings("unchecked")
     public List<Event> findAll() throws IllegalArgumentException {
 		logger.debug("Finding all events...");
@@ -105,6 +108,7 @@ public class EventDAOImpl implements EventDAO {
 	 * objects of a determined process instance identifier.
 	 * @throws IllegalArgumentException if an illegal argument error occurred.
 	 */
+    @Override
     @SuppressWarnings("unchecked")
     public List<Event> findAllByProcessInstId(long processInstId) throws IllegalArgumentException {
 		logger.debug("Finding all events of process instance with id " + processInstId + "...");
@@ -163,20 +167,23 @@ public class EventDAOImpl implements EventDAO {
 	 * object associated.
 	 * @throws IllegalArgumentException if an illegal argument error occurred.
 	 */
+    @Override
 	public Event findById(long eventId) throws IllegalArgumentException {
 		logger.debug("Retrieving event with identifier " + eventId + "...");
 		long ini = System.nanoTime();
 		HEvent hevent = entityManager.find(HEvent.class, eventId);	
 		long end = System.nanoTime();	
-		stats.writeStat(Stats.Operation.READ_BY_ID, hevent, ini, end);
+		stats.writeStat(Stats.Operation.READ_BY_ID, HEvent.class, hevent, ini, end);
 		if (hevent != null) {					
 			Event event = BusinessObjectAssembler.getInstance().toBusinessObject(hevent);
 			// load the process instance
 			ProcessInstance processInstance = processInstanceDAO.findById(hevent.getProcessInstance());
 			event.setProcessInstance(processInstance);
-			// load the activity instance 	
-			ActivityInstance activityInstance = activityInstanceDAO.findById(hevent.getActivityInstance());
-			event.setActivityInstance(activityInstance);
+			// load the activity instance if present 	
+			if (hevent.getActivityInstance() != null) {
+				ActivityInstance activityInstance = activityInstanceDAO.findById(hevent.getActivityInstance());
+				event.setActivityInstance(activityInstance);
+			}
 			// load remaining sets of data
 			loadPayload(event); 
 			loadCorrelation(event); 
@@ -185,8 +192,8 @@ public class EventDAOImpl implements EventDAO {
 			return event;
 		} else {
 			logger.debug("Event with identifier " + eventId + " not found.");
-		}		
-		return null;
+			return null;
+		}				
 	}	
 	/**
 	 * Merges and synchronizes the {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Event}
@@ -197,13 +204,14 @@ public class EventDAOImpl implements EventDAO {
 	 * @throws IllegalArgumentException if an illegal argument error occurred.
 	 * @throws TransactionRequiredException if a transaction error occurred.
 	 */
+    @Override
 	public void merge(Event event) throws IllegalArgumentException, TransactionRequiredException {
 		logger.debug("Merging event " + event + "...");	
 		HEvent hevent = BusinessObjectAssembler.getInstance().toEntity(event);
 		long ini = System.nanoTime();
 		entityManager.merge(hevent);
 		long end = System.nanoTime();
-		stats.writeStat(Stats.Operation.UPDATE, hevent, ini, end);	
+		stats.writeStat(Stats.Operation.UPDATE, HEvent.class, hevent, ini, end);	
 		logger.debug("Event " + event + " merged successfully.");
 	}
 	/**
@@ -214,7 +222,8 @@ public class EventDAOImpl implements EventDAO {
 	 * entity object to delete.
 	 * @throws IllegalArgumentException if an illegal argument error occurred.
 	 * @throws TransactionRequiredException if a transaction error occurred.
-	 */	
+	 */
+    @Override
 	public void delete(Event event) throws IllegalArgumentException, TransactionRequiredException {
 		logger.debug("Deleting event " + event + "...");
 		HEvent hevent = entityManager.find(HEvent.class, event.getEventID());
@@ -229,7 +238,7 @@ public class EventDAOImpl implements EventDAO {
 		long ini = System.nanoTime();
 		entityManager.remove(hevent);
 		long end = System.nanoTime();
-		stats.writeStat(Stats.Operation.DELETE, hevent, ini, end);
+		stats.writeStat(Stats.Operation.DELETE, HEvent.class, hevent, ini, end);
 		logger.debug("Event " + event + " removed successfully.");
 	}	
 	/**
@@ -242,9 +251,9 @@ public class EventDAOImpl implements EventDAO {
 	 * objects are to be deleted.
 	 * @throws IllegalArgumentException if an illegal argument error occurred.
 	 * @throws TransactionRequiredException if a transaction error occurred.
-	 */	
+	 */
 	@SuppressWarnings("unchecked")
-	public void deleteEventCorrelators(Event event) throws IllegalArgumentException, TransactionRequiredException {
+	private void deleteEventCorrelators(Event event) throws IllegalArgumentException, TransactionRequiredException {
 		logger.debug("Deleting event correlators of event " + event + "...");
 		HEvent hevent = entityManager.find(HEvent.class, event.getEventID());
 		if (hevent == null) {
@@ -279,7 +288,7 @@ public class EventDAOImpl implements EventDAO {
 			long ini = System.nanoTime();
 			entityManager.remove(hcorrelation);
 			long end = System.nanoTime();
-			stats.writeStat(Stats.Operation.DELETE, hcorrelation, ini, end);
+			stats.writeStat(Stats.Operation.DELETE, HEventCorrelation.class, hcorrelation, ini, end);
 			logger.debug("Event correlation " + hcorrelation + " removed successfully.");			
 		}
 		logger.debug("Event correlations of event " + event + " removed successfully.");
@@ -294,9 +303,9 @@ public class EventDAOImpl implements EventDAO {
 	 * objects are to be deleted.
 	 * @throws IllegalArgumentException if an illegal argument error occurred.
 	 * @throws TransactionRequiredException if a transaction error occurred.
-	 */	
+	 */
 	@SuppressWarnings("unchecked")
-	public void deleteEventPayload(Event event) throws IllegalArgumentException, TransactionRequiredException {
+	private void deleteEventPayload(Event event) throws IllegalArgumentException, TransactionRequiredException {
 		logger.debug("Deleting event payload of event " + event + "...");
 		HEvent hevent = entityManager.find(HEvent.class, event.getEventID());
 		if (hevent == null) {
@@ -331,7 +340,7 @@ public class EventDAOImpl implements EventDAO {
 			long ini = System.nanoTime();
 			entityManager.remove(_hpayload);
 			long end = System.nanoTime();
-			stats.writeStat(Stats.Operation.DELETE, _hpayload, ini, end);
+			stats.writeStat(Stats.Operation.DELETE, HEventPayload.class, _hpayload, ini, end);
 			logger.debug("Event payload " + _hpayload + " removed successfully.");			
 		}
 		logger.debug("Event payload of event " + event + " removed successfully.");
@@ -346,9 +355,9 @@ public class EventDAOImpl implements EventDAO {
 	 * objects are to be deleted.
 	 * @throws IllegalArgumentException if an illegal argument error occurred.
 	 * @throws TransactionRequiredException if a transaction error occurred.
-	 */	
+	 */
 	@SuppressWarnings("unchecked")
-	public void deleteEventData(Event event) throws IllegalArgumentException, TransactionRequiredException {
+	private void deleteEventData(Event event) throws IllegalArgumentException, TransactionRequiredException {
 		logger.debug("Deleting event data elements of event " + event + "...");
 		HEvent hevent = entityManager.find(HEvent.class, event.getEventID());
 		if (hevent == null) {
@@ -383,7 +392,7 @@ public class EventDAOImpl implements EventDAO {
 			long ini = System.nanoTime();
 			entityManager.remove(_hdata);
 			long end = System.nanoTime();
-			stats.writeStat(Stats.Operation.DELETE, _hdata, ini, end);
+			stats.writeStat(Stats.Operation.DELETE, HEventData.class, _hdata, ini, end);
 			logger.debug("Event data elements " + _hdata + " removed successfully.");			
 		}
 		logger.debug("Event data elements of event " + event + " removed successfully.");
@@ -396,7 +405,8 @@ public class EventDAOImpl implements EventDAO {
 	 * entity object to save.
 	 * @throws IllegalArgumentException if an illegal argument error occurred.
 	 * @throws TransactionRequiredException if a transaction error occurred.
-	 */	
+	 */
+    @Override
 	public void save(Event event) throws IllegalArgumentException, TransactionRequiredException {
 		logger.debug("Saving event " + event + "...");	
 		/* save process instance */
@@ -409,7 +419,7 @@ public class EventDAOImpl implements EventDAO {
 		long ini = System.nanoTime();
 		entityManager.persist(hevent);
 		long end = System.nanoTime();
-		stats.writeStat(Stats.Operation.WRITE, hevent, ini, end);
+		stats.writeStat(Stats.Operation.WRITE, HEvent.class, hevent, ini, end);
 		// updates the current event back with the new assigned identifier
 		entityManager.refresh(hevent);
 		event.setEventID(hevent.getEventID());
@@ -429,7 +439,8 @@ public class EventDAOImpl implements EventDAO {
 	 * 
 	 * @param event {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Event} to load the event payload on.
 	 * @throws IllegalArgumentException if an illegal argument error occurred.
-	 */	
+	 */
+    @Override
 	@SuppressWarnings("unchecked")
 	public void loadPayload(Event event) throws IllegalArgumentException {
 		if (event == null) {
@@ -472,7 +483,8 @@ public class EventDAOImpl implements EventDAO {
 	 * 
 	 * @param event {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Event} to load the event correlation data on.
 	 * @throws IllegalArgumentException if an illegal argument error occurred.
-	 */	
+	 */
+    @Override
 	@SuppressWarnings("unchecked")
 	public void loadCorrelation(Event event) throws IllegalArgumentException {
 		if (event == null) {
@@ -508,14 +520,15 @@ public class EventDAOImpl implements EventDAO {
 		logger.debug("Correlation data from event " + event + " loaded successfully.");				
 	}	
 	/**
-	 * Load the {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Event#getData()} associated
+	 * Load the {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Event#getCorrelations()} associated
 	 * from the data base. This is needed due to the fetch property is set to lazy, and the 
 	 * object is loaded out of synchronism when the {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Event} 
 	 * is loaded out of the same transaction.
 	 * 
 	 * @param event {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.Event} to load the event data elements on.
 	 * @throws IllegalArgumentException if an illegal argument error occurred.
-	 */	
+	 */
+    @Override
 	@SuppressWarnings("unchecked")
 	public void loadData(Event event) throws IllegalArgumentException {
 		if (event == null) {
@@ -564,10 +577,46 @@ public class EventDAOImpl implements EventDAO {
 			long ini = System.nanoTime();
 			entityManager.persist(hcorrelation);
 			long end = System.nanoTime();
-			stats.writeStat(Stats.Operation.WRITE, hcorrelation, ini, end);
-			logger.debug("Event correlation " + correlation + " saved successfully.");			
+			stats.writeStat(Stats.Operation.WRITE, HEventCorrelation.class, hcorrelation, ini, end);
+			logger.debug("Event correlations " + correlation + " saved successfully.");
 		}
-		logger.debug("Event correlations of event " + event + " saved successfully.");		
+        if (!event.getCorrelations().isEmpty()) {
+            // insert event	correlation index for process
+            HEventCorrelationIndex index = HIndexBuilder.getInstance().buildProcessCorrelationIndex(event);
+             // save the index for the process if it doesn't exist
+            if (entityManager.find(HEventCorrelationIndex.class, index.getCorrelationSet()) == null) {
+                long ini = System.nanoTime();
+                entityManager.persist(index);
+                long end = System.nanoTime();
+                stats.writeStat(Stats.Operation.WRITE, HEventCorrelationIndex.class, index, ini, end);
+                logger.debug("Event process correlations of event " + event + " indexed successfully.");
+            } else {
+                long ini = System.nanoTime();
+                entityManager.merge(index);
+                long end = System.nanoTime();
+                stats.writeStat(Stats.Operation.UPDATE, HEventCorrelationIndex.class, index, ini, end);
+                logger.debug("Event process correlations of event " + event + " indexed (updated) successfully.");
+            }
+            // saves the index for the activity
+            if (event.getActivityInstance() != null) {
+                // insert event	correlation index for activity
+                index = HIndexBuilder.getInstance().buildActivityCorrelationIndex(event);
+                // save the index if it doesn't exist
+                if (entityManager.find(HEventCorrelationIndex.class, index.getCorrelationSet()) == null) {
+                    long ini = System.nanoTime();
+                    entityManager.persist(index);
+                    long end = System.nanoTime();
+                    stats.writeStat(Stats.Operation.WRITE, HEventCorrelationIndex.class, index, ini, end);
+                    logger.debug("Event activity correlations of event " + event + " indexed successfully.");
+                } else {
+                    long ini = System.nanoTime();
+                    entityManager.merge(index);
+                    long end = System.nanoTime();
+                    stats.writeStat(Stats.Operation.UPDATE, HEventCorrelationIndex.class, index, ini, end);
+                    logger.debug("Event activity correlations of event " + event + " indexed (updated) successfully.");
+                }
+            }
+        }
 	}
 	/**
 	 * Saves the {@link es.uc3m.softlab.cbi4api.basu.event.store.domain.EventCorrelation} objects
@@ -583,7 +632,7 @@ public class EventDAOImpl implements EventDAO {
 			long ini = System.nanoTime();
 			entityManager.persist(hpayload);
 			long end = System.nanoTime();
-			stats.writeStat(Stats.Operation.WRITE, hpayload, ini, end);
+			stats.writeStat(Stats.Operation.WRITE, HEventPayload.class, hpayload, ini, end);
 			logger.debug("Event correlation " + payload + " saved successfully.");			
 		}
 		logger.debug("Event correlations of event " + event + " saved successfully.");		
@@ -602,7 +651,7 @@ public class EventDAOImpl implements EventDAO {
 			long ini = System.nanoTime();
 			entityManager.persist(hdata);
 			long end = System.nanoTime();
-			stats.writeStat(Stats.Operation.WRITE, hdata, ini, end);
+			stats.writeStat(Stats.Operation.WRITE, HEventData.class, hdata, ini, end);
 			logger.debug("Event data element " + dataElement + " saved successfully.");			
 		}
 		logger.debug("Event data elements of event " + event + " saved successfully.");		

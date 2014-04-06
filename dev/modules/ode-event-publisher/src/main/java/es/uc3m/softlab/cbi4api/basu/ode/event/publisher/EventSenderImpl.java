@@ -102,7 +102,7 @@ public class EventSenderImpl implements EventSender {
 	 * 
 	 * @throws JMSException
 	 */
-	public void publishProcessModels() throws JMSException {
+	public void publishModels() throws JMSException {
 			/*
 			DbConfStoreConnectionFactory confStoreFactory = new DbConfStoreConnectionFactory(bpelDAO.getDataSource(), false, OdeConfigProperties.DEFAULT_TX_FACTORY_CLASS_NAME);
 			Collection<DeploymentUnitDAO> dunits = confStoreFactory.getConnection().getDeploymentUnits();

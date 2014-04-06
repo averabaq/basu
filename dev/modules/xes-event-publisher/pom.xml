@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>es.uc3m.softlab.cbi4api.basu</groupId>
 		<artifactId>basu-prj</artifactId>
-		<version>1.0.0-SNAPSHOT</version>
+		<version>1.0.2-SNAPSHOT</version>
 		<relativePath>../../pom.xml</relativePath>
 	</parent>	
 	<organization>
@@ -18,7 +18,7 @@
 	<artifactId>xes-event-publisher</artifactId>
 	<inceptionYear>2013</inceptionYear>
 	<packaging>jar</packaging>
-	<version>1.0.0-SNAPSHOT</version>
+	<version>1.0.2-SNAPSHOT</version>
 	<name>CBI4API (BASU) - XES Event Publisher</name>
 	<description>
 		Cloud-based Infrastructure for Advanced Process Intelligence (BASU) - XES Event Publisher
@@ -53,13 +53,6 @@
 			</notifier>
 		</notifiers>
 	</ciManagement>
-	<repositories>
-		<repository>
-			<id>nexus</id>
-			<url>http://nexus.verasoft.es/nexus/content/repositories/public</url>
-			<layout>default</layout>
-		</repository>
-	</repositories>
 	<dependencies>	
 		<dependency>
 			<groupId>commons-io</groupId>
@@ -172,7 +165,7 @@
 			<version>3.12</version>
 			<type>jar</type>
 			<scope>runtime</scope>
-		</dependency>			
+		</dependency>
 	</dependencies>
 	<build>
 		<defaultGoal>package</defaultGoal>
@@ -215,8 +208,8 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.0</version>
 				<configuration>
-					<source>1.6</source>
-					<target>1.6</target>
+					<source>1.7</source>
+					<target>1.7</target>
 					<encoding>UTF-8</encoding> 					
 				</configuration>
 			</plugin>
@@ -254,7 +247,7 @@
 						</manifestEntries>
 					</archive>
 				</configuration>	
-			</plugin>					
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-docck-plugin</artifactId>
@@ -381,7 +374,6 @@
 				<artifactId>maven-pmd-plugin</artifactId>
 				<version>2.7.1</version>
 				<configuration>
-					<linkXref>true</linkXref>
 					<sourceEncoding>utf-8</sourceEncoding>
 					<minimumTokens>100</minimumTokens>
 					<targetJdk>1.7</targetJdk>

@@ -101,6 +101,7 @@ public class EventGenerator extends Thread {
 		correlation.setEvent(event);
 		event.getCorrelations().add(correlation);
 		*/
+		
 		for (int j = 0; j < (1+((int)(Math.random() * 8))); j++) {				
 			EventCorrelation correlation = new EventCorrelation();
 			correlation.setKey(corKey[j]);

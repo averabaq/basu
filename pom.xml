@@ -38,7 +38,9 @@
 		<module>modules/event-dw</module>
 		<module>modules/bpeql</module>
 		<module>applications/basu-war</module>
+		<!--
         <module>applications/basu-dist</module>
+        -->
 	</modules>	
 	<scm>		
 		<url>http://git.verasoft.es/cbi4api/basu.git</url>

@@ -669,7 +669,7 @@
 	<properties>
 		<vendor>Universidad Carlos III de Madrid</vendor>
 		<vendor-url>http://www.uc3m.es</vendor-url>
-        <org.apache.hadoop.version>2.0.0-cdh4.7.1</org.apache.hadoop.version>
+        <org.apache.hadoop.version>3.2.3</org.apache.hadoop.version>
         <org.apache.hbase.version>0.94.15-cdh4.7.1</org.apache.hbase.version>
         <org.apache.hive.version>0.10.0-cdh4.7.1</org.apache.hive.version>
 		<org.datanucleus.version>3.2.6</org.datanucleus.version>
